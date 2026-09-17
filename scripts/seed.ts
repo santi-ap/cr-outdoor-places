@@ -1,0 +1,327 @@
+// Seeds the `places` table with the starting set from Section 5 of the
+// build plan. Re-running this script is safe: it deletes existing
+// source='seed' rows first, so it never creates duplicates.
+//
+// Coordinates/hours/fees below reflect a one-time web check done when this
+// script was written — `confidence` is 'verified' only where a specific,
+// credible source was found for hours + fee + coordinates together;
+// otherwise 'unverified'. A follow-up pass should reconfirm hours and
+// entrance fees before this goes in front of real users, since park
+// hours/fees change and some data here is necessarily approximate
+// (noted per-place below).
+//
+// Two corrections from the original plan's Section 5 table, found during
+// this web check:
+//  - Ojo de Agua (San Antonio de Belén) is in Heredia province, not
+//    Alajuela — Belén canton belongs to Heredia.
+//  - "Bosque del Niño (Recreo Verde)" conflated two unrelated places:
+//    Bosque del Niño (a.k.a. the Grecia Forest Reserve) is in San Isidro
+//    de Grecia, Alajuela; Recreo Verde is a separate hot-springs resort
+//    elsewhere in Alajuela. Seeded the actual Bosque del Niño / Grecia
+//    Forest Reserve and dropped the "(Recreo Verde)" name.
+//
+// Usage: npm run seed  (runs via tsx --env-file=.env.local)
+import { createClient } from '@supabase/supabase-js';
+import { placeInsertSchema, type PlaceInsert } from '../src/lib/validation/schemas';
+import type { Database } from '../src/lib/supabase/database.types';
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!url || !serviceKey) {
+  console.error('Missing NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient<Database>(url, serviceKey);
+
+const PLACES: PlaceInsert[] = [
+  {
+    // Source: pre-verified in the build plan (Section 5). Hours are the
+    // commonly cited range for this park; not independently confirmed.
+    name: 'Parque Metropolitano La Sabana',
+    description:
+      '72-hectare urban park in the heart of San José — flat, paved paths, lake, and open lawns.',
+    category: 'municipal_park',
+    province: 'San José',
+    canton: 'San José',
+    lat: 9.9356,
+    lng: -84.1042,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 3400,
+    duration_min: 45,
+    cost_type: 'free',
+    cost_amount: null,
+    pet_friendly: 'unknown',
+    hours_text: 'Daily, approx. 5:00 a.m.–10:00 p.m.',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: La Nación, IguanaGo, Montes de Oca municipality. Coordinates
+    // approximate (Sabanilla district center) — exact park coords not found.
+    name: 'Parque del Este',
+    description:
+      'Municipal park in Montes de Oca, popular for walking and running; free entry 5–8am for exercisers.',
+    category: 'municipal_park',
+    province: 'San José',
+    canton: 'Montes de Oca',
+    lat: 9.9431,
+    lng: -84.0332,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 1500,
+    duration_min: 25,
+    cost_type: 'paid',
+    cost_amount: '₡1,000 (free 5–8am for exercisers; free for under-12s and 65+)',
+    pet_friendly: 'yes',
+    hours_text: 'Tue–Sun 8:00 a.m.–4:00 p.m. (closed Mon); free early entry 5–8am',
+    source: 'seed',
+    confidence: 'unverified',
+  },
+  {
+    // Source: Belén municipality, La Nación history piece. Exact fee/hours
+    // not found in this pass — flagged unverified.
+    name: 'Ojo de Agua',
+    description:
+      "Costa Rica's oldest water park, fed by a natural spring; pools plus walking areas.",
+    category: 'private_reserve',
+    province: 'Heredia',
+    canton: 'Belén',
+    lat: 9.9781,
+    lng: -84.1879,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 800,
+    duration_min: 15,
+    cost_type: 'paid',
+    cost_amount: null,
+    pet_friendly: 'unknown',
+    hours_text: null,
+    source: 'seed',
+    confidence: 'unverified',
+  },
+  {
+    // Source: jbl.ucr.ac.cr official tarifas-2026 page.
+    name: 'Jardín Botánico Lankester',
+    description:
+      'University of Costa Rica-run botanical garden famous for its orchid collection; flat, easy trails.',
+    category: 'private_reserve',
+    province: 'Cartago',
+    canton: 'Cartago',
+    lat: 9.8396,
+    lng: -83.8885,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 1200,
+    duration_min: 40,
+    cost_type: 'paid',
+    cost_amount: '$10 (non-resident); ₡3,000 (resident); ₡2,000 (preferential)',
+    pet_friendly: 'unknown',
+    hours_text: 'Daily, including holidays, 8:30 a.m.–4:30 p.m.',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: SINAC official page, multiple 2026 travel guides. Requires
+    // advance online reservation via the SINAC portal.
+    name: 'Volcán Poás National Park',
+    description:
+      'Active volcano with a paved path to the main crater viewpoint. Advance online reservation required via SINAC.',
+    category: 'national_park',
+    province: 'Alajuela',
+    canton: 'Poás',
+    lat: 10.2,
+    lng: -84.2333,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 1000,
+    duration_min: 30,
+    cost_type: 'paid',
+    cost_amount: '$15 (foreigner, adult); reservation required',
+    pet_friendly: 'no',
+    hours_text: 'Daily 8:00 a.m.–4:00 p.m., last admission 2:00 p.m. (reservation required)',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: SINAC official page, multiple 2026 travel guides.
+    name: 'Volcán Irazú National Park',
+    description:
+      "Costa Rica's highest volcano; paved path to the main crater overlook, sparse high-elevation terrain.",
+    category: 'national_park',
+    province: 'Cartago',
+    canton: 'Oreamuno',
+    lat: 9.9792,
+    lng: -83.8522,
+    difficulty: 'easy',
+    terrain: 'paved',
+    distance_m: 500,
+    duration_min: 20,
+    cost_type: 'paid',
+    cost_amount: '$15 (foreigner, adult); ~$5 (child); reservation via SINAC',
+    pet_friendly: 'no',
+    hours_text: 'Daily 8:00 a.m.–3:30 p.m.',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: waterfallgardens.com, multiple 2026 travel guides.
+    name: 'Catarata La Paz (Peace Waterfall Gardens)',
+    description:
+      'Private eco-park with paved/stepped walkways to five waterfalls plus wildlife exhibits.',
+    category: 'private_reserve',
+    province: 'Alajuela',
+    canton: 'Poás',
+    lat: 10.2017,
+    lng: -84.1615,
+    difficulty: 'moderate',
+    terrain: 'mixed',
+    distance_m: 3500,
+    duration_min: 120,
+    cost_type: 'paid',
+    cost_amount: '$52–56 (adult, foreigner); $36–40 (child 3–12)',
+    pet_friendly: 'no',
+    hours_text: 'Daily 8:00 a.m.–5:00 p.m., last entry 3:30 p.m.',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: SINAC, manuelantonioparktickets.com. Advance online
+    // reservation mandatory (600 visitors/day cap); closed Tuesdays.
+    name: 'Manuel Antonio National Park',
+    description:
+      'Beach-and-rainforest-trail combo park with abundant wildlife. Advance SINAC reservation required.',
+    category: 'national_park',
+    province: 'Puntarenas',
+    canton: 'Quepos',
+    lat: 9.3756,
+    lng: -84.1358,
+    difficulty: 'moderate',
+    terrain: 'mixed',
+    distance_m: 2000,
+    duration_min: 90,
+    cost_type: 'paid',
+    cost_amount: '$18 (foreigner, adult); $5 (child 2–12); reservation required',
+    pet_friendly: 'no',
+    hours_text: 'Wed–Mon 7:00 a.m.–4:00 p.m. (closed Tue)',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Source: coordinates approximate (Zurquí sector, nearest confirmed
+    // reference point is the Quebrada González sector a few km northeast).
+    // Spans three provinces — recorded as free text since it doesn't fit a
+    // single canton.
+    name: 'Parque Nacional Braulio Carrillo',
+    description:
+      'Cloud forest national park with three entrance sectors (Zurquí, Quebrada González, Barva); moderate–hard trails.',
+    category: 'national_park',
+    province: 'Heredia/San José/Limón',
+    canton: 'Vázquez de Coronado (Zurquí sector)',
+    lat: 10.05,
+    lng: -84.02,
+    difficulty: 'moderate',
+    terrain: 'dirt',
+    distance_m: 4000,
+    duration_min: 120,
+    cost_type: 'paid',
+    cost_amount: '₡1,000 (national); $12 (foreigner)',
+    pet_friendly: 'no',
+    hours_text: 'Daily 8:00 a.m.–4:00 p.m.',
+    source: 'seed',
+    confidence: 'unverified',
+  },
+  {
+    // Source: Wikipedia, cloudforestmonteverde.com. Fee varies by source
+    // ($25–29 non-resident); daily visitor cap in effect.
+    name: 'Reserva Biológica Bosque Nuboso Monteverde',
+    description:
+      'Private cloud forest reserve with suspension bridges and moderate trails through primary forest.',
+    category: 'private_reserve',
+    province: 'Puntarenas',
+    canton: 'Puntarenas',
+    lat: 10.3025,
+    lng: -84.7956,
+    difficulty: 'moderate',
+    terrain: 'dirt',
+    distance_m: 1900,
+    duration_min: 90,
+    cost_type: 'paid',
+    cost_amount: '$25–29 (non-resident adult); $10 (resident)',
+    pet_friendly: 'no',
+    hours_text: 'Daily 7:00 a.m.–4:00 p.m.',
+    source: 'seed',
+    confidence: 'verified',
+  },
+  {
+    // Corrected from the plan's "Bosque del Niño (Recreo Verde)" — see
+    // file header. Coordinates approximate (nearest confirmed reference
+    // points are Grecia town center and the Calle Rodríguez area).
+    name: 'Bosque del Niño',
+    description:
+      'Community forest reserve (Grecia Forest Reserve) on the slopes of Poás; easy walking trails.',
+    category: 'private_reserve',
+    province: 'Alajuela',
+    canton: 'Grecia',
+    lat: 10.09,
+    lng: -84.28,
+    difficulty: 'easy',
+    terrain: 'dirt',
+    distance_m: 2000,
+    duration_min: 60,
+    cost_type: 'paid',
+    cost_amount: '₡600 (national/resident adult); ₡500 (child 3–11)',
+    pet_friendly: 'unknown',
+    hours_text: 'Daily 8:00 a.m.–4:00 p.m.',
+    source: 'seed',
+    confidence: 'unverified',
+  },
+  {
+    // Source: Wikipedia; coordinate precision uncertain (search results
+    // partly conflated with a same-named park in Panama). Kelly Creek
+    // entrance is donation-based; Puerto Vargas entrance has a fixed fee.
+    name: 'Cahuita National Park',
+    description: 'Coastal jungle park with beach and reef; Kelly Creek entrance is donation-based.',
+    category: 'national_park',
+    province: 'Limón',
+    canton: 'Talamanca',
+    lat: 9.7292,
+    lng: -82.825,
+    difficulty: 'easy',
+    terrain: 'dirt',
+    distance_m: 2000,
+    duration_min: 60,
+    cost_type: 'free',
+    cost_amount:
+      '$5–10 suggested donation (Kelly Creek); ₡3,000 fixed (Puerto Vargas, incl. parking)',
+    pet_friendly: 'no',
+    hours_text: 'Daily 7:00 a.m.–4:00 p.m., last entry 3:30 p.m.',
+    source: 'seed',
+    confidence: 'unverified',
+  },
+];
+
+async function main() {
+  for (const place of PLACES) {
+    placeInsertSchema.parse(place);
+  }
+
+  const { error: deleteError } = await supabase.from('places').delete().eq('source', 'seed');
+  if (deleteError) throw new Error(`failed to clear existing seed rows: ${deleteError.message}`);
+
+  const { data, error: insertError } = await supabase
+    .from('places')
+    .insert(PLACES)
+    .select('id, name');
+  if (insertError) throw new Error(`failed to insert seed places: ${insertError.message}`);
+
+  console.log(`Seeded ${data.length} places:`);
+  for (const row of data) console.log(`  - ${row.name}`);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
