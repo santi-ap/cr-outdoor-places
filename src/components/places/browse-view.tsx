@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { Map as MapIcon, List as ListIcon, SlidersHorizontal } from 'lucide-react';
 import { usePlaces } from '@/lib/places/use-places';
 import { PlaceFilters } from './place-filters';
@@ -23,7 +24,10 @@ export function BrowseView() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-end gap-2 border-b p-3 md:hidden">
+      <div className="flex items-center justify-between gap-2 border-b p-3 md:hidden">
+        <Button render={<Link href="/suggest-place" />} variant="ghost" size="sm">
+          Suggest a place
+        </Button>
         <ToggleGroup
           value={[view]}
           onValueChange={(values) => {
@@ -54,8 +58,16 @@ export function BrowseView() {
         </Sheet>
       </div>
 
-      <div className="hidden border-b p-3 md:block">
+      <div className="hidden items-start justify-between gap-4 border-b p-3 md:flex">
         <PlaceFilters filter={filter} onChange={setFilter} />
+        <Button
+          render={<Link href="/suggest-place" />}
+          variant="ghost"
+          size="sm"
+          className="shrink-0"
+        >
+          Suggest a place
+        </Button>
       </div>
 
       <div className="flex min-h-0 flex-1">
