@@ -10,14 +10,21 @@ import { PlaceList } from './place-list';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
+
+function MapLoadingFallback() {
+  const { t } = useLanguage();
+  return <div className="flex h-full items-center justify-center">{t.browse.loadingPlaces}</div>;
+}
 
 const PlaceMap = dynamic(() => import('./place-map').then((m) => m.PlaceMap), {
   ssr: false,
-  loading: () => <div className="flex h-full items-center justify-center">Loading map…</div>,
+  loading: () => <MapLoadingFallback />,
 });
 
 export function BrowseView() {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<PlacesFilter>({});
   const [view, setView] = useState<'map' | 'list'>('map');
   const { data: places = [], isLoading } = usePlaces(filter);
@@ -26,7 +33,7 @@ export function BrowseView() {
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b p-3 md:hidden">
         <Button render={<Link href="/suggest-place" />} nativeButton={false} variant="ghost" size="sm">
-          Suggest a place
+          {t.browse.suggestPlace}
         </Button>
         <ToggleGroup
           value={[view]}
@@ -35,21 +42,21 @@ export function BrowseView() {
             if (next) setView(next as 'map' | 'list');
           }}
         >
-          <ToggleGroupItem value="map" aria-label="Map view">
+          <ToggleGroupItem value="map" aria-label={t.browse.mapView}>
             <MapIcon className="size-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="list" aria-label="List view">
+          <ToggleGroupItem value="list" aria-label={t.browse.listView}>
             <ListIcon className="size-4" />
           </ToggleGroupItem>
         </ToggleGroup>
         <Sheet>
           <SheetTrigger render={<Button variant="outline" size="sm" />}>
             <SlidersHorizontal className="size-4" />
-            Filters
+            {t.browse.filters}
           </SheetTrigger>
           <SheetContent side="bottom">
             <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
+              <SheetTitle>{t.browse.filters}</SheetTitle>
             </SheetHeader>
             <div className="p-4">
               <PlaceFilters filter={filter} onChange={setFilter} />
@@ -67,7 +74,7 @@ export function BrowseView() {
           size="sm"
           className="shrink-0"
         >
-          Suggest a place
+          {t.browse.suggestPlace}
         </Button>
       </div>
 
@@ -78,7 +85,7 @@ export function BrowseView() {
           }`}
         >
           {isLoading ? (
-            <p className="text-muted-foreground p-4">Loading places…</p>
+            <p className="text-muted-foreground p-4">{t.browse.loadingPlaces}</p>
           ) : (
             <PlaceList places={places} />
           )}
