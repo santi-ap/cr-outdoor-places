@@ -45,13 +45,53 @@ Built with Next.js, Tailwind CSS + shadcn/ui, Supabase (Postgres + Auth), and Le
 
 ## Local development
 
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a Supabase project (or use an existing one), then copy `.env.local.example` to `.env.local` and fill in the values from Project Settings → API:
+
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+3. Link the Supabase CLI to your project and run migrations:
+
+   ```bash
+   npx supabase link --project-ref <your-project-ref>
+   npx supabase db push
+   ```
+
+   This creates the `places`, `lists`, `list_items`, and `place_suggestions` tables with RLS policies (see `supabase/migrations/`). Magic-link email auth is enabled by default in Supabase Auth — no extra setup needed.
+
+4. Seed the `places` table with the starting set of Costa Rican outdoor places:
+
+   ```bash
+   npm run seed
+   ```
+
+5. Start the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+### Verifying against the real database
+
+`scripts/verify-*.mjs` and `verify-zod-schemas.ts` exercise the app's actual Supabase queries (including RLS) using throwaway test users, rather than mocks. Run them after schema or server-action changes:
+
 ```bash
-npm install
-npm run dev
+npm run verify:supabase          # connection + basic query sanity
+npm run verify:list-items        # save/mark-visited flow
+npm run verify:my-list           # My List toggle/remove flow
+npm run verify:place-suggestions # suggest-a-place / suggest-an-edit flow
+npm run verify:zod               # zod schema validation
 ```
 
-Setup instructions for environment variables, migrations, and seeding will be added as the corresponding issues land (Supabase setup, seed script).
+### Deployment
 
-## Getting Started (Next.js default)
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The project deploys to Vercel automatically on every push to `main` (connected via Vercel's GitHub integration — Project Settings → Git). Vercel needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` set for Production/Preview/Development under Project Settings → Environment Variables, matching your `.env.local`.
