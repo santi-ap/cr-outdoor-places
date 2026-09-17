@@ -42,6 +42,14 @@ design target, not a responsive-shrink pass done after the desktop layout is bui
 
 Real-database verification scripts live in `scripts/verify-*.mjs` (run via `npm run verify:*`, reading `.env.local`). Prefer these over trusting a code read — they exercise the actual Supabase RLS-scoped queries. When an issue's acceptance criteria implies a new flow, add a verify script following the existing pattern (create test user via service role, act as anon-scoped user, assert, clean up).
 
+## Design source
+
+The "Lugares CR" visual design system (colors, type, components, four applied screens) lives in
+Claude Design at https://claude.ai/design/p/efbbccde-1ad2-489e-947b-aeaebfed00d2 — read it via the
+`DesignSync` tool (needs `/design-login` once per session). Tracked for implementation in
+[issue #13](https://github.com/santi-ap/cr-outdoor-places/issues/13); see that issue for the full
+spec summary and the open Spanish-copy scope question before starting work on it.
+
 ## Conventions already established in this repo
 
 - Server actions in `src/app/actions/*.ts` (`'use server'`), one file per feature area.
