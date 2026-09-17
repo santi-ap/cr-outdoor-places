@@ -8,6 +8,23 @@ CR Outdoor Places — a mobile-first, PWA-installable site to find outdoor place
 
 Master prompt intent (from the build plan): work the GitHub issues in `docs/build-plan.md` Section 6 **one at a time, in order**, without waiting for check-ins, as long as each issue is unambiguous and stays inside Section 1 (Pillars) / Section 2 (Scope).
 
+## Mobile-first is a priority, not a checklist item
+
+This is a mobile-first product (Pillar 6). Treat the phone-width experience as the primary
+design target, not a responsive-shrink pass done after the desktop layout is built:
+
+- When building any new page or component, design and test the ~375px-wide layout first,
+  then adapt up to desktop — not the other way around.
+- Prefer patterns already established for this (bottom sheets/drawers for filters, a
+  toggle between map/list instead of showing both at once, single-column stacked forms)
+  over squeezing a desktop layout down with breakpoints alone.
+- Every UI change gets checked at 375px width (see `docs/build-plan.md` Section 6, Issue
+  11) before it's considered done — no horizontal scroll, no overlapping elements, tap
+  targets stay usable. Do this as part of implementing the issue, not as a separate
+  deferred pass.
+- If a design decision trades off mobile simplicity for desktop polish, default to the
+  mobile-friendly choice and flag the tradeoff rather than silently optimizing for desktop.
+
 ## Standing workflow — do this without being asked
 
 1. Check `gh issue list --state all` to see what's open/closed. Work the lowest-numbered open issue next (issues have dependencies, so don't skip ahead).

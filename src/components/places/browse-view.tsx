@@ -25,7 +25,7 @@ export function BrowseView() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b p-3 md:hidden">
-        <Button render={<Link href="/suggest-place" />} variant="ghost" size="sm">
+        <Button render={<Link href="/suggest-place" />} nativeButton={false} variant="ghost" size="sm">
           Suggest a place
         </Button>
         <ToggleGroup
@@ -62,6 +62,7 @@ export function BrowseView() {
         <PlaceFilters filter={filter} onChange={setFilter} />
         <Button
           render={<Link href="/suggest-place" />}
+          nativeButton={false}
           variant="ghost"
           size="sm"
           className="shrink-0"
