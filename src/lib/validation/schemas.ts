@@ -1,0 +1,111 @@
+import { z } from 'zod';
+
+export const placeCategorySchema = z.enum([
+  'national_park',
+  'municipal_park',
+  'private_reserve',
+  'beach',
+  'mountain',
+  'trail',
+  'other',
+]);
+
+export const difficultySchema = z.enum(['easy', 'moderate', 'hard']);
+export const terrainSchema = z.enum(['paved', 'dirt', 'rocky', 'mixed']);
+export const costTypeSchema = z.enum(['free', 'paid', 'unknown']);
+export const petFriendlySchema = z.enum(['yes', 'no', 'unknown']);
+export const placeSourceSchema = z.enum(['seed', 'community']);
+export const placeConfidenceSchema = z.enum(['unverified', 'verified']);
+export const listItemStatusSchema = z.enum(['saved', 'visited']);
+export const placeSuggestionStatusSchema = z.enum(['pending', 'approved', 'rejected']);
+
+export const placeSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  description: z.string().nullable(),
+  category: placeCategorySchema,
+  province: z.string().nullable(),
+  canton: z.string().nullable(),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  difficulty: difficultySchema.nullable(),
+  terrain: terrainSchema.nullable(),
+  distance_m: z.number().int().positive().nullable(),
+  duration_min: z.number().int().positive().nullable(),
+  cost_type: costTypeSchema,
+  cost_amount: z.string().nullable(),
+  pet_friendly: petFriendlySchema,
+  hours_text: z.string().nullable(),
+  source: placeSourceSchema,
+  confidence: placeConfidenceSchema,
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const placeInsertSchema = placeSchema
+  .omit({ id: true, created_at: true, updated_at: true })
+  .partial({
+    description: true,
+    province: true,
+    canton: true,
+    difficulty: true,
+    terrain: true,
+    distance_m: true,
+    duration_min: true,
+    cost_type: true,
+    cost_amount: true,
+    pet_friendly: true,
+    hours_text: true,
+    source: true,
+    confidence: true,
+  });
+
+export const listSchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  name: z.string().min(1),
+  created_at: z.string(),
+});
+
+export const listInsertSchema = listSchema.omit({ id: true, created_at: true }).partial({
+  name: true,
+});
+
+export const listItemSchema = z.object({
+  id: z.string().uuid(),
+  list_id: z.string().uuid(),
+  place_id: z.string().uuid(),
+  status: listItemStatusSchema,
+  visited_at: z.string().nullable(),
+  created_at: z.string(),
+});
+
+export const listItemInsertSchema = listItemSchema
+  .omit({ id: true, created_at: true })
+  .partial({ status: true, visited_at: true });
+
+// `changes` covers both a full new-place payload (place_id is null) and a
+// partial set of proposed edits to an existing place — see Section 4.
+export const placeSuggestionChangesSchema = placeInsertSchema.partial();
+
+export const placeSuggestionSchema = z.object({
+  id: z.string().uuid(),
+  place_id: z.string().uuid().nullable(),
+  suggested_by: z.string().uuid().nullable(),
+  changes: placeSuggestionChangesSchema,
+  status: placeSuggestionStatusSchema,
+  created_at: z.string(),
+});
+
+export const placeSuggestionInsertSchema = placeSuggestionSchema
+  .omit({ id: true, created_at: true })
+  .partial({ place_id: true, suggested_by: true, status: true });
+
+export type Place = z.infer<typeof placeSchema>;
+export type PlaceInsert = z.infer<typeof placeInsertSchema>;
+export type List = z.infer<typeof listSchema>;
+export type ListInsert = z.infer<typeof listInsertSchema>;
+export type ListItem = z.infer<typeof listItemSchema>;
+export type ListItemInsert = z.infer<typeof listItemInsertSchema>;
+export type PlaceSuggestion = z.infer<typeof placeSuggestionSchema>;
+export type PlaceSuggestionInsert = z.infer<typeof placeSuggestionInsertSchema>;
