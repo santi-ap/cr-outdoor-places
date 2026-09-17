@@ -22,41 +22,37 @@ export function BrowseView() {
   const { data: places = [], isLoading } = usePlaces(filter);
 
   return (
-    <div className="flex h-[100dvh] flex-col">
-      <header className="flex items-center justify-between gap-2 border-b p-3">
-        <h1 className="text-lg font-semibold">CR Outdoor Places</h1>
-        <div className="flex items-center gap-2">
-          <ToggleGroup
-            value={[view]}
-            onValueChange={(values) => {
-              const next = values[0];
-              if (next) setView(next as 'map' | 'list');
-            }}
-            className="md:hidden"
-          >
-            <ToggleGroupItem value="map" aria-label="Map view">
-              <MapIcon className="size-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="list" aria-label="List view">
-              <ListIcon className="size-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <Sheet>
-            <SheetTrigger render={<Button variant="outline" size="sm" className="md:hidden" />}>
-              <SlidersHorizontal className="size-4" />
-              Filters
-            </SheetTrigger>
-            <SheetContent side="bottom">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="p-4">
-                <PlaceFilters filter={filter} onChange={setFilter} />
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-end gap-2 border-b p-3 md:hidden">
+        <ToggleGroup
+          value={[view]}
+          onValueChange={(values) => {
+            const next = values[0];
+            if (next) setView(next as 'map' | 'list');
+          }}
+        >
+          <ToggleGroupItem value="map" aria-label="Map view">
+            <MapIcon className="size-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="list" aria-label="List view">
+            <ListIcon className="size-4" />
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <Sheet>
+          <SheetTrigger render={<Button variant="outline" size="sm" />}>
+            <SlidersHorizontal className="size-4" />
+            Filters
+          </SheetTrigger>
+          <SheetContent side="bottom">
+            <SheetHeader>
+              <SheetTitle>Filters</SheetTitle>
+            </SheetHeader>
+            <div className="p-4">
+              <PlaceFilters filter={filter} onChange={setFilter} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
       <div className="hidden border-b p-3 md:block">
         <PlaceFilters filter={filter} onChange={setFilter} />

@@ -38,7 +38,7 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
   }
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4">
       <Link href="/" className="text-muted-foreground text-sm underline">
         &larr; Back to map
       </Link>
