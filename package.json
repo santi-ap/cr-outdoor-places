@@ -10,6 +10,7 @@
     "verify:supabase": "node --env-file=.env.local scripts/verify-supabase-connection.mjs",
     "verify:list-items": "node --env-file=.env.local scripts/verify-list-items.mjs",
     "verify:my-list": "node --env-file=.env.local scripts/verify-my-list.mjs",
+    "verify:place-suggestions": "node --env-file=.env.local scripts/verify-place-suggestions.mjs",
     "verify:zod": "tsx scripts/verify-zod-schemas.ts",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "gen:types": "supabase gen types typescript --linked > src/lib/supabase/database.types.ts"
