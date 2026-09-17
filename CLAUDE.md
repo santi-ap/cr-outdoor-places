@@ -46,9 +46,10 @@ Real-database verification scripts live in `scripts/verify-*.mjs` (run via `npm 
 
 The "Lugares CR" visual design system (colors, type, components, four applied screens) lives in
 Claude Design at https://claude.ai/design/p/efbbccde-1ad2-489e-947b-aeaebfed00d2 — read it via the
-`DesignSync` tool (needs `/design-login` once per session). Tracked for implementation in
-[issue #13](https://github.com/santi-ap/cr-outdoor-places/issues/13); see that issue for the full
-spec summary and the open Spanish-copy scope question before starting work on it.
+`DesignSync` tool (needs `/design-login` once per session). Implementation is sequenced across
+issues #13 (tokens + es/en toggle foundation — decided: add the toggle, es default) → #14 (shared
+components) → #15 (mobile screens) → #16 (desktop screens). Work them in that order; #13 has the
+full spec summary copied into its body.
 
 ## Conventions already established in this repo
 
