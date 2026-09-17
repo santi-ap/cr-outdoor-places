@@ -25,3 +25,10 @@ export const costTypeLabels: Record<string, string> = {
   paid: 'Paid',
   unknown: 'Cost unknown',
 };
+
+export const terrainLabels: Record<string, string> = {
+  paved: 'Paved',
+  dirt: 'Dirt',
+  rocky: 'Rocky',
+  mixed: 'Mixed',
+};
