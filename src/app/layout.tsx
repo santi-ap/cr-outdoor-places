@@ -1,13 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono, Hanken_Grotesk, Newsreader } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { LanguageProvider } from '@/lib/i18n/language-context';
 import { SiteHeader } from '@/components/layout/site-header';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const hankenGrotesk = Hanken_Grotesk({
+  variable: '--font-hanken-grotesk',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const newsreader = Newsreader({
+  variable: '--font-newsreader',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
 });
 
 const geistMono = Geist_Mono({
@@ -34,12 +43,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      className={`${hankenGrotesk.variable} ${newsreader.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <body className="flex h-dvh flex-col overflow-hidden">
-        <QueryProvider>
-          <SiteHeader />
-          <div className="min-h-0 flex-1">{children}</div>
-        </QueryProvider>
+        <LanguageProvider>
+          <QueryProvider>
+            <SiteHeader />
+            <div className="min-h-0 flex-1">{children}</div>
+          </QueryProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

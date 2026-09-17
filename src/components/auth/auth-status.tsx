@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 export function AuthStatus() {
+  const { t } = useLanguage();
   const [supabase] = useState(() => createBrowserSupabaseClient());
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,13 +61,13 @@ export function AuthStatus() {
     return (
       <div className="flex items-center gap-2">
         <Link href="/my-list" className="text-sm underline">
-          My List
+          {t.header.myList}
         </Link>
         <span className="text-muted-foreground hidden max-w-[180px] truncate text-sm sm:inline">
           {user.email}
         </span>
         <Button variant="outline" size="sm" onClick={handleSignOut}>
-          Sign out
+          {t.header.signOut}
         </Button>
       </div>
     );
@@ -80,23 +82,23 @@ export function AuthStatus() {
         }
       }}
     >
-      <PopoverTrigger render={<Button variant="outline" size="sm" />}>Sign in</PopoverTrigger>
+      <PopoverTrigger render={<Button variant="outline" size="sm" />}>{t.header.signIn}</PopoverTrigger>
       <PopoverContent align="end">
         {status === 'sent' ? (
-          <p className="p-1 text-sm">Check your email for a sign-in link.</p>
+          <p className="p-1 text-sm">{t.auth.checkEmail}</p>
         ) : (
           <form onSubmit={handleSendLink} className="flex flex-col gap-2 p-1">
-            <Label htmlFor="auth-email">Email</Label>
+            <Label htmlFor="auth-email">{t.auth.email}</Label>
             <Input
               id="auth-email"
               type="email"
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
+              placeholder={t.auth.emailPlaceholder}
             />
             <Button type="submit" disabled={status === 'sending'}>
-              {status === 'sending' ? 'Sending…' : 'Send magic link'}
+              {status === 'sending' ? t.auth.sending : t.auth.sendMagicLink}
             </Button>
             {status === 'error' && <p className="text-destructive text-sm">{errorMessage}</p>}
           </form>
