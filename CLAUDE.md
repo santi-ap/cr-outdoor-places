@@ -36,6 +36,7 @@ design target, not a responsive-shrink pass done after the desktop layout is bui
 7. Move to the next issue and repeat — don't stop to ask "should I continue?" between issues.
 8. **Do stop and ask** (or comment on the issue explaining the blocker) when: an issue is genuinely ambiguous, it conflicts with Section 1/2, it requires a decision only Santi can make (e.g. naming a new external service, picking a paid tier), or it needs a credential/account Claude doesn't have access to.
 9. Never add features, libraries, or pages outside Section 2's "in scope" list without flagging it first — that's scope drift.
+10. If something out-of-scope for the issue/branch currently being worked comes up — a bug noticed in passing, an infra gap, a follow-up idea — do not pull it into the current branch. Document it with `gh issue create` (title + description, same format as the build-plan issues) and keep working the current issue. Exception: a fix that's a hard blocker for the current issue's acceptance criteria (e.g. the deploy pipeline being broken while verifying a deploy-dependent issue) can be handled inline, but still gets noted (a comment on the relevant issue, as with the Vercel/GitHub connection fix on #1).
 
 ## Verification scripts
 
