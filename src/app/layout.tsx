@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
@@ -18,6 +18,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'CR Outdoor Places',
   description: 'Find a place to go outside in Costa Rica.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    title: 'CR Outdoors',
+    statusBarStyle: 'default',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#166534',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

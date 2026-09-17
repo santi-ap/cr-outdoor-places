@@ -181,7 +181,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
         />
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Province">
           <Input value={values.province} onChange={(e) => setField('province', e.target.value)} />
         </Field>
@@ -190,7 +190,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Latitude">
           <Input
             type="number"
@@ -209,7 +209,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Difficulty">
           <EnumSelect
             value={values.difficulty}
@@ -228,7 +228,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Distance (m)">
           <Input
             type="number"
@@ -245,7 +245,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Cost type">
           <EnumSelect
             value={values.cost_type}

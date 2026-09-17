@@ -89,7 +89,7 @@ function ListSection({
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-2 rounded-md border p-3"
+              className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <Link href={`/places/${item.place.id}`} className="font-medium hover:underline">
                 {item.place.name}
