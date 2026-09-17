@@ -101,7 +101,16 @@ export const placeSuggestionInsertSchema = placeSuggestionSchema
   .omit({ id: true, created_at: true })
   .partial({ place_id: true, suggested_by: true, status: true });
 
+export const placesFilterSchema = z.object({
+  category: placeCategorySchema.optional(),
+  difficulty: difficultySchema.optional(),
+  pet_friendly: petFriendlySchema.optional(),
+  cost_type: costTypeSchema.optional(),
+  max_distance_m: z.coerce.number().int().positive().optional(),
+});
+
 export type Place = z.infer<typeof placeSchema>;
+export type PlacesFilter = z.infer<typeof placesFilterSchema>;
 export type PlaceInsert = z.infer<typeof placeInsertSchema>;
 export type List = z.infer<typeof listSchema>;
 export type ListInsert = z.infer<typeof listInsertSchema>;
