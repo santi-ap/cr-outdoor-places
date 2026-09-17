@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -57,6 +58,9 @@ export function AuthStatus() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
+        <Link href="/my-list" className="text-sm underline">
+          My List
+        </Link>
         <span className="text-muted-foreground hidden max-w-[180px] truncate text-sm sm:inline">
           {user.email}
         </span>
