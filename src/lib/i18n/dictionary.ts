@@ -34,6 +34,14 @@ const es = {
     maxDistance: 'Distancia máxima',
     any: 'Cualquiera',
     clearFilters: 'Limpiar filtros',
+    petsQuick: 'Perros',
+  },
+  placeActions: {
+    save: 'Guardar en mi lista',
+    saved: 'Guardado',
+    markVisited: 'Marcar como visitado',
+    visited: 'Visitado',
+    signInPrompt: 'Inicia sesión (arriba a la derecha) para guardar lugares y llevar registro de tus visitas.',
   },
 };
 
@@ -70,6 +78,14 @@ const en: typeof es = {
     maxDistance: 'Max distance',
     any: 'Any',
     clearFilters: 'Clear filters',
+    petsQuick: 'Dogs',
+  },
+  placeActions: {
+    save: 'Save to my list',
+    saved: 'Saved',
+    markVisited: 'Mark as visited',
+    visited: 'Visited',
+    signInPrompt: 'Sign in (top right) to save places and track visits.',
   },
 };
 

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { PlaceActions } from '@/components/places/place-actions';
 import { Badge } from '@/components/ui/badge';
+import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import {
   categoryLabels,
   costTypeLabels,
@@ -10,6 +11,15 @@ import {
   petFriendlyLabels,
   terrainLabels,
 } from '@/lib/places/labels';
+
+// The app's difficulty enum ('easy'|'moderate'|'hard') maps onto the design's
+// broader moss -> clay -> clay-dark tier scale ('plano' has no separate app
+// value, so 'easy' takes the 'facil' tier).
+const DIFFICULTY_TIER: Record<string, Tier> = {
+  easy: 'facil',
+  moderate: 'moderado',
+  hard: 'dificil',
+};
 
 export default async function PlaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,11 +57,17 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
       {place.description && <p className="text-muted-foreground">{place.description}</p>}
 
       <div className="flex flex-wrap gap-2">
-        <Badge>{categoryLabels[place.category] ?? place.category}</Badge>
-        {place.difficulty && <Badge variant="outline">{difficultyLabels[place.difficulty]}</Badge>}
-        {place.terrain && <Badge variant="outline">{terrainLabels[place.terrain]}</Badge>}
-        <Badge variant="outline">{costTypeLabels[place.cost_type]}</Badge>
-        <Badge variant="outline">{petFriendlyLabels[place.pet_friendly]}</Badge>
+        <TierBadge label={categoryLabels[place.category] ?? place.category} tier="neutral" size="md" />
+        {place.difficulty && (
+          <TierBadge
+            label={difficultyLabels[place.difficulty]}
+            tier={DIFFICULTY_TIER[place.difficulty]}
+            size="md"
+          />
+        )}
+        {place.terrain && <TierBadge label={terrainLabels[place.terrain]} tier="neutral" size="md" />}
+        <TierBadge label={costTypeLabels[place.cost_type]} tier="neutral" size="md" />
+        <TierBadge label={petFriendlyLabels[place.pet_friendly]} tier="neutral" size="md" />
         {place.confidence === 'unverified' && (
           <Badge variant="destructive">Unverified details</Badge>
         )}

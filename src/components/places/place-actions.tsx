@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Button } from '@/components/ui/button';
+import { ActionButton } from '@/components/ui/action-button';
+import { useLanguage } from '@/lib/i18n/language-context';
 import { savePlace, markVisited } from '@/app/actions/list-items';
 
 type Status = 'saved' | 'visited' | null;
@@ -15,6 +16,7 @@ export function PlaceActions({
   isSignedIn: boolean;
   initialStatus: Status;
 }) {
+  const { t } = useLanguage();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -23,14 +25,10 @@ export function PlaceActions({
     return (
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <Button disabled>Save to my list</Button>
-          <Button disabled variant="outline">
-            Mark as visited
-          </Button>
+          <ActionButton label={t.placeActions.save} variant="secondary" size="desktop" disabled />
+          <ActionButton label={t.placeActions.markVisited} variant="primary" size="desktop" disabled />
         </div>
-        <p className="text-muted-foreground text-sm">
-          Sign in (top right) to save places and track visits.
-        </p>
+        <p className="text-ink-muted text-sm">{t.placeActions.signInPrompt}</p>
       </div>
     );
   }
@@ -38,9 +36,12 @@ export function PlaceActions({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <Button
+        <ActionButton
+          label={status ? t.placeActions.saved : t.placeActions.save}
+          variant="secondary"
+          size="desktop"
           disabled={isPending || status !== null}
-          onClick={() =>
+          onPress={() =>
             startTransition(async () => {
               const result = await savePlace(placeId);
               if (result.success) {
@@ -51,14 +52,14 @@ export function PlaceActions({
               }
             })
           }
-        >
-          {status ? 'Saved' : 'Save to my list'}
-        </Button>
+        />
         {status !== null && (
-          <Button
-            variant="outline"
+          <ActionButton
+            label={status === 'visited' ? t.placeActions.visited : t.placeActions.markVisited}
+            variant="primary"
+            size="desktop"
             disabled={isPending || status === 'visited'}
-            onClick={() =>
+            onPress={() =>
               startTransition(async () => {
                 const result = await markVisited(placeId);
                 if (result.success) {
@@ -69,9 +70,7 @@ export function PlaceActions({
                 }
               })
             }
-          >
-            {status === 'visited' ? 'Visited' : 'Mark as visited'}
-          </Button>
+          />
         )}
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
