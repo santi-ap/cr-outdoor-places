@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { FilterChip } from '@/components/ui/filter-chip';
 import {
   categoryLabels,
   difficultyLabels,
@@ -70,6 +71,12 @@ export function PlaceFilters({
           value={filter.cost_type}
           options={costTypeLabels}
           onChange={(v) => setField('cost_type', v as PlacesFilter['cost_type'])}
+        />
+        <FilterChip
+          label={t.filters.petsQuick}
+          active={filter.pet_friendly === 'yes'}
+          size="desktop"
+          onToggle={() => setField('pet_friendly', filter.pet_friendly === 'yes' ? undefined : 'yes')}
         />
       </div>
 
