@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { toggleListItemStatus, removeListItem } from '@/app/actions/my-list';
+import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
 
 export type ListItemWithPlace = {
@@ -13,6 +14,7 @@ export type ListItemWithPlace = {
 };
 
 export function MyListClient({ items: initialItems }: { items: ListItemWithPlace[] }) {
+  const { t } = useLanguage();
   const [items, setItems] = useState(initialItems);
   const [isPending, startTransition] = useTransition();
 
@@ -42,19 +44,20 @@ export function MyListClient({ items: initialItems }: { items: ListItemWithPlace
 
   return (
     <div className="flex flex-col gap-6">
+      <h1 className="text-2xl font-semibold">{t.header.myList}</h1>
       <ListSection
-        title="Saved"
+        title={t.myList.saved}
         items={saved}
         isPending={isPending}
-        toggleLabel="Mark visited"
+        toggleLabel={t.myList.markVisited}
         onToggle={handleToggle}
         onRemove={handleRemove}
       />
       <ListSection
-        title="Visited"
+        title={t.myList.visited}
         items={visited}
         isPending={isPending}
-        toggleLabel="Mark saved"
+        toggleLabel={t.myList.markSaved}
         onToggle={handleToggle}
         onRemove={handleRemove}
       />
@@ -77,13 +80,14 @@ function ListSection({
   onToggle: (item: ListItemWithPlace) => void;
   onRemove: (item: ListItemWithPlace) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <section>
       <h2 className="mb-2 text-lg font-medium">
         {title} ({items.length})
       </h2>
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nothing here yet.</p>
+        <p className="text-sm text-muted-foreground">{t.myList.empty}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((item) => (
@@ -109,7 +113,7 @@ function ListSection({
                   disabled={isPending}
                   onClick={() => onRemove(item)}
                 >
-                  Remove
+                  {t.myList.remove}
                 </Button>
               </div>
             </li>

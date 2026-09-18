@@ -95,11 +95,3 @@ export function getCostTypeLabels(language: Language) {
 export function getTerrainLabels(language: Language) {
   return byLanguage(language, terrainLabelsEs, terrainLabelsEn);
 }
-
-// English-only maps kept for server components that can't read the client
-// language context yet (place detail page's practical-info fallback, etc.).
-export const categoryLabels = categoryLabelsEn;
-export const difficultyLabels = difficultyLabelsEn;
-export const petFriendlyLabels = petFriendlyLabelsEn;
-export const costTypeLabels = costTypeLabelsEn;
-export const terrainLabels = terrainLabelsEn;
