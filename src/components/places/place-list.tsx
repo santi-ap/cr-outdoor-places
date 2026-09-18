@@ -1,9 +1,14 @@
+'use client';
+
 import type { Place } from '@/lib/validation/schemas';
 import { PlaceCard } from './place-card';
+import { useLanguage } from '@/lib/i18n/language-context';
 
 export function PlaceList({ places }: { places: Place[] }) {
+  const { t } = useLanguage();
+
   if (places.length === 0) {
-    return <p className="text-muted-foreground p-4 text-center">No places match these filters.</p>;
+    return <p className="text-muted-foreground p-4 text-center">{t.placeCard.noMatches}</p>;
   }
 
   return (
