@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cn } from 'cn';
 
 const VARIANT_STYLES = {
@@ -11,6 +12,14 @@ const SIZE_STYLES = {
   desktop: 'min-h-11 px-[22px] py-[13px] text-[15px]',
 } as const;
 
+type ActionButtonProps = {
+  label: string;
+  variant?: keyof typeof VARIANT_STYLES;
+  size?: keyof typeof SIZE_STYLES;
+  fullWidth?: boolean;
+  className?: string;
+};
+
 export function ActionButton({
   label,
   variant = 'primary',
@@ -19,30 +28,31 @@ export function ActionButton({
   disabled,
   type = 'button',
   onPress,
+  href,
   className,
-}: {
-  label: string;
-  variant?: keyof typeof VARIANT_STYLES;
-  size?: keyof typeof SIZE_STYLES;
-  fullWidth?: boolean;
-  disabled?: boolean;
-  type?: 'button' | 'submit';
-  onPress?: () => void;
-  className?: string;
-}) {
+}: ActionButtonProps &
+  (
+    | { href: string; disabled?: undefined; type?: undefined; onPress?: undefined }
+    | { href?: undefined; disabled?: boolean; type?: 'button' | 'submit'; onPress?: () => void }
+  )) {
+  const sharedClassName = cn(
+    'cursor-pointer rounded-control text-center font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    VARIANT_STYLES[variant],
+    SIZE_STYLES[size],
+    fullWidth ? 'w-full' : 'w-auto',
+    className,
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={cn(sharedClassName, 'inline-block')}>
+        {label}
+      </Link>
+    );
+  }
+
   return (
-    <button
-      type={type}
-      onClick={onPress}
-      disabled={disabled}
-      className={cn(
-        'cursor-pointer rounded-control text-center font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        VARIANT_STYLES[variant],
-        SIZE_STYLES[size],
-        fullWidth ? 'w-full' : 'w-auto',
-        className,
-      )}
-    >
+    <button type={type} onClick={onPress} disabled={disabled} className={sharedClassName}>
       {label}
     </button>
   );

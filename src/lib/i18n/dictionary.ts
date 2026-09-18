@@ -16,10 +16,9 @@ const es = {
     checkEmail: 'Revisa tu correo para el enlace de acceso.',
   },
   browse: {
+    heading: 'Lugares para caminar',
     suggestPlace: 'Sugerir un lugar',
     filters: 'Filtros',
-    mapView: 'Vista de mapa',
-    listView: 'Vista de lista',
     loadingPlaces: 'Cargando lugares…',
   },
   filters: {
@@ -35,6 +34,7 @@ const es = {
     any: 'Cualquiera',
     clearFilters: 'Limpiar filtros',
     petsQuick: 'Perros',
+    resultsCount: 'lugares',
   },
   placeActions: {
     save: 'Guardar en mi lista',
@@ -42,6 +42,27 @@ const es = {
     markVisited: 'Marcar como visitado',
     visited: 'Visitado',
     signInPrompt: 'Inicia sesión (arriba a la derecha) para guardar lugares y llevar registro de tus visitas.',
+  },
+  tabBar: {
+    explore: 'Explorar',
+    myList: 'Mi lista',
+    suggest: 'Sugerir',
+  },
+  placeCard: {
+    noMatches: 'Ningún lugar coincide con estos filtros.',
+  },
+  detail: {
+    backToMap: 'Volver al mapa',
+    distanceStat: 'recorrido',
+    durationStat: 'caminando',
+    practicalInfo: 'Datos prácticos',
+    entrance: 'Entrada',
+    hours: 'Horario',
+    pets: 'Perros',
+    terrain: 'Terreno',
+    suggestEdit: 'Sugerir una edición',
+    photoPlaceholder: 'Foto no disponible',
+    unverified: 'Datos sin verificar',
   },
 };
 
@@ -60,10 +81,9 @@ const en: typeof es = {
     checkEmail: 'Check your email for a sign-in link.',
   },
   browse: {
+    heading: 'Places to walk',
     suggestPlace: 'Suggest a place',
     filters: 'Filters',
-    mapView: 'Map view',
-    listView: 'List view',
     loadingPlaces: 'Loading places…',
   },
   filters: {
@@ -79,6 +99,7 @@ const en: typeof es = {
     any: 'Any',
     clearFilters: 'Clear filters',
     petsQuick: 'Dogs',
+    resultsCount: 'places',
   },
   placeActions: {
     save: 'Save to my list',
@@ -86,6 +107,27 @@ const en: typeof es = {
     markVisited: 'Mark as visited',
     visited: 'Visited',
     signInPrompt: 'Sign in (top right) to save places and track visits.',
+  },
+  tabBar: {
+    explore: 'Explore',
+    myList: 'My List',
+    suggest: 'Suggest',
+  },
+  placeCard: {
+    noMatches: 'No places match these filters.',
+  },
+  detail: {
+    backToMap: 'Back to map',
+    distanceStat: 'main route',
+    durationStat: 'walking',
+    practicalInfo: 'Practical info',
+    entrance: 'Entrance',
+    hours: 'Hours',
+    pets: 'Pets',
+    terrain: 'Terrain',
+    suggestEdit: 'Suggest an edit',
+    photoPlaceholder: 'Photo not available',
+    unverified: 'Unverified details',
   },
 };
 

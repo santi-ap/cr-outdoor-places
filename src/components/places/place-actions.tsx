@@ -6,15 +6,20 @@ import { useLanguage } from '@/lib/i18n/language-context';
 import { savePlace, markVisited } from '@/app/actions/list-items';
 
 type Status = 'saved' | 'visited' | null;
+type Size = 'mobile' | 'desktop';
 
 export function PlaceActions({
   placeId,
   isSignedIn,
   initialStatus,
+  size = 'desktop',
+  fullWidth,
 }: {
   placeId: string;
   isSignedIn: boolean;
   initialStatus: Status;
+  size?: Size;
+  fullWidth?: boolean;
 }) {
   const { t } = useLanguage();
   const [status, setStatus] = useState<Status>(initialStatus);
@@ -25,8 +30,20 @@ export function PlaceActions({
     return (
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <ActionButton label={t.placeActions.save} variant="secondary" size="desktop" disabled />
-          <ActionButton label={t.placeActions.markVisited} variant="primary" size="desktop" disabled />
+          <ActionButton
+            label={t.placeActions.save}
+            variant="secondary"
+            size={size}
+            fullWidth={fullWidth}
+            disabled
+          />
+          <ActionButton
+            label={t.placeActions.markVisited}
+            variant="primary"
+            size={size}
+            fullWidth={fullWidth}
+            disabled
+          />
         </div>
         <p className="text-ink-muted text-sm">{t.placeActions.signInPrompt}</p>
       </div>
@@ -39,7 +56,8 @@ export function PlaceActions({
         <ActionButton
           label={status ? t.placeActions.saved : t.placeActions.save}
           variant="secondary"
-          size="desktop"
+          size={size}
+          fullWidth={fullWidth}
           disabled={isPending || status !== null}
           onPress={() =>
             startTransition(async () => {
@@ -57,7 +75,8 @@ export function PlaceActions({
           <ActionButton
             label={status === 'visited' ? t.placeActions.visited : t.placeActions.markVisited}
             variant="primary"
-            size="desktop"
+            size={size}
+            fullWidth={fullWidth}
             disabled={isPending || status === 'visited'}
             onPress={() =>
               startTransition(async () => {

@@ -57,6 +57,45 @@ export async function savePlace(placeId: string) {
   }
 }
 
+// Toggles a place's saved state by place id, for contexts (place cards in a
+// list) that don't already know the list_item's own id the way the My List
+// page does.
+export async function toggleSavedPlace(placeId: string) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false as const, error: 'You must be signed in to save a place.' };
+  }
+
+  try {
+    const list = await getOrCreateList(supabase, user.id);
+
+    const { data: existingItem } = await supabase
+      .from('list_items')
+      .select('id')
+      .eq('list_id', list.id)
+      .eq('place_id', placeId)
+      .maybeSingle();
+
+    if (existingItem) {
+      const { error } = await supabase.from('list_items').delete().eq('id', existingItem.id);
+      if (error) throw error;
+      return { success: true as const, saved: false as const };
+    }
+
+    const { error } = await supabase
+      .from('list_items')
+      .insert({ list_id: list.id, place_id: placeId, status: 'saved' });
+    if (error) throw error;
+    return { success: true as const, saved: true as const };
+  } catch (err) {
+    return { success: false as const, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 export async function markVisited(placeId: string) {
   const supabase = await createServerSupabaseClient();
   const {

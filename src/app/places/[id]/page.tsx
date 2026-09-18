@@ -1,25 +1,7 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { PlaceActions } from '@/components/places/place-actions';
-import { Badge } from '@/components/ui/badge';
-import { TierBadge, type Tier } from '@/components/ui/tier-badge';
-import {
-  categoryLabels,
-  costTypeLabels,
-  difficultyLabels,
-  petFriendlyLabels,
-  terrainLabels,
-} from '@/lib/places/labels';
-
-// The app's difficulty enum ('easy'|'moderate'|'hard') maps onto the design's
-// broader moss -> clay -> clay-dark tier scale ('plano' has no separate app
-// value, so 'easy' takes the 'facil' tier).
-const DIFFICULTY_TIER: Record<string, Tier> = {
-  easy: 'facil',
-  moderate: 'moderado',
-  hard: 'dificil',
-};
+import { PlaceDetailView } from '@/components/places/place-detail-view';
+import type { Place } from '@/lib/validation/schemas';
 
 export default async function PlaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -48,59 +30,10 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
   }
 
   return (
-    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4">
-      <Link href="/" className="text-muted-foreground text-sm underline">
-        &larr; Back to map
-      </Link>
-
-      <h1 className="text-2xl font-semibold">{place.name}</h1>
-      {place.description && <p className="text-muted-foreground">{place.description}</p>}
-
-      <div className="flex flex-wrap gap-2">
-        <TierBadge label={categoryLabels[place.category] ?? place.category} tier="neutral" size="md" />
-        {place.difficulty && (
-          <TierBadge
-            label={difficultyLabels[place.difficulty]}
-            tier={DIFFICULTY_TIER[place.difficulty]}
-            size="md"
-          />
-        )}
-        {place.terrain && <TierBadge label={terrainLabels[place.terrain]} tier="neutral" size="md" />}
-        <TierBadge label={costTypeLabels[place.cost_type]} tier="neutral" size="md" />
-        <TierBadge label={petFriendlyLabels[place.pet_friendly]} tier="neutral" size="md" />
-        {place.confidence === 'unverified' && (
-          <Badge variant="destructive">Unverified details</Badge>
-        )}
-      </div>
-
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-        <dt className="text-muted-foreground">Province</dt>
-        <dd>{place.province ?? '—'}</dd>
-
-        <dt className="text-muted-foreground">Canton</dt>
-        <dd>{place.canton ?? '—'}</dd>
-
-        <dt className="text-muted-foreground">Distance</dt>
-        <dd>{place.distance_m ? `${place.distance_m} m` : '—'}</dd>
-
-        <dt className="text-muted-foreground">Duration</dt>
-        <dd>{place.duration_min ? `${place.duration_min} min` : '—'}</dd>
-
-        <dt className="text-muted-foreground">Cost</dt>
-        <dd>{place.cost_amount ?? costTypeLabels[place.cost_type]}</dd>
-
-        <dt className="text-muted-foreground">Hours</dt>
-        <dd>{place.hours_text ?? '—'}</dd>
-      </dl>
-
-      <PlaceActions placeId={place.id} isSignedIn={!!user} initialStatus={initialStatus} />
-
-      <Link
-        href={`/places/${place.id}/suggest-edit`}
-        className="text-muted-foreground text-sm underline"
-      >
-        Suggest an edit
-      </Link>
-    </main>
+    <PlaceDetailView
+      place={place as unknown as Place}
+      isSignedIn={!!user}
+      initialStatus={initialStatus}
+    />
   );
 }

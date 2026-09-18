@@ -11,10 +11,10 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { FilterChip } from '@/components/ui/filter-chip';
 import {
-  categoryLabels,
-  difficultyLabels,
-  petFriendlyLabels,
-  costTypeLabels,
+  getCategoryLabels,
+  getDifficultyLabels,
+  getPetFriendlyLabels,
+  getCostTypeLabels,
 } from '@/lib/places/labels';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
@@ -28,7 +28,7 @@ export function PlaceFilters({
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const hasActiveFilters = Object.keys(filter).length > 0;
 
   function setField<K extends keyof PlacesFilter>(key: K, value: PlacesFilter[K] | undefined) {
@@ -48,28 +48,28 @@ export function PlaceFilters({
           label={t.filters.category}
           anyLabel={t.filters.anyCategory}
           value={filter.category}
-          options={categoryLabels}
+          options={getCategoryLabels(language)}
           onChange={(v) => setField('category', v as PlacesFilter['category'])}
         />
         <FilterSelect
           label={t.filters.difficulty}
           anyLabel={t.filters.anyDifficulty}
           value={filter.difficulty}
-          options={difficultyLabels}
+          options={getDifficultyLabels(language)}
           onChange={(v) => setField('difficulty', v as PlacesFilter['difficulty'])}
         />
         <FilterSelect
           label={t.filters.pets}
           anyLabel={t.filters.anyPets}
           value={filter.pet_friendly}
-          options={petFriendlyLabels}
+          options={getPetFriendlyLabels(language)}
           onChange={(v) => setField('pet_friendly', v as PlacesFilter['pet_friendly'])}
         />
         <FilterSelect
           label={t.filters.cost}
           anyLabel={t.filters.anyCost}
           value={filter.cost_type}
-          options={costTypeLabels}
+          options={getCostTypeLabels(language)}
           onChange={(v) => setField('cost_type', v as PlacesFilter['cost_type'])}
         />
         <FilterChip
@@ -127,7 +127,9 @@ function FilterSelect({
       onValueChange={(v) => onChange(!v || v === 'any' ? undefined : v)}
     >
       <SelectTrigger className="w-[150px]" aria-label={label}>
-        <SelectValue placeholder={label} />
+        <SelectValue placeholder={label}>
+          {(v: unknown) => (v === 'any' ? anyLabel : (options[v as string] ?? label))}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="any">{anyLabel}</SelectItem>
