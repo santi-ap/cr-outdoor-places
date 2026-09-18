@@ -5,6 +5,7 @@ import './globals.css';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { LanguageProvider } from '@/lib/i18n/language-context';
 import { SiteHeader } from '@/components/layout/site-header';
+import { NavRailDesktop } from '@/components/layout/nav-rail-desktop';
 
 const hankenGrotesk = Hanken_Grotesk({
   variable: '--font-hanken-grotesk',
@@ -47,10 +48,11 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       lang="es"
       className={`${hankenGrotesk.variable} ${newsreader.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex h-dvh flex-col overflow-hidden">
+      <body className="flex h-dvh flex-col overflow-hidden lg:flex-row">
         <LanguageProvider>
           <QueryProvider>
             <SiteHeader />
+            <NavRailDesktop />
             <div className="min-h-0 flex-1">{children}</div>
           </QueryProvider>
         </LanguageProvider>

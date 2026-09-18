@@ -48,6 +48,10 @@ const es = {
     myList: 'Mi lista',
     suggest: 'Sugerir',
   },
+  navRail: {
+    visitedOf: 'de',
+    visitedSuffix: 'visitados',
+  },
   placeCard: {
     noMatches: 'Ningún lugar coincide con estos filtros.',
   },
@@ -112,6 +116,10 @@ const en: typeof es = {
     explore: 'Explore',
     myList: 'My List',
     suggest: 'Suggest',
+  },
+  navRail: {
+    visitedOf: 'of',
+    visitedSuffix: 'visited',
   },
   placeCard: {
     noMatches: 'No places match these filters.',

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
-import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useLanguage } from '@/lib/i18n/language-context';
 
-export function AuthStatus() {
+export function AuthStatus({ layout = 'header' }: { layout?: 'header' | 'rail' }) {
   const { t } = useLanguage();
   const [supabase] = useState(() => createBrowserSupabaseClient());
   const [user, setUser] = useState<User | null>(null);
@@ -58,11 +57,21 @@ export function AuthStatus() {
   }
 
   if (user) {
+    // 'rail' layout: no "My List" link — the nav rail already has its own
+    // link to that route, so repeating it here would be redundant.
+    if (layout === 'rail') {
+      return (
+        <div className="flex flex-col gap-2">
+          <span className="text-ink-muted truncate text-xs">{user.email}</span>
+          <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full">
+            {t.header.signOut}
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <div className="flex items-center gap-2">
-        <Link href="/my-list" className="text-sm underline">
-          {t.header.myList}
-        </Link>
         <span className="text-muted-foreground hidden max-w-[180px] truncate text-sm sm:inline">
           {user.email}
         </span>
@@ -82,8 +91,12 @@ export function AuthStatus() {
         }
       }}
     >
-      <PopoverTrigger render={<Button variant="outline" size="sm" />}>{t.header.signIn}</PopoverTrigger>
-      <PopoverContent align="end">
+      <PopoverTrigger
+        render={<Button variant="outline" size="sm" className={layout === 'rail' ? 'w-full' : undefined} />}
+      >
+        {t.header.signIn}
+      </PopoverTrigger>
+      <PopoverContent align={layout === 'rail' ? 'start' : 'end'}>
         {status === 'sent' ? (
           <p className="p-1 text-sm">{t.auth.checkEmail}</p>
         ) : (

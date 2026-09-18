@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { cn } from 'cn';
 import { ActionButton } from '@/components/ui/action-button';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { savePlace, markVisited } from '@/app/actions/list-items';
@@ -14,32 +15,36 @@ export function PlaceActions({
   initialStatus,
   size = 'desktop',
   fullWidth,
+  stacked,
 }: {
   placeId: string;
   isSignedIn: boolean;
   initialStatus: Status;
   size?: Size;
   fullWidth?: boolean;
+  stacked?: boolean;
 }) {
   const { t } = useLanguage();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const rowClassName = cn('flex gap-2', stacked && 'flex-col');
+
   if (!isSignedIn) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
+        <div className={rowClassName}>
           <ActionButton
-            label={t.placeActions.save}
-            variant="secondary"
+            label={t.placeActions.markVisited}
+            variant="primary"
             size={size}
             fullWidth={fullWidth}
             disabled
           />
           <ActionButton
-            label={t.placeActions.markVisited}
-            variant="primary"
+            label={t.placeActions.save}
+            variant="secondary"
             size={size}
             fullWidth={fullWidth}
             disabled
@@ -52,25 +57,7 @@ export function PlaceActions({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        <ActionButton
-          label={status ? t.placeActions.saved : t.placeActions.save}
-          variant="secondary"
-          size={size}
-          fullWidth={fullWidth}
-          disabled={isPending || status !== null}
-          onPress={() =>
-            startTransition(async () => {
-              const result = await savePlace(placeId);
-              if (result.success) {
-                setStatus('saved');
-                setError(null);
-              } else {
-                setError(result.error);
-              }
-            })
-          }
-        />
+      <div className={rowClassName}>
         {status !== null && (
           <ActionButton
             label={status === 'visited' ? t.placeActions.visited : t.placeActions.markVisited}
@@ -91,6 +78,24 @@ export function PlaceActions({
             }
           />
         )}
+        <ActionButton
+          label={status ? t.placeActions.saved : t.placeActions.save}
+          variant="secondary"
+          size={size}
+          fullWidth={fullWidth}
+          disabled={isPending || status !== null}
+          onPress={() =>
+            startTransition(async () => {
+              const result = await savePlace(placeId);
+              if (result.success) {
+                setStatus('saved');
+                setError(null);
+              } else {
+                setError(result.error);
+              }
+            })
+          }
+        />
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
     </div>
