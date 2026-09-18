@@ -11,7 +11,6 @@ import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
 import { ActionButton } from '@/components/ui/action-button';
-import { FilterChip } from '@/components/ui/filter-chip';
 import { ViewToggle, type BrowseView as BrowseViewMode } from './view-toggle';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
@@ -36,6 +35,7 @@ export function BrowseView() {
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
+  const activeFilterCount = Object.keys(filter).length;
 
   const toggleSaved = useMutation({
     mutationFn: (placeId: string) => toggleSavedPlace(placeId),
@@ -58,18 +58,10 @@ export function BrowseView() {
 
         <div className="flex shrink-0 items-center gap-2 overflow-x-auto px-5 py-4">
           <ActionButton
-            label={t.browse.filters}
+            label={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
             variant="primary"
             size="desktop"
             onPress={() => setSheetOpen(true)}
-          />
-          <FilterChip
-            label={t.filters.petsQuick}
-            active={filter.pet_friendly === 'yes'}
-            size="mobile"
-            onToggle={() =>
-              setFilter((f) => ({ ...f, pet_friendly: f.pet_friendly === 'yes' ? undefined : 'yes' }))
-            }
           />
           <ViewToggle
             view={mobileView}

@@ -31,7 +31,6 @@ const es = {
     maxDistance: 'Longitud máxima del recorrido',
     any: 'Cualquiera',
     clearFilters: 'Limpiar filtros',
-    petsQuick: 'Perros',
     resultsCount: 'lugares',
   },
   placeActions: {
@@ -98,7 +97,6 @@ const en: typeof es = {
     maxDistance: 'Max route length',
     any: 'Any',
     clearFilters: 'Clear filters',
-    petsQuick: 'Dogs',
     resultsCount: 'places',
   },
   placeActions: {
