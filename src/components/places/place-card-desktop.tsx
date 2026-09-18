@@ -57,7 +57,7 @@ export function PlaceCardDesktop({
         </svg>
       </button>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <Link href={`/places/${place.id}`} className="font-display text-bark text-2xl font-medium">
+        <Link href={`/places/${place.id}`} className="font-display text-bark text-2xl font-medium text-wrap-pretty">
           {place.name}
         </Link>
         <p className="text-ink-muted text-sm">

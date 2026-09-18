@@ -50,7 +50,10 @@ export function PlaceCardMobile({
         tabIndex={-1}
       />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <Link href={`/places/${place.id}`} className="text-bark truncate font-display text-[19px] font-medium">
+        <Link
+          href={`/places/${place.id}`}
+          className="text-bark font-display text-[19px] leading-snug font-medium text-wrap-pretty"
+        >
           {place.name}
         </Link>
         <p className="text-ink-muted truncate text-[12.5px]">
