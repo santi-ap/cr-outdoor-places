@@ -9,7 +9,7 @@ export function SiteHeader() {
   const { t } = useLanguage();
 
   return (
-    <header className="flex shrink-0 items-center justify-between gap-2 border-b p-3">
+    <header className="flex shrink-0 items-center justify-between gap-2 border-b p-3 lg:hidden">
       <Link href="/" className="font-display text-lg font-semibold">
         {t.brand}
       </Link>

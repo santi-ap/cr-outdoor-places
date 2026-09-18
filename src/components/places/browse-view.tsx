@@ -6,10 +6,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePlaces } from '@/lib/places/use-places';
 import { useSavedPlaceIds } from '@/lib/places/use-saved-places';
 import { toggleSavedPlace } from '@/app/actions/list-items';
-import { PlaceFilters } from './place-filters';
-import { PlaceList } from './place-list';
 import { PlaceCardMobile } from './place-card-mobile';
+import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
+import { FilterPanelDesktop } from './filter-panel-desktop';
 import { ActionButton } from '@/components/ui/action-button';
 import { FilterChip } from '@/components/ui/filter-chip';
 import { TabBarMobile } from '@/components/ui/tab-bar-mobile';
@@ -98,29 +98,42 @@ export function BrowseView() {
         </div>
       </div>
 
-      {/* Desktop explore screen (>=1024px) — restyled per #16. */}
-      <div className="hidden h-full flex-col lg:flex">
-        <div className="border-line flex items-start justify-between gap-4 border-b p-3">
-          <PlaceFilters filter={filter} onChange={setFilter} />
-          <ActionButton
-            label={t.browse.suggestPlace}
-            variant="secondary"
-            size="desktop"
-            href="/suggest-place"
-            className="shrink-0"
-          />
-        </div>
-        <div className="flex min-h-0 flex-1">
-          <div className="w-[380px] overflow-y-auto border-r">
+      {/* Desktop explore screen (>=1024px): nav rail (global, layout.tsx)
+          + content column (real map + 3-column card grid) + filter panel. */}
+      <div className="hidden h-full overflow-y-auto lg:block">
+        <div className="mx-auto flex max-w-[1100px] gap-7 p-10">
+          <div className="flex min-w-0 flex-1 flex-col gap-6">
+            <div>
+              <h1 className="font-display text-bark text-[40px] leading-[1.05] font-medium">
+                {t.browse.heading}
+              </h1>
+              <p className="text-ink-muted mt-1.5 text-sm">
+                {places.length} {t.filters.resultsCount}
+              </p>
+            </div>
+
+            <div className="rounded-card-lg border-line h-[300px] shrink-0 overflow-hidden border">
+              <PlaceMap places={places} />
+            </div>
+
             {isLoading ? (
-              <p className="text-ink-muted p-4">{t.browse.loadingPlaces}</p>
+              <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
+            ) : places.length === 0 ? (
+              <p className="text-ink-muted">{t.placeCard.noMatches}</p>
             ) : (
-              <PlaceList places={places} />
+              <div className="grid grid-cols-2 gap-5 xl:grid-cols-3">
+                {places.map((place) => (
+                  <PlaceCardDesktop
+                    key={place.id}
+                    place={place}
+                    saved={savedIds?.has(place.id) ?? false}
+                    onToggleSave={() => toggleSaved.mutate(place.id)}
+                  />
+                ))}
+              </div>
             )}
           </div>
-          <div className="min-h-0 flex-1">
-            <PlaceMap places={places} />
-          </div>
+          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={places.length} />
         </div>
       </div>
 
