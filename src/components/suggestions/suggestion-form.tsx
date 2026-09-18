@@ -14,12 +14,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  categoryLabels,
-  costTypeLabels,
-  difficultyLabels,
-  petFriendlyLabels,
-  terrainLabels,
+  getCategoryLabels,
+  getCostTypeLabels,
+  getDifficultyLabels,
+  getPetFriendlyLabels,
+  getTerrainLabels,
 } from '@/lib/places/labels';
+import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place, PlaceInsert } from '@/lib/validation/schemas';
 
 type FieldValues = {
@@ -113,11 +114,18 @@ function buildChanges(values: FieldValues, original: FieldValues | null): Partia
 }
 
 export function SuggestionForm({ place }: { place?: Place }) {
+  const { t, language } = useLanguage();
   const original = place ? placeToFieldValues(place) : null;
   const [values, setValues] = useState<FieldValues>(original ?? EMPTY);
   const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
+
+  const categoryLabels = getCategoryLabels(language);
+  const difficultyLabels = getDifficultyLabels(language);
+  const terrainLabels = getTerrainLabels(language);
+  const costTypeLabels = getCostTypeLabels(language);
+  const petFriendlyLabels = getPetFriendlyLabels(language);
 
   function setField(key: keyof PlaceInsert, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -127,14 +135,14 @@ export function SuggestionForm({ place }: { place?: Place }) {
     event.preventDefault();
 
     if (!place && (values.name.trim() === '' || values.category.trim() === '')) {
-      setError('Name and category are required for a new place.');
+      setError(t.suggest.errorNameCategoryRequired);
       setStatus('error');
       return;
     }
 
     const changes = buildChanges(values, original);
     if (Object.keys(changes).length === 0) {
-      setError('Change at least one field before submitting.');
+      setError(t.suggest.errorChangeAtLeastOne);
       setStatus('error');
       return;
     }
@@ -155,16 +163,16 @@ export function SuggestionForm({ place }: { place?: Place }) {
   }
 
   if (status === 'sent') {
-    return <p className="text-sm">Thanks! Your suggestion has been submitted for review.</p>;
+    return <p className="text-sm">{t.suggest.thanks}</p>;
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Field label="Name">
+      <Field label={t.suggest.fields.name}>
         <Input value={values.name} onChange={(e) => setField('name', e.target.value)} />
       </Field>
 
-      <Field label="Description">
+      <Field label={t.suggest.fields.description}>
         <Textarea
           value={values.description}
           onChange={(e) => setField('description', e.target.value)}
@@ -172,26 +180,26 @@ export function SuggestionForm({ place }: { place?: Place }) {
         />
       </Field>
 
-      <Field label="Category">
+      <Field label={t.suggest.fields.category}>
         <EnumSelect
           value={values.category}
           options={categoryLabels}
-          placeholder="Select a category"
+          placeholder={t.suggest.selectCategory}
           onChange={(v) => setField('category', v)}
         />
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Province">
+        <Field label={t.suggest.fields.province}>
           <Input value={values.province} onChange={(e) => setField('province', e.target.value)} />
         </Field>
-        <Field label="Canton">
+        <Field label={t.suggest.fields.canton}>
           <Input value={values.canton} onChange={(e) => setField('canton', e.target.value)} />
         </Field>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Latitude">
+        <Field label={t.suggest.fields.latitude}>
           <Input
             type="number"
             step="any"
@@ -199,7 +207,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
             onChange={(e) => setField('lat', e.target.value)}
           />
         </Field>
-        <Field label="Longitude">
+        <Field label={t.suggest.fields.longitude}>
           <Input
             type="number"
             step="any"
@@ -210,33 +218,33 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Difficulty">
+        <Field label={t.suggest.fields.difficulty}>
           <EnumSelect
             value={values.difficulty}
             options={difficultyLabels}
-            placeholder="Not set"
+            placeholder={t.suggest.notSet}
             onChange={(v) => setField('difficulty', v)}
           />
         </Field>
-        <Field label="Terrain">
+        <Field label={t.suggest.fields.terrain}>
           <EnumSelect
             value={values.terrain}
             options={terrainLabels}
-            placeholder="Not set"
+            placeholder={t.suggest.notSet}
             onChange={(v) => setField('terrain', v)}
           />
         </Field>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Distance (m)">
+        <Field label={t.suggest.fields.distanceM}>
           <Input
             type="number"
             value={values.distance_m}
             onChange={(e) => setField('distance_m', e.target.value)}
           />
         </Field>
-        <Field label="Duration (min)">
+        <Field label={t.suggest.fields.durationMin}>
           <Input
             type="number"
             value={values.duration_min}
@@ -246,42 +254,42 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Cost type">
+        <Field label={t.suggest.fields.costType}>
           <EnumSelect
             value={values.cost_type}
             options={costTypeLabels}
-            placeholder="Not set"
+            placeholder={t.suggest.notSet}
             onChange={(v) => setField('cost_type', v)}
           />
         </Field>
-        <Field label="Cost amount">
+        <Field label={t.suggest.fields.costAmount}>
           <Input
-            placeholder="e.g. ₡2000"
+            placeholder={t.suggest.costAmountPlaceholder}
             value={values.cost_amount}
             onChange={(e) => setField('cost_amount', e.target.value)}
           />
         </Field>
       </div>
 
-      <Field label="Pet policy">
+      <Field label={t.suggest.fields.petPolicy}>
         <EnumSelect
           value={values.pet_friendly}
           options={petFriendlyLabels}
-          placeholder="Not set"
+          placeholder={t.suggest.notSet}
           onChange={(v) => setField('pet_friendly', v)}
         />
       </Field>
 
-      <Field label="Hours">
+      <Field label={t.suggest.fields.hours}>
         <Input
-          placeholder="e.g. 8am–4pm daily"
+          placeholder={t.suggest.hoursPlaceholder}
           value={values.hours_text}
           onChange={(e) => setField('hours_text', e.target.value)}
         />
       </Field>
 
       <Button type="submit" disabled={isPending}>
-        {isPending ? 'Submitting…' : 'Submit suggestion'}
+        {isPending ? t.suggest.submitting : t.suggest.submit}
       </Button>
 
       {status === 'error' && <p className="text-destructive text-sm">{error}</p>}
@@ -315,7 +323,9 @@ function EnumSelect({
       onValueChange={(v) => onChange(!v || v === 'unset' ? '' : v)}
     >
       <SelectTrigger>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder}>
+          {(v: unknown) => (v === 'unset' ? placeholder : (options[v as string] ?? placeholder))}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="unset">{placeholder}</SelectItem>
