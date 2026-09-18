@@ -20,6 +20,8 @@ const es = {
     suggestPlace: 'Sugerir un lugar',
     filters: 'Filtros',
     loadingPlaces: 'Cargando lugares…',
+    mapView: 'Mapa',
+    listView: 'Lista',
   },
   filters: {
     category: 'Categoría',
@@ -89,6 +91,8 @@ const en: typeof es = {
     suggestPlace: 'Suggest a place',
     filters: 'Filters',
     loadingPlaces: 'Loading places…',
+    mapView: 'Map',
+    listView: 'List',
   },
   filters: {
     category: 'Category',
