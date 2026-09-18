@@ -19,7 +19,7 @@ export default async function SuggestEditPage({ params }: { params: Promise<{ id
   } = await supabase.auth.getUser();
 
   return (
-    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4">
+    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4 pb-24 lg:pb-4">
       <Link href={`/places/${place.id}`} className="text-muted-foreground text-sm underline">
         &larr; Back to {place.name}
       </Link>

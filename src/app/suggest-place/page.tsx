@@ -9,7 +9,7 @@ export default async function SuggestPlacePage() {
   } = await supabase.auth.getUser();
 
   return (
-    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4">
+    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4 pb-24 lg:pb-4">
       <Link href="/" className="text-muted-foreground text-sm underline">
         &larr; Back to map
       </Link>

@@ -95,7 +95,7 @@ export function PlaceDetailView({
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 p-5 pb-40">
+        <div className="flex flex-col gap-5 p-5 pb-56">
           <div>
             <h1 className="font-display text-bark text-[32px] leading-[1.05] font-medium text-wrap-pretty">
               {place.name}
@@ -144,7 +144,9 @@ export function PlaceDetailView({
           </Link>
         </div>
 
-        <div className="from-cream border-line fixed inset-x-0 bottom-0 border-t bg-gradient-to-t via-70% p-5 pt-8">
+        {/* bottom-[76px] clears the floating global tab bar (MobileTabBar,
+            ~44px pill + 26px offset) instead of sitting underneath it. */}
+        <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-5 pt-8">
           <PlaceActions
             placeId={place.id}
             isSignedIn={isSignedIn}

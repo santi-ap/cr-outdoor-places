@@ -12,7 +12,6 @@ import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
 import { ActionButton } from '@/components/ui/action-button';
 import { FilterChip } from '@/components/ui/filter-chip';
-import { TabBarMobile } from '@/components/ui/tab-bar-mobile';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
@@ -40,12 +39,6 @@ export function BrowseView() {
     mutationFn: (placeId: string) => toggleSavedPlace(placeId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['saved-place-ids'] }),
   });
-
-  const tabBarItems = [
-    { label: t.tabBar.explore, href: '/' },
-    { label: t.tabBar.myList, href: '/my-list' },
-    { label: t.tabBar.suggest, href: '/suggest-place' },
-  ];
 
   return (
     <div className="bg-cream h-full">
@@ -134,12 +127,6 @@ export function BrowseView() {
             )}
           </div>
           <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={places.length} />
-        </div>
-      </div>
-
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[26px] lg:hidden">
-        <div className="pointer-events-auto">
-          <TabBarMobile items={tabBarItems} />
         </div>
       </div>
 
