@@ -33,24 +33,13 @@ export function PlaceActions({
 
   if (!isSignedIn) {
     return (
-      <div className="flex flex-col gap-2">
-        <div className={rowClassName}>
-          <ActionButton
-            label={t.placeActions.markVisited}
-            variant="primary"
-            size={size}
-            fullWidth={fullWidth}
-            disabled
-          />
-          <ActionButton
-            label={t.placeActions.save}
-            variant="secondary"
-            size={size}
-            fullWidth={fullWidth}
-            disabled
-          />
-        </div>
-        <p className="text-ink-muted text-sm">{t.placeActions.signInPrompt}</p>
+      <div
+        className={cn(
+          'border-line bg-sand rounded-2xl border px-4 py-3',
+          fullWidth ? 'w-full' : 'w-auto',
+        )}
+      >
+        <p className="text-ink-body text-sm">{t.placeActions.signInPrompt}</p>
       </div>
     );
   }
