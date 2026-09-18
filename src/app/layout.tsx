@@ -6,6 +6,7 @@ import { QueryProvider } from '@/components/providers/query-provider';
 import { LanguageProvider } from '@/lib/i18n/language-context';
 import { SiteHeader } from '@/components/layout/site-header';
 import { NavRailDesktop } from '@/components/layout/nav-rail-desktop';
+import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
 
 const hankenGrotesk = Hanken_Grotesk({
   variable: '--font-hanken-grotesk',
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
             <SiteHeader />
             <NavRailDesktop />
             <div className="min-h-0 flex-1">{children}</div>
+            <MobileTabBar />
           </QueryProvider>
         </LanguageProvider>
       </body>
