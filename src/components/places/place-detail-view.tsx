@@ -130,9 +130,9 @@ export function PlaceDetailView({
               <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.practicalInfo}</h2>
               <div className="border-line divide-line divide-y rounded-2xl border">
                 {practical.map((row) => (
-                  <div key={row.label} className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div key={row.label} className="flex flex-col gap-0.5 px-4 py-3">
                     <span className="text-ink-muted text-sm">{row.label}</span>
-                    <span className="text-right text-sm font-medium">{row.value}</span>
+                    <span className="text-sm font-medium text-wrap-pretty">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -218,9 +218,9 @@ export function PlaceDetailView({
                   <h2 className="font-display text-bark text-xl font-medium">{t.detail.practicalInfo}</h2>
                   <div className="flex flex-col">
                     {practical.map((row) => (
-                      <div key={row.label} className="border-line-soft flex justify-between gap-3 border-b py-3">
+                      <div key={row.label} className="border-line-soft flex flex-col gap-0.5 border-b py-3">
                         <span className="text-ink-muted text-sm">{row.label}</span>
-                        <span className="text-right text-sm font-medium">{row.value}</span>
+                        <span className="text-sm font-medium text-wrap-pretty">{row.value}</span>
                       </div>
                     ))}
                   </div>
