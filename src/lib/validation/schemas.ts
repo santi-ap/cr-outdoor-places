@@ -19,6 +19,15 @@ export const placeConfidenceSchema = z.enum(['unverified', 'verified']);
 export const listItemStatusSchema = z.enum(['saved', 'visited']);
 export const placeSuggestionStatusSchema = z.enum(['pending', 'approved', 'rejected']);
 
+// Mock/display-only — seed-authored, read-only (Issue #36). No submission
+// form or user-generated rows; see docs/build-plan.md Section 2 for why a
+// real reviews system stays out of scope for v0.
+export const placeReviewSchema = z.object({
+  author: z.string().min(1),
+  rating: z.number().min(1).max(5),
+  text: z.string().min(1),
+});
+
 export const placeSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
@@ -38,6 +47,8 @@ export const placeSchema = z.object({
   hours_text: z.string().nullable(),
   source: placeSourceSchema,
   confidence: placeConfidenceSchema,
+  rating: z.number().min(1).max(5).nullable(),
+  reviews: z.array(placeReviewSchema),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -58,6 +69,8 @@ export const placeInsertSchema = placeSchema
     hours_text: true,
     source: true,
     confidence: true,
+    rating: true,
+    reviews: true,
   });
 
 export const listSchema = z.object({
@@ -122,6 +135,7 @@ export const placesFilterSchema = z.object({
 });
 
 export type Place = z.infer<typeof placeSchema>;
+export type PlaceReview = z.infer<typeof placeReviewSchema>;
 export type PlacesFilter = z.infer<typeof placesFilterSchema>;
 export type PlaceInsert = z.infer<typeof placeInsertSchema>;
 export type List = z.infer<typeof listSchema>;
