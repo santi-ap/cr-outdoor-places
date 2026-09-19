@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { cn } from 'cn';
 import { PlaceCardMobile } from './place-card-mobile';
 import { ActionButton } from '@/components/ui/action-button';
 import { FilterChipCarousel } from './filter-chip-carousel';
@@ -132,44 +133,64 @@ export function ListDrawer({
     onPointerCancel: handlePointerUp,
   };
 
+  const isFull = state === 'full';
+
   return (
     <div
-      className="rounded-t-[28px] border-line bg-cream absolute inset-x-0 top-6 bottom-0 flex flex-col border shadow-[0_-8px_24px_rgba(0,0,0,0.12)]"
+      className={cn(
+        'bg-cream absolute inset-x-0 bottom-0 flex flex-col border',
+        isFull ? 'top-0 rounded-none border-transparent' : 'top-6 rounded-t-[28px] border-line',
+      )}
       style={{
         transform: `translateY(calc(${restingTransformBase(state)} + ${dragDeltaY}px))`,
-        transition: isDragging ? 'none' : 'transform 220ms ease-out',
+        boxShadow: isFull ? 'none' : '0 -8px 24px rgba(0,0,0,0.12)',
+        transition: isDragging
+          ? 'none'
+          : 'transform 220ms ease-out, border-radius 200ms ease-out, box-shadow 200ms ease-out',
       }}
     >
-      <div className="flex shrink-0 flex-col gap-3 pb-3" {...dragHandlers}>
-        <button
-          type="button"
-          aria-expanded={state === 'full'}
-          aria-label={state === 'full' ? t.browse.mapView : t.browse.listView}
-          className="flex cursor-grab items-center justify-center pt-3 pb-1 active:cursor-grabbing"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setState((s) => (s === 'full' ? 'peek' : 'full'));
-            }
-          }}
-        >
-          <span className="bg-line-strong h-1 w-10 rounded-full" />
-        </button>
+      {/* Once fully expanded this reads as a plain full-page list, not a
+          floating sheet — no grab handle, no drag-to-collapse. The Map
+          button (moved into the search row below) is the only way back. */}
+      <div className="flex shrink-0 flex-col gap-3 pb-3" {...(isFull ? {} : dragHandlers)}>
+        {!isFull && (
+          <button
+            type="button"
+            aria-expanded={isFull}
+            aria-label={isFull ? t.browse.mapView : t.browse.listView}
+            className="flex cursor-grab items-center justify-center pt-3 pb-1 active:cursor-grabbing"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setState((s) => (s === 'full' ? 'peek' : 'full'));
+              }
+            }}
+          >
+            <span className="bg-line-strong h-1 w-10 rounded-full" />
+          </button>
+        )}
 
-        <div className="px-5">
-          <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
-        </div>
-        <div className="flex items-center justify-between gap-2 px-5">
-          <p className="text-ink-muted text-sm">{resultsLabel}</p>
-          {state === 'full' && (
+        <div className={cn('flex items-center gap-2 px-5', isFull ? '' : 'pt-3')}>
+          <div className="min-w-0 flex-1">
+            <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
+          </div>
+          <div
+            className={cn(
+              'shrink-0 overflow-hidden transition-all duration-200 ease-out',
+              isFull ? 'w-[92px] opacity-100' : 'w-0 opacity-0',
+            )}
+          >
             <ActionButton
               label={t.browse.mapView}
               variant="secondary"
               size="desktop"
               onPress={() => setState('peek')}
-              className="shrink-0"
+              className="h-11 w-[92px] whitespace-nowrap"
             />
-          )}
+          </div>
+        </div>
+        <div className="px-5">
+          <p className="text-ink-muted text-sm">{resultsLabel}</p>
         </div>
         <div className="px-5">
           <FilterChipCarousel filter={filter} onChange={onFilterChange} onOpenAllFilters={onOpenFilters} />
@@ -178,8 +199,8 @@ export function ListDrawer({
 
       <div
         className="min-h-0 flex-1 overflow-y-auto px-5 pb-24"
-        style={state !== 'full' ? { touchAction: 'none' } : undefined}
-        {...(state !== 'full' ? dragHandlers : {})}
+        style={!isFull ? { touchAction: 'none' } : undefined}
+        {...(!isFull ? dragHandlers : {})}
       >
         {isLoading ? (
           <p className="text-ink-muted">{t.browse.loadingPlaces}</p>

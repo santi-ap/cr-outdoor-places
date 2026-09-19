@@ -136,13 +136,13 @@ export function FilterChipCarousel({
       </div>
 
       {selectedPills.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
           {selectedPills.map((pill) => (
             <button
               key={pill.key}
               type="button"
               onClick={pill.onRemove}
-              className="border-forest bg-forest/10 text-forest rounded-pill flex items-center gap-1 border px-3 py-1 text-xs font-medium"
+              className="border-forest bg-forest/10 text-forest rounded-pill flex shrink-0 items-center gap-1 border px-3 py-1 text-xs font-medium whitespace-nowrap"
             >
               {pill.label}
               <XIcon className="size-3" />
