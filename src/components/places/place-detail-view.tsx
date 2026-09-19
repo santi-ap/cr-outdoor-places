@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
-import { PlaceActions } from './place-actions';
+import { PlaceActions, SaveIconButton, type Status } from './place-actions';
 import { PhotoCarousel } from './photo-carousel';
 import { StarRating } from './star-rating';
 import { DirectionsButton } from './directions-button';
@@ -33,8 +34,6 @@ const PlaceMap = dynamic(() => import('./place-map').then((m) => m.PlaceMap), {
 
 const LOCATION_MAP_ZOOM = 14;
 
-type Status = 'saved' | 'visited' | null;
-
 export function PlaceDetailView({
   place,
   isSignedIn,
@@ -45,6 +44,9 @@ export function PlaceDetailView({
   initialStatus: Status;
 }) {
   const { t, language } = useLanguage();
+  // Lifted so the header's icon SaveIconButton and the PlaceActions bar
+  // below stay in sync about whether the place is already saved.
+  const [status, setStatus] = useState<Status>(initialStatus);
 
   const categoryLabels = getCategoryLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
@@ -96,24 +98,27 @@ export function PlaceDetailView({
       <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
         <div className="relative h-[220px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-between p-4">
-            <Link
-              href="/"
-              aria-label={t.detail.backToMap}
-              className="border-line bg-cream pointer-events-auto flex h-11 w-11 items-center justify-center rounded-2xl border"
-            >
-              <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
-            </Link>
-            <ShareButton title={place.name} iconOnly className="pointer-events-auto" />
-          </div>
+          <Link
+            href="/"
+            aria-label={t.detail.backToMap}
+            className="border-line bg-cream absolute top-4 left-4 flex h-11 w-11 items-center justify-center rounded-2xl border"
+          >
+            <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
+          </Link>
         </div>
 
         <div className="flex flex-col gap-5 p-5 pb-56">
-          <div>
-            <h1 className="font-display text-bark text-[32px] leading-[1.05] font-medium text-wrap-pretty">
-              {place.name}
-            </h1>
-            <p className="text-ink-muted mt-1.5 text-sm">{locationLine}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-display text-bark text-[32px] leading-[1.05] font-medium text-wrap-pretty">
+                {place.name}
+              </h1>
+              <p className="text-ink-muted mt-1.5 text-sm">{locationLine}</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <ShareButton title={place.name} iconOnly />
+              {isSignedIn && <SaveIconButton placeId={place.id} status={status} onStatusChange={setStatus} />}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -186,7 +191,8 @@ export function PlaceDetailView({
           <PlaceActions
             placeId={place.id}
             isSignedIn={isSignedIn}
-            initialStatus={initialStatus}
+            status={status}
+            onStatusChange={setStatus}
             size="mobile"
             fullWidth
           />
@@ -288,7 +294,8 @@ export function PlaceDetailView({
               <PlaceActions
                 placeId={place.id}
                 isSignedIn={isSignedIn}
-                initialStatus={initialStatus}
+                status={status}
+                onStatusChange={setStatus}
                 size="desktop"
                 fullWidth
                 stacked
