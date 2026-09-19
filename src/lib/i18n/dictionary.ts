@@ -73,6 +73,9 @@ const es = {
     nextPhoto: 'Foto siguiente',
     location: 'Ubicación',
     reviews: 'Reseñas',
+    getDirections: 'Cómo llegar',
+    share: 'Compartir',
+    linkCopied: 'Enlace copiado',
   },
   myList: {
     saved: 'Guardados',
@@ -192,6 +195,9 @@ const en: typeof es = {
     nextPhoto: 'Next photo',
     location: 'Location',
     reviews: 'Reviews',
+    getDirections: 'Get directions',
+    share: 'Share',
+    linkCopied: 'Link copied',
   },
   myList: {
     saved: 'Saved',
