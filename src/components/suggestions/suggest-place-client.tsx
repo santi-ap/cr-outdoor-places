@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { SuggestionForm } from './suggestion-form';
+import { SignInNotice } from '@/components/auth/sign-in-notice';
 import { useLanguage } from '@/lib/i18n/language-context';
 
 export function SuggestPlaceClient({ isSignedIn }: { isSignedIn: boolean }) {
@@ -16,7 +17,7 @@ export function SuggestPlaceClient({ isSignedIn }: { isSignedIn: boolean }) {
       <h1 className="text-2xl font-semibold">{t.suggest.newPlaceHeading}</h1>
       <p className="text-muted-foreground text-sm">{t.suggest.newPlaceDescription}</p>
 
-      <SuggestionForm isSignedIn={isSignedIn} />
+      {isSignedIn ? <SuggestionForm /> : <SignInNotice message={t.suggest.signInToSuggest} />}
     </main>
   );
 }

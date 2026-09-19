@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { SignInNotice } from '@/components/auth/sign-in-notice';
 import { toggleListItemStatus, removeListItem } from '@/app/actions/my-list';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
@@ -54,9 +55,7 @@ export function MyListClient({
         <h1 className="text-2xl font-semibold">{t.header.myList}</h1>
         <ListSection title={t.myList.saved} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
         <ListSection title={t.myList.visited} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
-        <div className="border-line bg-sand rounded-2xl border px-4 py-3">
-          <p className="text-ink-body text-sm">{t.placeActions.signInPrompt}</p>
-        </div>
+        <SignInNotice message={t.placeActions.signInPrompt} />
       </div>
     );
   }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { ArrowLeftIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
 import { PlaceActions, SaveIconButton, type Status } from './place-actions';
@@ -101,9 +102,9 @@ export function PlaceDetailView({
           <Link
             href="/"
             aria-label={t.detail.backToMap}
-            className="border-line bg-cream absolute top-4 left-4 flex h-11 w-11 items-center justify-center rounded-2xl border"
+            className="border-line bg-cream text-bark absolute top-4 left-4 flex h-11 w-11 items-center justify-center rounded-2xl border"
           >
-            <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
+            <ArrowLeftIcon className="size-5" />
           </Link>
         </div>
 
@@ -190,18 +191,25 @@ export function PlaceDetailView({
           </Link>
         </div>
 
-        {/* bottom-[76px] clears the floating global tab bar (MobileTabBar,
-            ~44px pill + 26px offset) instead of sitting underneath it. */}
-        <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-5 pt-8">
-          <PlaceActions
-            placeId={place.id}
-            isSignedIn={isSignedIn}
-            status={status}
-            onStatusChange={setStatus}
-            size="mobile"
-            fullWidth
-          />
-        </div>
+        {/* Save already lives in the header's SaveIconButton — this bar
+            only needs to surface once there's a "mark visited" action to
+            take, so a signed-out or not-yet-saved visitor sees no floating
+            bar at all. bottom-[76px] clears the floating global tab bar
+            (MobileTabBar, ~44px pill + 26px offset) instead of sitting
+            underneath it. */}
+        {status !== null && (
+          <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-5 pt-8">
+            <PlaceActions
+              placeId={place.id}
+              isSignedIn={isSignedIn}
+              status={status}
+              onStatusChange={setStatus}
+              size="mobile"
+              fullWidth
+              showSaveButton={false}
+            />
+          </div>
+        )}
       </div>
 
       {/* Desktop detail screen (>=1024px). */}
