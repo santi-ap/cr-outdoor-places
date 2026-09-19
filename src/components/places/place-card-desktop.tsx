@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
+import { PlaceCardPhoto } from './place-card-photo';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
@@ -12,12 +13,6 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
   easy: 'facil',
   moderate: 'moderado',
   hard: 'dificil',
-};
-
-const PHOTO_PLACEHOLDER_STYLE = {
-  backgroundColor: '#E3D6C1',
-  backgroundImage:
-    'repeating-linear-gradient(118deg, rgba(143,168,118,0.4) 0 9px, rgba(143,168,118,0) 9px 20px)',
 };
 
 export function PlaceCardDesktop({
@@ -63,13 +58,13 @@ export function PlaceCardDesktop({
   badges.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
   return (
-    <div className="rounded-card-lg bg-sand relative flex flex-col overflow-hidden">
+    <div className="rounded-card-lg bg-rail relative flex flex-col overflow-hidden">
       <Link
         href={`/places/${place.id}`}
         className="absolute inset-0 z-0"
         aria-label={place.name}
       />
-      <div className="pointer-events-none h-[172px] shrink-0" style={PHOTO_PLACEHOLDER_STYLE} />
+      <PlaceCardPhoto placeId={place.id} className="h-[172px]" />
       <button
         type="button"
         aria-pressed={saved}
