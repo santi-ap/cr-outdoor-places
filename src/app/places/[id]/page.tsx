@@ -7,15 +7,20 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const { data: place } = await supabase.from('places').select('*').eq('id', id).maybeSingle();
+  // Independent round trips (the place row and the caller's identity) run
+  // in parallel — auth.getUser() calls out to the Supabase Auth server to
+  // verify the token, so awaiting it after the place query serialized two
+  // full network round trips for no reason.
+  const [{ data: place }, {
+    data: { user },
+  }] = await Promise.all([
+    supabase.from('places').select('*').eq('id', id).maybeSingle(),
+    supabase.auth.getUser(),
+  ]);
 
   if (!place) {
     notFound();
   }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   let initialStatus: 'saved' | 'visited' | null = null;
   if (user) {

@@ -7,15 +7,16 @@ export default async function SuggestEditPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const { data: place } = await supabase.from('places').select('*').eq('id', id).maybeSingle();
+  const [{ data: place }, {
+    data: { user },
+  }] = await Promise.all([
+    supabase.from('places').select('*').eq('id', id).maybeSingle(),
+    supabase.auth.getUser(),
+  ]);
 
   if (!place) {
     notFound();
   }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   return <SuggestEditClient place={place as unknown as Place} isSignedIn={!!user} />;
 }
