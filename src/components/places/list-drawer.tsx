@@ -12,7 +12,7 @@ import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 // enough to show the search bar, results count, filters row, and a hint of
 // the first card, so it reads as "there's a list here, drag up for more"
 // rather than a bare bar.
-const PEEK_HEIGHT_PX = 370;
+const PEEK_HEIGHT_PX = 340;
 // Below this drag distance a release is treated as a tap (toggle state)
 // rather than an intentional drag past/short-of the snap threshold.
 const TAP_THRESHOLD_PX = 6;
@@ -26,7 +26,6 @@ export function ListDrawer({
   savedIds,
   onToggleSave,
   resultsLabel,
-  filtersLabel,
   onOpenFilters,
   filter,
   onFilterChange,
@@ -38,7 +37,6 @@ export function ListDrawer({
   savedIds: Set<string> | undefined;
   onToggleSave: (placeId: string) => void;
   resultsLabel: string;
-  filtersLabel: string;
   onOpenFilters: () => void;
   filter: PlacesFilter;
   onFilterChange: (filter: PlacesFilter) => void;
@@ -106,14 +104,19 @@ export function ListDrawer({
 
       <div className="flex shrink-0 flex-col gap-3 px-5 pb-3">
         <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
-        <p className="text-ink-muted text-sm">{resultsLabel}</p>
-        <div className="flex items-center gap-2">
-          <ActionButton label={filtersLabel} variant="primary" size="desktop" onPress={onOpenFilters} />
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-ink-muted text-sm">{resultsLabel}</p>
           {state === 'full' && (
-            <ActionButton label={t.browse.mapView} variant="secondary" size="desktop" onPress={() => setState('peek')} />
+            <ActionButton
+              label={t.browse.mapView}
+              variant="secondary"
+              size="desktop"
+              onPress={() => setState('peek')}
+              className="shrink-0"
+            />
           )}
         </div>
-        <FilterChipCarousel filter={filter} onChange={onFilterChange} />
+        <FilterChipCarousel filter={filter} onChange={onFilterChange} onOpenAllFilters={onOpenFilters} />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-24">

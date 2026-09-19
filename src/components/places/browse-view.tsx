@@ -35,7 +35,6 @@ export function BrowseView() {
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
-  const activeFilterCount = Object.keys(filter).length;
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
   const visiblePlaces = trimmedQuery
@@ -64,7 +63,6 @@ export function BrowseView() {
           savedIds={savedIds}
           onToggleSave={(placeId) => toggleSaved.mutate(placeId)}
           resultsLabel={`${visiblePlaces.length} ${t.filters.resultsCount}`}
-          filtersLabel={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
           onOpenFilters={() => setSheetOpen(true)}
           filter={filter}
           onFilterChange={setFilter}

@@ -3,10 +3,10 @@ import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 
 async function fetchPlaces(filter: PlacesFilter): Promise<Place[]> {
   const params = new URLSearchParams();
-  if (filter.category) params.set('category', filter.category);
-  if (filter.difficulty) params.set('difficulty', filter.difficulty);
-  if (filter.pet_friendly) params.set('pet_friendly', filter.pet_friendly);
-  if (filter.cost_type) params.set('cost_type', filter.cost_type);
+  if (filter.category?.length) params.set('category', filter.category.join(','));
+  if (filter.difficulty?.length) params.set('difficulty', filter.difficulty.join(','));
+  if (filter.pet_friendly?.length) params.set('pet_friendly', filter.pet_friendly.join(','));
+  if (filter.cost_type?.length) params.set('cost_type', filter.cost_type.join(','));
   if (filter.max_distance_m !== undefined) {
     params.set('max_distance_m', String(filter.max_distance_m));
   }

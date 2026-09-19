@@ -31,7 +31,9 @@ const es = {
     cost: 'Costo',
     maxDistance: 'Longitud máxima del recorrido',
     any: 'Cualquiera',
+    clear: 'Limpiar',
     clearFilters: 'Limpiar filtros',
+    allFilters: 'Todos los filtros',
     resultsCount: 'lugares',
   },
   placeActions: {
@@ -145,7 +147,9 @@ const en: typeof es = {
     cost: 'Cost',
     maxDistance: 'Max route length',
     any: 'Any',
+    clear: 'Clear',
     clearFilters: 'Clear filters',
+    allFilters: 'All filters',
     resultsCount: 'places',
   },
   placeActions: {

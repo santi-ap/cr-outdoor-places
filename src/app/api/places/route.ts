@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
   const supabase = await createServerSupabaseClient();
   let query = supabase.from('places').select('*');
 
-  if (category) query = query.eq('category', category);
-  if (difficulty) query = query.eq('difficulty', difficulty);
-  if (pet_friendly) query = query.eq('pet_friendly', pet_friendly);
-  if (cost_type) query = query.eq('cost_type', cost_type);
+  if (category?.length) query = query.in('category', category);
+  if (difficulty?.length) query = query.in('difficulty', difficulty);
+  if (pet_friendly?.length) query = query.in('pet_friendly', pet_friendly);
+  if (cost_type?.length) query = query.in('cost_type', cost_type);
   if (max_distance_m !== undefined) {
     query = query.not('distance_m', 'is', null).lte('distance_m', max_distance_m);
   }
