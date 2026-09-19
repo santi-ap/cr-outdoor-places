@@ -184,7 +184,7 @@ export function ListDrawer({
             <button
               type="button"
               onClick={() => setState('peek')}
-              className="border-line-strong bg-cream text-bark flex h-11 w-[68px] items-center justify-center rounded-control border text-sm font-medium whitespace-nowrap"
+              className="bg-moss border-moss flex h-11 w-[68px] items-center justify-center rounded-control border text-sm font-medium whitespace-nowrap text-[#23281C]"
             >
               {t.browse.mapView}
             </button>
@@ -201,7 +201,7 @@ export function ListDrawer({
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto px-5 pb-24"
+        className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-24"
         style={!isFull ? { touchAction: 'none' } : undefined}
         {...(!isFull ? dragHandlers : {})}
       >

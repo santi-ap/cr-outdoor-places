@@ -165,3 +165,16 @@
     @apply font-sans;
   }
 }
+
+/* Hides the scroll track/thumb while keeping the element scrollable —
+   used on mobile scroll regions (filter chip rows, the explore list,
+   etc.) where a visible scrollbar reads as clutter rather than a
+   wayfinding aid. Declared with @utility (not a plain class) so
+   Tailwind variants like `max-lg:no-scrollbar` work on components
+   shared with desktop, where the scrollbar should stay visible. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -8,7 +8,7 @@ export function SuggestPlaceClient({ isSignedIn }: { isSignedIn: boolean }) {
   const { t } = useLanguage();
 
   return (
-    <main className="mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4 pb-24 lg:pb-4">
+    <main className="max-lg:no-scrollbar mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4 pb-24 lg:pb-4">
       <Link href="/" className="text-muted-foreground text-sm underline">
         &larr; {t.detail.backToMap}
       </Link>

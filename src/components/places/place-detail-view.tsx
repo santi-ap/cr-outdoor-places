@@ -93,7 +93,7 @@ export function PlaceDetailView({
   return (
     <>
       {/* Mobile detail screen (<1024px). */}
-      <div className="flex h-full flex-col overflow-y-auto lg:hidden">
+      <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
         <div className="relative h-[220px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-between p-4">

@@ -111,7 +111,7 @@ export function FilterChipCarousel({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-0.5">
         <button
           type="button"
           onClick={onOpenAllFilters}
@@ -140,7 +140,7 @@ export function FilterChipCarousel({
       <div className="flex items-center gap-2">
         <p className="text-ink-muted shrink-0 text-sm whitespace-nowrap">{resultsLabel}</p>
         {selectedPills.length > 0 && (
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-0.5">
+          <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-0.5">
             {selectedPills.map((pill) => (
               <button
                 key={pill.key}
