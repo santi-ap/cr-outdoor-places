@@ -22,6 +22,7 @@ const es = {
     loadingPlaces: 'Cargando lugares…',
     mapView: 'Mapa',
     listView: 'Lista',
+    searchPlaceholder: 'Buscar por nombre…',
   },
   filters: {
     category: 'Categoría',
@@ -132,6 +133,7 @@ const en: typeof es = {
     loadingPlaces: 'Loading places…',
     mapView: 'Map',
     listView: 'List',
+    searchPlaceholder: 'Search by name…',
   },
   filters: {
     category: 'Category',

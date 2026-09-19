@@ -4,14 +4,15 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { PlaceCardMobile } from './place-card-mobile';
 import { ActionButton } from '@/components/ui/action-button';
 import { FilterChipCarousel } from './filter-chip-carousel';
+import { PlaceSearchInput } from './place-search-input';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 
 // How much of the drawer peeks above the bottom edge when collapsed — tall
-// enough to show the results count + filters row + a hint of the first
-// card, so it reads as "there's a list here, drag up for more" rather than
-// a bare bar.
-const PEEK_HEIGHT_PX = 320;
+// enough to show the search bar, results count, filters row, and a hint of
+// the first card, so it reads as "there's a list here, drag up for more"
+// rather than a bare bar.
+const PEEK_HEIGHT_PX = 370;
 // Below this drag distance a release is treated as a tap (toggle state)
 // rather than an intentional drag past/short-of the snap threshold.
 const TAP_THRESHOLD_PX = 6;
@@ -29,6 +30,8 @@ export function ListDrawer({
   onOpenFilters,
   filter,
   onFilterChange,
+  searchQuery,
+  onSearchChange,
 }: {
   places: Place[];
   isLoading: boolean;
@@ -39,6 +42,8 @@ export function ListDrawer({
   onOpenFilters: () => void;
   filter: PlacesFilter;
   onFilterChange: (filter: PlacesFilter) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }) {
   const { t } = useLanguage();
   const [state, setState] = useState<DrawerState>('peek');
@@ -100,6 +105,7 @@ export function ListDrawer({
       </button>
 
       <div className="flex shrink-0 flex-col gap-3 px-5 pb-3">
+        <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
         <p className="text-ink-muted text-sm">{resultsLabel}</p>
         <div className="flex items-center gap-2">
           <ActionButton label={filtersLabel} variant="primary" size="desktop" onPress={onOpenFilters} />
