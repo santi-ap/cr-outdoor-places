@@ -10,6 +10,8 @@ import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
 import { ListDrawer } from './list-drawer';
+import { PlaceSearchInput } from './place-search-input';
+import { normalizeForSearch } from '@/lib/places/search';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
@@ -29,10 +31,16 @@ export function BrowseView() {
   const { t } = useLanguage();
   const [filter, setFilter] = useState<PlacesFilter>({});
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
   const activeFilterCount = Object.keys(filter).length;
+
+  const trimmedQuery = normalizeForSearch(searchQuery.trim());
+  const visiblePlaces = trimmedQuery
+    ? places.filter((place) => normalizeForSearch(place.name).includes(trimmedQuery))
+    : places;
 
   const toggleSaved = useMutation({
     mutationFn: (placeId: string) => toggleSavedPlace(placeId),
@@ -48,18 +56,20 @@ export function BrowseView() {
           Map/List toggle from #24. */}
       <div className="relative h-full overflow-hidden lg:hidden">
         <div className="absolute inset-0">
-          <PlaceMap places={places} />
+          <PlaceMap places={visiblePlaces} />
         </div>
         <ListDrawer
-          places={places}
+          places={visiblePlaces}
           isLoading={isLoading}
           savedIds={savedIds}
           onToggleSave={(placeId) => toggleSaved.mutate(placeId)}
-          resultsLabel={`${places.length} ${t.filters.resultsCount}`}
+          resultsLabel={`${visiblePlaces.length} ${t.filters.resultsCount}`}
           filtersLabel={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
           onOpenFilters={() => setSheetOpen(true)}
           filter={filter}
           onFilterChange={setFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
         />
       </div>
 
@@ -68,26 +78,33 @@ export function BrowseView() {
       <div className="hidden h-full overflow-y-auto lg:block">
         <div className="mx-auto flex max-w-[1100px] gap-7 p-10">
           <div className="flex min-w-0 flex-1 flex-col gap-6">
-            <div>
-              <h1 className="font-display text-bark text-[40px] leading-[1.05] font-medium">
-                {t.browse.heading}
-              </h1>
-              <p className="text-ink-muted mt-1.5 text-sm">
-                {places.length} {t.filters.resultsCount}
-              </p>
+            <div className="flex flex-col gap-4">
+              <div>
+                <h1 className="font-display text-bark text-[40px] leading-[1.05] font-medium">
+                  {t.browse.heading}
+                </h1>
+                <p className="text-ink-muted mt-1.5 text-sm">
+                  {visiblePlaces.length} {t.filters.resultsCount}
+                </p>
+              </div>
+              <PlaceSearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t.browse.searchPlaceholder}
+              />
             </div>
 
             <div className="rounded-card-lg border-line h-[300px] shrink-0 overflow-hidden border">
-              <PlaceMap places={places} />
+              <PlaceMap places={visiblePlaces} />
             </div>
 
             {isLoading ? (
               <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
-            ) : places.length === 0 ? (
+            ) : visiblePlaces.length === 0 ? (
               <p className="text-ink-muted">{t.placeCard.noMatches}</p>
             ) : (
               <div className="grid grid-cols-2 gap-5 xl:grid-cols-3">
-                {places.map((place) => (
+                {visiblePlaces.map((place) => (
                   <PlaceCardDesktop
                     key={place.id}
                     place={place}
@@ -98,7 +115,7 @@ export function BrowseView() {
               </div>
             )}
           </div>
-          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={places.length} />
+          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={visiblePlaces.length} />
         </div>
       </div>
 
@@ -107,7 +124,7 @@ export function BrowseView() {
         onOpenChange={setSheetOpen}
         filter={filter}
         onChange={setFilter}
-        matchCount={places.length}
+        matchCount={visiblePlaces.length}
       />
     </div>
   );
