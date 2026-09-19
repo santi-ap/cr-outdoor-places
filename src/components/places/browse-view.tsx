@@ -58,6 +58,8 @@ export function BrowseView() {
           resultsLabel={`${places.length} ${t.filters.resultsCount}`}
           filtersLabel={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
           onOpenFilters={() => setSheetOpen(true)}
+          filter={filter}
+          onFilterChange={setFilter}
         />
       </div>
 
