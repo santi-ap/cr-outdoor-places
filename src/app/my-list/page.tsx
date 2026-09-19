@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { MyListClient, type ListItemWithPlace } from '@/components/my-list/my-list-client';
 
@@ -8,20 +7,18 @@ export default async function MyListPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/');
+  let items: ListItemWithPlace[] = [];
+  if (user) {
+    const { data } = await supabase
+      .from('list_items')
+      .select('id, status, place:places(*)')
+      .order('created_at', { ascending: false });
+    items = (data ?? []) as unknown as ListItemWithPlace[];
   }
-
-  const { data } = await supabase
-    .from('list_items')
-    .select('id, status, place:places(*)')
-    .order('created_at', { ascending: false });
-
-  const items = (data ?? []) as unknown as ListItemWithPlace[];
 
   return (
     <main className="mx-auto h-full max-w-2xl overflow-y-auto p-4 pb-24 lg:pb-4">
-      <MyListClient items={items} />
+      <MyListClient items={items} isSignedIn={!!user} />
     </main>
   );
 }
