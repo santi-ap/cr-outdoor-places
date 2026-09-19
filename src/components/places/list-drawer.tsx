@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useRef, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent } from 'react';
 import { cn } from 'cn';
 import { PlaceCardMobile } from './place-card-mobile';
 import { FilterChipCarousel } from './filter-chip-carousel';
@@ -11,6 +11,41 @@ import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 // Three snap points, drag-adjacent only (low <-> peek <-> full), matching
 // the order they naturally appear top-to-bottom of a drag gesture.
 type DrawerState = 'low' | 'peek' | 'full';
+
+// Persisted across a round trip to a place's detail page and back — the
+// drawer otherwise unmounts on navigation and would always reset to
+// 'peek'. sessionStorage (not a DB-backed preference) since this is a
+// per-tab UI convenience, not something that needs to follow the user
+// across devices. Modeled as a tiny external store (read via
+// useSyncExternalStore) rather than component state seeded in an effect,
+// so the server/first-client-render value ('peek', sessionStorage isn't
+// available during SSR) and the real restored value can differ without a
+// hydration mismatch — that's exactly what this hook is for.
+const DRAWER_STATE_STORAGE_KEY = 'cr-outdoor-places:explore-drawer-state';
+const drawerStateListeners = new Set<() => void>();
+
+function isDrawerState(value: string | null): value is DrawerState {
+  return value === 'low' || value === 'peek' || value === 'full';
+}
+
+function getDrawerStateSnapshot(): DrawerState {
+  const stored = sessionStorage.getItem(DRAWER_STATE_STORAGE_KEY);
+  return isDrawerState(stored) ? stored : 'peek';
+}
+
+function getServerDrawerStateSnapshot(): DrawerState {
+  return 'peek';
+}
+
+function subscribeDrawerState(onStoreChange: () => void) {
+  drawerStateListeners.add(onStoreChange);
+  return () => drawerStateListeners.delete(onStoreChange);
+}
+
+function setDrawerState(next: DrawerState) {
+  sessionStorage.setItem(DRAWER_STATE_STORAGE_KEY, next);
+  drawerStateListeners.forEach((listener) => listener());
+}
 
 // "peek" (the default) shows the search bar, results count, filter row,
 // and a hint of the first card. "low" shows just enough of the header
@@ -63,7 +98,12 @@ export function ListDrawer({
   onSearchChange: (query: string) => void;
 }) {
   const { t } = useLanguage();
-  const [state, setState] = useState<DrawerState>('peek');
+  const state = useSyncExternalStore(
+    subscribeDrawerState,
+    getDrawerStateSnapshot,
+    getServerDrawerStateSnapshot,
+  );
+
   const [isDragging, setIsDragging] = useState(false);
   const [dragDeltaY, setDragDeltaY] = useState(0);
   const startYRef = useRef(0);
@@ -117,11 +157,11 @@ export function ListDrawer({
     setDragDeltaY(0);
     if (Math.abs(delta) < DRAG_RELEASE_THRESHOLD_PX) return;
     if (delta < 0) {
-      if (state === 'low') setState('peek');
-      else if (state === 'peek') setState('full');
+      if (state === 'low') setDrawerState('peek');
+      else if (state === 'peek') setDrawerState('full');
     } else {
-      if (state === 'full') setState('peek');
-      else if (state === 'peek') setState('low');
+      if (state === 'full') setDrawerState('peek');
+      else if (state === 'peek') setDrawerState('low');
     }
   }
 
@@ -163,7 +203,9 @@ export function ListDrawer({
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setState((s) => (s === 'full' ? 'peek' : 'full'));
+                // This control only renders while !isFull, so the toggle
+                // always means "expand."
+                setDrawerState('full');
               }
             }}
           >
@@ -183,7 +225,7 @@ export function ListDrawer({
           >
             <button
               type="button"
-              onClick={() => setState('peek')}
+              onClick={() => setDrawerState('peek')}
               className="bg-moss border-moss flex h-11 w-[68px] items-center justify-center rounded-control border text-sm font-medium whitespace-nowrap text-[#23281C]"
             >
               {t.browse.mapView}
