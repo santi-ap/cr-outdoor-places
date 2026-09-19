@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { StarIcon, PersonStandingIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
+import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
@@ -44,13 +44,13 @@ export function PlaceCardMobile({
   const difficultyLabels = getDifficultyLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
 
-  const pills: { key: string; label: string; tier: Tier; icon: typeof PersonStandingIcon }[] = [];
+  const pills: { key: string; label: string; tier: Tier; icon: typeof FootprintsIcon }[] = [];
   if (place.difficulty) {
     pills.push({
       key: 'difficulty',
       label: difficultyLabels[place.difficulty],
       tier: DIFFICULTY_TIER[place.difficulty],
-      icon: PersonStandingIcon,
+      icon: FootprintsIcon,
     });
   }
   if (place.distance_m) {
@@ -72,7 +72,7 @@ export function PlaceCardMobile({
   pills.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
 
   return (
-    <div className="rounded-card border-line bg-cream relative flex flex-col overflow-hidden border">
+    <div className="rounded-card bg-sand relative flex flex-col overflow-hidden">
       <Link href={`/places/${place.id}`} className="absolute inset-0 z-0" aria-label={place.name} />
 
       <div className="pointer-events-none relative h-[172px] shrink-0" style={PHOTO_PLACEHOLDER_STYLE}>

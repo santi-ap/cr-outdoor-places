@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { StarIcon, PersonStandingIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
+import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
@@ -34,13 +34,13 @@ export function PlaceCardDesktop({
   const difficultyLabels = getDifficultyLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
 
-  const badges: { key: string; label: string; tier: Tier; icon?: typeof PersonStandingIcon }[] = [];
+  const badges: { key: string; label: string; tier: Tier; icon?: typeof FootprintsIcon }[] = [];
   if (place.difficulty) {
     badges.push({
       key: 'difficulty',
       label: difficultyLabels[place.difficulty],
       tier: DIFFICULTY_TIER[place.difficulty],
-      icon: PersonStandingIcon,
+      icon: FootprintsIcon,
     });
   }
   if (place.distance_m) {
@@ -63,7 +63,7 @@ export function PlaceCardDesktop({
   badges.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
   return (
-    <div className="rounded-card-lg border-line bg-cream relative flex flex-col overflow-hidden border">
+    <div className="rounded-card-lg bg-sand relative flex flex-col overflow-hidden">
       <Link
         href={`/places/${place.id}`}
         className="absolute inset-0 z-0"
