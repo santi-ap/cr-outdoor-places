@@ -3,7 +3,6 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { cn } from 'cn';
 import { PlaceCardMobile } from './place-card-mobile';
-import { ActionButton } from '@/components/ui/action-button';
 import { FilterChipCarousel } from './filter-chip-carousel';
 import { PlaceSearchInput } from './place-search-input';
 import { useLanguage } from '@/lib/i18n/language-context';
@@ -150,9 +149,11 @@ export function ListDrawer({
       }}
     >
       {/* Once fully expanded this reads as a plain full-page list, not a
-          floating sheet — no grab handle, no drag-to-collapse. The Map
-          button (moved into the search row below) is the only way back. */}
-      <div className="flex shrink-0 flex-col gap-3 pb-3" {...(isFull ? {} : dragHandlers)}>
+          floating sheet — no grab handle, no rounded/shadowed drawer look.
+          Dragging from anywhere in this header (still not the card list
+          below) still collapses it back — the Map button is just a more
+          discoverable, explicit way to do the same thing. */}
+      <div className="flex shrink-0 flex-col gap-3 pb-3" {...dragHandlers}>
         {!isFull && (
           <button
             type="button"
@@ -170,30 +171,32 @@ export function ListDrawer({
           </button>
         )}
 
-        <div className={cn('flex items-center gap-2 px-5', isFull ? '' : 'pt-3')}>
+        <div className={cn('flex items-center gap-2 px-5', isFull ? 'pt-5' : 'pt-2')}>
           <div className="min-w-0 flex-1">
             <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
           </div>
           <div
             className={cn(
               'shrink-0 overflow-hidden transition-all duration-200 ease-out',
-              isFull ? 'w-[92px] opacity-100' : 'w-0 opacity-0',
+              isFull ? 'w-[68px] opacity-100' : 'w-0 opacity-0',
             )}
           >
-            <ActionButton
-              label={t.browse.mapView}
-              variant="secondary"
-              size="desktop"
-              onPress={() => setState('peek')}
-              className="h-11 w-[92px] whitespace-nowrap"
-            />
+            <button
+              type="button"
+              onClick={() => setState('peek')}
+              className="border-line-strong bg-cream text-bark flex h-11 w-[68px] items-center justify-center rounded-control border text-sm font-medium whitespace-nowrap"
+            >
+              {t.browse.mapView}
+            </button>
           </div>
         </div>
         <div className="px-5">
-          <p className="text-ink-muted text-sm">{resultsLabel}</p>
-        </div>
-        <div className="px-5">
-          <FilterChipCarousel filter={filter} onChange={onFilterChange} onOpenAllFilters={onOpenFilters} />
+          <FilterChipCarousel
+            filter={filter}
+            onChange={onFilterChange}
+            onOpenAllFilters={onOpenFilters}
+            resultsLabel={resultsLabel}
+          />
         </div>
       </div>
 
