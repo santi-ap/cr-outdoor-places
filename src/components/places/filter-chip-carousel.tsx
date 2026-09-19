@@ -111,15 +111,14 @@ export function FilterChipCarousel({
 
   return (
     <div className="flex flex-col gap-2">
-      <button
-        type="button"
-        onClick={onOpenAllFilters}
-        className="border-forest bg-forest text-cream rounded-control self-start border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap"
-      >
-        {t.filters.allFilters}
-      </button>
-
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+        <button
+          type="button"
+          onClick={onOpenAllFilters}
+          className="border-forest bg-forest text-cream rounded-control shrink-0 border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap"
+        >
+          {t.filters.allFilters}
+        </button>
         {fields.map((field) => (
           <button
             key={field.key}
