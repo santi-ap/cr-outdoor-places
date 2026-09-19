@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
 import { PlaceActions } from './place-actions';
@@ -21,6 +22,13 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
   moderate: 'moderado',
   hard: 'dificil',
 };
+
+const PlaceMap = dynamic(() => import('./place-map').then((m) => m.PlaceMap), {
+  ssr: false,
+  loading: () => <div className="bg-sand h-full w-full" />,
+});
+
+const LOCATION_MAP_ZOOM = 14;
 
 type Status = 'saved' | 'visited' | null;
 
@@ -135,6 +143,13 @@ export function PlaceDetailView({
             </div>
           )}
 
+          <div>
+            <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.location}</h2>
+            <div className="rounded-2xl border-line h-[200px] overflow-hidden border">
+              <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
+            </div>
+          </div>
+
           <Link href={`/places/${place.id}/suggest-edit`} className="text-ink-muted text-sm underline">
             {t.detail.suggestEdit}
           </Link>
@@ -202,6 +217,13 @@ export function PlaceDetailView({
                   {place.description}
                 </p>
               )}
+
+              <div>
+                <h2 className="font-display text-bark mb-3 text-xl font-medium">{t.detail.location}</h2>
+                <div className="rounded-2xl border-line h-[260px] overflow-hidden border">
+                  <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
+                </div>
+              </div>
 
               <Link href={`/places/${place.id}/suggest-edit`} className="text-ink-muted text-sm underline">
                 {t.detail.suggestEdit}
