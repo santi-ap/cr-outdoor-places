@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { createPlaceSuggestion } from '@/app/actions/place-suggestions';
+import { SignInRequiredDialog } from '@/components/auth/sign-in-required-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -115,13 +116,14 @@ function buildChanges(values: FieldValues, original: FieldValues | null): Partia
   return changes as Partial<PlaceInsert>;
 }
 
-export function SuggestionForm({ place }: { place?: Place }) {
+export function SuggestionForm({ place, isSignedIn }: { place?: Place; isSignedIn: boolean }) {
   const { t, language } = useLanguage();
   const original = place ? placeToFieldValues(place) : null;
   const [values, setValues] = useState<FieldValues>(original ?? EMPTY);
   const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [signInDialogOpen, setSignInDialogOpen] = useState(false);
 
   const categoryLabels = getCategoryLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
@@ -135,6 +137,11 @@ export function SuggestionForm({ place }: { place?: Place }) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!isSignedIn) {
+      setSignInDialogOpen(true);
+      return;
+    }
 
     if (!place && (values.name.trim() === '' || values.category.trim() === '')) {
       setError(t.suggest.errorNameCategoryRequired);
@@ -169,7 +176,8 @@ export function SuggestionForm({ place }: { place?: Place }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <Field label={t.suggest.fields.name}>
         <Input value={values.name} onChange={(e) => setField('name', e.target.value)} />
       </Field>
@@ -295,7 +303,13 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </Button>
 
       {status === 'error' && <p className="text-destructive text-sm">{error}</p>}
-    </form>
+      </form>
+      <SignInRequiredDialog
+        open={signInDialogOpen}
+        onOpenChange={setSignInDialogOpen}
+        message={place ? t.suggest.signInToEdit : t.suggest.signInToSuggest}
+      />
+    </>
   );
 }
 
