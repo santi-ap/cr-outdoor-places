@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
 import { PlaceActions } from './place-actions';
+import { PhotoCarousel } from './photo-carousel';
 import { useLanguage } from '@/lib/i18n/language-context';
 import {
   getCategoryLabels,
@@ -19,12 +20,6 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
   easy: 'facil',
   moderate: 'moderado',
   hard: 'dificil',
-};
-
-const PHOTO_PLACEHOLDER_STYLE = {
-  backgroundColor: '#E3D6C1',
-  backgroundImage:
-    'repeating-linear-gradient(118deg, rgba(143,168,118,0.4) 0 9px, rgba(143,168,118,0) 9px 20px)',
 };
 
 type Status = 'saved' | 'visited' | null;
@@ -83,12 +78,13 @@ export function PlaceDetailView({
     <>
       {/* Mobile detail screen (<1024px). */}
       <div className="flex h-full flex-col overflow-y-auto lg:hidden">
-        <div className="relative h-[220px] shrink-0 rounded-b-[30px]" style={PHOTO_PLACEHOLDER_STYLE}>
-          <div className="flex items-center justify-between p-4">
+        <div className="relative h-[220px] shrink-0">
+          <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-between p-4">
             <Link
               href="/"
               aria-label={t.detail.backToMap}
-              className="border-line bg-cream flex h-11 w-11 items-center justify-center rounded-2xl border"
+              className="border-line bg-cream pointer-events-auto flex h-11 w-11 items-center justify-center rounded-2xl border"
             >
               <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
             </Link>
@@ -171,7 +167,7 @@ export function PlaceDetailView({
             <span className="text-ink-muted text-sm">{locationLine}</span>
           </div>
 
-          <div className="h-[300px] rounded-[26px]" style={PHOTO_PLACEHOLDER_STYLE} />
+          <PhotoCarousel roundedClassName="rounded-[26px]" className="h-[300px]" />
 
           <div className="flex items-start gap-10">
             <div className="flex min-w-0 flex-1 flex-col gap-6">

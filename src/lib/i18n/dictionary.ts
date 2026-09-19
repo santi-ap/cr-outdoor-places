@@ -65,6 +65,9 @@ const es = {
     suggestEdit: 'Sugerir una edición',
     photoPlaceholder: 'Foto no disponible',
     unverified: 'Datos sin verificar',
+    photo: 'Foto',
+    previousPhoto: 'Foto anterior',
+    nextPhoto: 'Foto siguiente',
   },
   myList: {
     saved: 'Guardados',
@@ -176,6 +179,9 @@ const en: typeof es = {
     suggestEdit: 'Suggest an edit',
     photoPlaceholder: 'Photo not available',
     unverified: 'Unverified details',
+    photo: 'Photo',
+    previousPhoto: 'Previous photo',
+    nextPhoto: 'Next photo',
   },
   myList: {
     saved: 'Saved',
