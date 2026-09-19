@@ -3,14 +3,15 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { PlaceCardMobile } from './place-card-mobile';
 import { ActionButton } from '@/components/ui/action-button';
+import { FilterChipCarousel } from './filter-chip-carousel';
 import { useLanguage } from '@/lib/i18n/language-context';
-import type { Place } from '@/lib/validation/schemas';
+import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 
 // How much of the drawer peeks above the bottom edge when collapsed — tall
 // enough to show the results count + filters row + a hint of the first
 // card, so it reads as "there's a list here, drag up for more" rather than
 // a bare bar.
-const PEEK_HEIGHT_PX = 280;
+const PEEK_HEIGHT_PX = 320;
 // Below this drag distance a release is treated as a tap (toggle state)
 // rather than an intentional drag past/short-of the snap threshold.
 const TAP_THRESHOLD_PX = 6;
@@ -26,6 +27,8 @@ export function ListDrawer({
   resultsLabel,
   filtersLabel,
   onOpenFilters,
+  filter,
+  onFilterChange,
 }: {
   places: Place[];
   isLoading: boolean;
@@ -34,6 +37,8 @@ export function ListDrawer({
   resultsLabel: string;
   filtersLabel: string;
   onOpenFilters: () => void;
+  filter: PlacesFilter;
+  onFilterChange: (filter: PlacesFilter) => void;
 }) {
   const { t } = useLanguage();
   const [state, setState] = useState<DrawerState>('peek');
@@ -102,6 +107,7 @@ export function ListDrawer({
             <ActionButton label={t.browse.mapView} variant="secondary" size="desktop" onPress={() => setState('peek')} />
           )}
         </div>
+        <FilterChipCarousel filter={filter} onChange={onFilterChange} />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-24">
