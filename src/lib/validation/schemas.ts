@@ -101,11 +101,23 @@ export const placeSuggestionInsertSchema = placeSuggestionSchema
   .omit({ id: true, created_at: true })
   .partial({ place_id: true, suggested_by: true, status: true });
 
+// Query params arrive as a single comma-separated string (e.g.
+// "easy,hard") since each filter field now supports multiple selected
+// values at once.
+function commaSeparated<T extends z.ZodTypeAny>(schema: T) {
+  return z
+    .preprocess(
+      (val) => (typeof val === 'string' ? val.split(',').filter(Boolean) : val),
+      z.array(schema).min(1),
+    )
+    .optional();
+}
+
 export const placesFilterSchema = z.object({
-  category: placeCategorySchema.optional(),
-  difficulty: difficultySchema.optional(),
-  pet_friendly: petFriendlySchema.optional(),
-  cost_type: costTypeSchema.optional(),
+  category: commaSeparated(placeCategorySchema),
+  difficulty: commaSeparated(difficultySchema),
+  pet_friendly: commaSeparated(petFriendlySchema),
+  cost_type: commaSeparated(costTypeSchema),
   max_distance_m: z.coerce.number().int().positive().optional(),
 });
 

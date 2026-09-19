@@ -1,6 +1,6 @@
 'use client';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from 'cn';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { useLanguage } from '@/lib/i18n/language-context';
@@ -11,43 +11,41 @@ import { useLanguage } from '@/lib/i18n/language-context';
 
 export const MAX_DISTANCE_M = 10000;
 
-export function FilterSelect({
-  label,
-  value,
+// A field can have more than one value selected at once (e.g. Easy AND
+// Hard difficulty) — each option is its own toggle button rather than a
+// single-value dropdown.
+export function MultiSelectField({
+  values,
   options,
   onChange,
-  hideLabel,
 }: {
-  label: string;
-  value: string | undefined;
+  values: string[];
   options: Record<string, string>;
-  onChange: (value: string | undefined) => void;
-  hideLabel?: boolean;
+  onChange: (values: string[]) => void;
 }) {
-  const { t } = useLanguage();
+  function toggle(key: string) {
+    onChange(values.includes(key) ? values.filter((v) => v !== key) : [...values, key]);
+  }
 
   return (
-    <div className="flex flex-col gap-1">
-      {!hideLabel && (
-        <Label htmlFor={`filter-${label}`} className="text-ink-muted text-xs font-medium">
-          {label}
-        </Label>
-      )}
-      <Select value={value ?? 'any'} onValueChange={(v) => onChange(!v || v === 'any' ? undefined : v)}>
-        <SelectTrigger id={`filter-${label}`} className={hideLabel ? 'w-full' : 'w-[150px]'} aria-label={label}>
-          <SelectValue placeholder={t.filters.any}>
-            {(v: unknown) => (v === 'any' ? t.filters.any : (options[v as string] ?? label))}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="any">{t.filters.any}</SelectItem>
-          {Object.entries(options).map(([key, text]) => (
-            <SelectItem key={key} value={key}>
-              {text}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-wrap gap-2">
+      {Object.entries(options).map(([key, text]) => {
+        const active = values.includes(key);
+        return (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={active}
+            onClick={() => toggle(key)}
+            className={cn(
+              'rounded-control border-[1.5px] px-3.5 py-2 text-sm font-medium transition-colors',
+              active ? 'border-forest bg-forest text-cream' : 'border-line-strong bg-cream text-bark',
+            )}
+          >
+            {text}
+          </button>
+        );
+      })}
     </div>
   );
 }
