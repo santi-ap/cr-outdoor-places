@@ -13,7 +13,13 @@ export type ListItemWithPlace = {
   place: Place;
 };
 
-export function MyListClient({ items: initialItems }: { items: ListItemWithPlace[] }) {
+export function MyListClient({
+  items: initialItems,
+  isSignedIn,
+}: {
+  items: ListItemWithPlace[];
+  isSignedIn: boolean;
+}) {
   const { t } = useLanguage();
   const [items, setItems] = useState(initialItems);
   const [isPending, startTransition] = useTransition();
@@ -40,6 +46,19 @@ export function MyListClient({ items: initialItems }: { items: ListItemWithPlace
         setItems((prev) => prev.filter((i) => i.id !== item.id));
       }
     });
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="flex flex-col gap-6">
+        <h1 className="text-2xl font-semibold">{t.header.myList}</h1>
+        <ListSection title={t.myList.saved} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
+        <ListSection title={t.myList.visited} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
+        <div className="border-line bg-sand rounded-2xl border px-4 py-3">
+          <p className="text-ink-body text-sm">{t.placeActions.signInPrompt}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
