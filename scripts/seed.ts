@@ -35,7 +35,46 @@ if (!url || !serviceKey) {
 
 const supabase = createClient<Database>(url, serviceKey);
 
-const PLACES: PlaceInsert[] = [
+// Mock/display-only ratings and reviews (Issue #36) — no submission form,
+// no per-user rows, generated deterministically per place (same seed run
+// always produces the same content) so every place gets a plausible-looking
+// but clearly-fabricated rating and a couple of reviews, varied by author
+// and phrasing so they don't read as copy-pasted across cards.
+const REVIEW_AUTHORS = [
+  'Mariana G.',
+  'Carlos R.',
+  'Ana L.',
+  'Diego M.',
+  'Sofía P.',
+  'Luis T.',
+  'Valentina C.',
+  'Andrés Q.',
+  'Camila S.',
+  'Jorge H.',
+];
+
+const REVIEW_TEMPLATES: ((name: string) => string)[] = [
+  (name) => `Beautiful spot — ${name} was well worth the visit. Would come back.`,
+  (name) => `Nice place to spend a few hours. ${name} has good paths and it wasn't too crowded.`,
+  (name) => `Loved it! ${name} exceeded expectations, especially the views.`,
+  (name) => `Solid choice for a day trip — parking near ${name} was easy to find.`,
+  (name) => `A bit more crowded than expected, but ${name} is still worth seeing.`,
+  (name) => `Great for families — ${name} has easy paths and clean facilities.`,
+  (name) => `Went early morning and had ${name} almost to ourselves. Highly recommend.`,
+];
+
+function mockReviewsFor(index: number, name: string): { rating: number; reviews: PlaceInsert['reviews'] } {
+  const reviewCount = 2 + (index % 2);
+  const reviews = Array.from({ length: reviewCount }, (_, i) => ({
+    author: REVIEW_AUTHORS[(index * 3 + i) % REVIEW_AUTHORS.length],
+    rating: 3 + ((index + i * 2) % 3),
+    text: REVIEW_TEMPLATES[(index * 5 + i * 2) % REVIEW_TEMPLATES.length](name),
+  }));
+  const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  return { rating: Math.round(average * 10) / 10, reviews };
+}
+
+const BASE_PLACES: PlaceInsert[] = [
   {
     // Source: pre-verified in the build plan (Section 5). Hours are the
     // commonly cited range for this park; not independently confirmed.
@@ -492,6 +531,11 @@ const PLACES: PlaceInsert[] = [
     confidence: 'unverified',
   },
 ];
+
+const PLACES: PlaceInsert[] = BASE_PLACES.map((place, index) => ({
+  ...place,
+  ...mockReviewsFor(index, place.name),
+}));
 
 async function main() {
   for (const place of PLACES) {

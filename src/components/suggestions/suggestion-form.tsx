@@ -23,8 +23,10 @@ import {
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place, PlaceInsert } from '@/lib/validation/schemas';
 
+// rating/reviews are mock/seed-only display data (Issue #36) — not exposed
+// here, since suggestions never touch them.
 type FieldValues = {
-  [K in keyof PlaceInsert]-?: string;
+  [K in keyof Omit<PlaceInsert, 'rating' | 'reviews'>]-?: string;
 };
 
 const EMPTY: FieldValues = {
@@ -102,7 +104,7 @@ function parseFieldValue(
 
 function buildChanges(values: FieldValues, original: FieldValues | null): Partial<PlaceInsert> {
   const changes: Record<string, unknown> = {};
-  for (const key of Object.keys(values) as (keyof PlaceInsert)[]) {
+  for (const key of Object.keys(values) as (keyof FieldValues)[]) {
     if (key === 'source' || key === 'confidence') continue;
     const raw = values[key];
     if (original && raw === original[key]) continue; // edit mode: unchanged

@@ -6,6 +6,7 @@ import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
 import { PlaceActions } from './place-actions';
 import { PhotoCarousel } from './photo-carousel';
+import { StarRating } from './star-rating';
 import { useLanguage } from '@/lib/i18n/language-context';
 import {
   getCategoryLabels,
@@ -15,7 +16,7 @@ import {
   getTerrainLabels,
 } from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
-import type { Place } from '@/lib/validation/schemas';
+import type { Place, PlaceReview } from '@/lib/validation/schemas';
 
 const DIFFICULTY_TIER: Record<string, Tier> = {
   easy: 'facil',
@@ -114,6 +115,14 @@ export function PlaceDetailView({
             {place.confidence === 'unverified' && <Badge variant="destructive">{t.detail.unverified}</Badge>}
           </div>
 
+          {place.rating != null && place.reviews.length > 0 && (
+            <div className="flex items-center gap-2">
+              <StarRating value={place.rating} />
+              <span className="text-bark text-sm font-medium">{place.rating.toFixed(1)}</span>
+              <span className="text-ink-muted text-sm">({place.reviews.length})</span>
+            </div>
+          )}
+
           {stats.length > 0 && (
             <div className="border-line divide-line flex divide-x rounded-2xl border">
               {stats.map((s) => (
@@ -149,6 +158,13 @@ export function PlaceDetailView({
               <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
             </div>
           </div>
+
+          {place.reviews.length > 0 && (
+            <div>
+              <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.reviews}</h2>
+              <ReviewsList reviews={place.reviews} />
+            </div>
+          )}
 
           <Link href={`/places/${place.id}/suggest-edit`} className="text-ink-muted text-sm underline">
             {t.detail.suggestEdit}
@@ -199,6 +215,13 @@ export function PlaceDetailView({
                     <Badge variant="destructive">{t.detail.unverified}</Badge>
                   )}
                 </div>
+                {place.rating != null && place.reviews.length > 0 && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <StarRating value={place.rating} />
+                    <span className="text-bark text-sm font-medium">{place.rating.toFixed(1)}</span>
+                    <span className="text-ink-muted text-sm">({place.reviews.length})</span>
+                  </div>
+                )}
               </div>
 
               {stats.length > 0 && (
@@ -224,6 +247,13 @@ export function PlaceDetailView({
                   <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
                 </div>
               </div>
+
+              {place.reviews.length > 0 && (
+                <div>
+                  <h2 className="font-display text-bark mb-3 text-xl font-medium">{t.detail.reviews}</h2>
+                  <ReviewsList reviews={place.reviews} />
+                </div>
+              )}
 
               <Link href={`/places/${place.id}/suggest-edit`} className="text-ink-muted text-sm underline">
                 {t.detail.suggestEdit}
@@ -257,5 +287,22 @@ export function PlaceDetailView({
         </div>
       </div>
     </>
+  );
+}
+
+// Read-only mock reviews (Issue #36) — no "write a review" UI anywhere.
+function ReviewsList({ reviews }: { reviews: PlaceReview[] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {reviews.map((review, i) => (
+        <div key={i} className="border-line-soft border-b pb-4 last:border-b-0 last:pb-0">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-bark text-sm font-medium">{review.author}</span>
+            <StarRating value={review.rating} size={14} />
+          </div>
+          <p className="text-ink-body mt-1.5 text-sm leading-relaxed">{review.text}</p>
+        </div>
+      ))}
+    </div>
   );
 }

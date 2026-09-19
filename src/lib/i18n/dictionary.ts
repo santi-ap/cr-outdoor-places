@@ -72,6 +72,7 @@ const es = {
     previousPhoto: 'Foto anterior',
     nextPhoto: 'Foto siguiente',
     location: 'Ubicación',
+    reviews: 'Reseñas',
   },
   myList: {
     saved: 'Guardados',
@@ -190,6 +191,7 @@ const en: typeof es = {
     previousPhoto: 'Previous photo',
     nextPhoto: 'Next photo',
     location: 'Location',
+    reviews: 'Reviews',
   },
   myList: {
     saved: 'Saved',
