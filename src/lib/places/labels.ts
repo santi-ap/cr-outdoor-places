@@ -54,7 +54,7 @@ const costTypeLabelsEn: LabelMap = {
 
 const costTypeLabelsEs: LabelMap = {
   free: 'Gratis',
-  paid: 'Con entrada',
+  paid: 'Pagado',
   unknown: 'Costo desconocido',
 };
 

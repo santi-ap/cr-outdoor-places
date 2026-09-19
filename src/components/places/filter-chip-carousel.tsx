@@ -28,10 +28,12 @@ export function FilterChipCarousel({
   filter,
   onChange,
   onOpenAllFilters,
+  resultsLabel,
 }: {
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
   onOpenAllFilters: () => void;
+  resultsLabel: string;
 }) {
   const { t, language } = useLanguage();
   const [openField, setOpenField] = useState<FilterKey | null>(null);
@@ -109,14 +111,15 @@ export function FilterChipCarousel({
 
   return (
     <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={onOpenAllFilters}
+        className="border-forest bg-forest text-cream rounded-control self-start border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap"
+      >
+        {t.filters.allFilters}
+      </button>
+
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
-        <button
-          type="button"
-          onClick={onOpenAllFilters}
-          className="border-forest bg-forest text-cream rounded-control shrink-0 border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap"
-        >
-          {t.filters.allFilters}
-        </button>
         {fields.map((field) => (
           <button
             key={field.key}
@@ -135,21 +138,24 @@ export function FilterChipCarousel({
         ))}
       </div>
 
-      {selectedPills.length > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-          {selectedPills.map((pill) => (
-            <button
-              key={pill.key}
-              type="button"
-              onClick={pill.onRemove}
-              className="border-forest bg-forest/10 text-forest rounded-pill flex shrink-0 items-center gap-1 border px-3 py-1 text-xs font-medium whitespace-nowrap"
-            >
-              {pill.label}
-              <XIcon className="size-3" />
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        <p className="text-ink-muted shrink-0 text-sm whitespace-nowrap">{resultsLabel}</p>
+        {selectedPills.length > 0 && (
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-0.5">
+            {selectedPills.map((pill) => (
+              <button
+                key={pill.key}
+                type="button"
+                onClick={pill.onRemove}
+                className="border-forest bg-forest/10 text-forest rounded-pill flex shrink-0 items-center gap-1 border px-3 py-1 text-xs font-medium whitespace-nowrap"
+              >
+                {pill.label}
+                <XIcon className="size-3" />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Sheet open={openField !== null} onOpenChange={(open) => !open && setOpenField(null)}>
         <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream">
