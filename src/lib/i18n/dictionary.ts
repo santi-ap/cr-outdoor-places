@@ -23,6 +23,7 @@ const es = {
     mapView: 'Mapa',
     listView: 'Lista',
     searchPlaceholder: 'Buscar por nombre…',
+    clearSearch: 'Limpiar búsqueda',
   },
   filters: {
     category: 'Categoría',
@@ -139,6 +140,7 @@ const en: typeof es = {
     mapView: 'Map',
     listView: 'List',
     searchPlaceholder: 'Search by name…',
+    clearSearch: 'Clear search',
   },
   filters: {
     category: 'Category',
