@@ -19,11 +19,19 @@ const markerIcon = L.icon({
 
 const COSTA_RICA_CENTER: [number, number] = [9.7489, -83.7534];
 
-export function PlaceMap({ places }: { places: Place[] }) {
+export function PlaceMap({
+  places,
+  center = COSTA_RICA_CENTER,
+  zoom = 8,
+}: {
+  places: Place[];
+  center?: [number, number];
+  zoom?: number;
+}) {
   return (
     <MapContainer
-      center={COSTA_RICA_CENTER}
-      zoom={8}
+      center={center}
+      zoom={zoom}
       // isolate traps Leaflet's internal z-index:1000 control layer inside
       // this stacking context so it can't render above fixed-position UI
       // elsewhere on the page (e.g. the filters Sheet).
