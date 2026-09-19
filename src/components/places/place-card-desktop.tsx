@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { StarIcon } from 'lucide-react';
+import { StarIcon, PersonStandingIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
-import { formatDuration } from '@/lib/places/format';
+import { formatDistance, formatDuration } from '@/lib/places/format';
 import type { Place } from '@/lib/validation/schemas';
 
 const DIFFICULTY_TIER: Record<string, Tier> = {
@@ -34,15 +34,33 @@ export function PlaceCardDesktop({
   const difficultyLabels = getDifficultyLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
 
-  const badges: { label: string; tier: Tier }[] = [];
+  const badges: { key: string; label: string; tier: Tier; icon?: typeof PersonStandingIcon }[] = [];
   if (place.difficulty) {
-    badges.push({ label: difficultyLabels[place.difficulty], tier: DIFFICULTY_TIER[place.difficulty] });
+    badges.push({
+      key: 'difficulty',
+      label: difficultyLabels[place.difficulty],
+      tier: DIFFICULTY_TIER[place.difficulty],
+      icon: PersonStandingIcon,
+    });
   }
-  badges.push({ label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
-  badges.push({ label: costTypeLabels[place.cost_type], tier: 'neutral' });
+  if (place.distance_m) {
+    badges.push({
+      key: 'distance',
+      label: formatDistance(place.distance_m, language),
+      tier: 'neutral',
+      icon: RulerIcon,
+    });
+  }
   if (place.duration_min) {
-    badges.push({ label: formatDuration(place.duration_min, language), tier: 'neutral' });
+    badges.push({
+      key: 'duration',
+      label: formatDuration(place.duration_min, language),
+      tier: 'neutral',
+      icon: ClockIcon,
+    });
   }
+  badges.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
+  badges.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
   return (
     <div className="rounded-card-lg border-line bg-cream relative flex flex-col overflow-hidden border">
@@ -79,7 +97,7 @@ export function PlaceCardDesktop({
             </span>
           )}
           {badges.map((b) => (
-            <TierBadge key={b.label} label={b.label} tier={b.tier} size="md" />
+            <TierBadge key={b.key} label={b.label} tier={b.tier} icon={b.icon} size="md" />
           ))}
         </div>
       </div>

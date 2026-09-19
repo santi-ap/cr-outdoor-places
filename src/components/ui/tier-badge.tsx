@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import { cn } from 'cn';
 
 export type Tier = 'plano' | 'facil' | 'moderado' | 'dificil' | 'neutral';
@@ -15,26 +16,34 @@ const SIZE_STYLES = {
   md: 'px-[11px] py-1.5 text-[12.5px]',
 } as const;
 
+const ICON_SIZE = {
+  sm: 'size-3',
+  md: 'size-3.5',
+} as const;
+
 export function TierBadge({
   label,
   tier = 'neutral',
   size = 'sm',
+  icon: Icon,
   className,
 }: {
   label: string;
   tier?: Tier;
   size?: keyof typeof SIZE_STYLES;
+  icon?: ComponentType<{ className?: string }>;
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-pill border font-semibold whitespace-nowrap',
+        'inline-flex items-center gap-1 rounded-pill border font-semibold whitespace-nowrap',
         TIER_STYLES[tier],
         SIZE_STYLES[size],
         className,
       )}
     >
+      {Icon && <Icon className={ICON_SIZE[size]} />}
       {label}
     </span>
   );
