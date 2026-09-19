@@ -17,7 +17,7 @@ export default async function MyListPage() {
   }
 
   return (
-    <main className="mx-auto h-full max-w-2xl overflow-y-auto p-4 pb-24 lg:pb-4">
+    <main className="max-lg:no-scrollbar mx-auto h-full max-w-2xl overflow-y-auto p-4 pb-24 lg:pb-4">
       <MyListClient items={items} isSignedIn={!!user} />
     </main>
   );

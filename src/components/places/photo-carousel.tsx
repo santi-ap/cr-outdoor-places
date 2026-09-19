@@ -60,7 +60,7 @@ export function PhotoCarousel({
       <div
         ref={trackRef}
         onScroll={handleScroll}
-        className="flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="no-scrollbar flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
       >
         {SLIDE_STYLES.map((style, i) => (
           <div

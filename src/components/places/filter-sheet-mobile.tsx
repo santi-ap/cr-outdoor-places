@@ -22,7 +22,7 @@ export function FilterSheetMobile({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream max-h-[85vh] overflow-y-auto">
+      <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream no-scrollbar max-h-[85vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="font-display text-2xl font-medium">{t.browse.filters}</SheetTitle>
           <p className="text-ink-muted text-sm">
