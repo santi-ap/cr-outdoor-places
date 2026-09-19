@@ -137,9 +137,8 @@ export function FilterChipCarousel({
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
-        <p className="text-ink-muted shrink-0 text-sm whitespace-nowrap">{resultsLabel}</p>
-        {selectedPills.length > 0 && (
+      {selectedPills.length > 0 && (
+        <div className="flex items-center gap-2">
           <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto pb-0.5">
             {selectedPills.map((pill) => (
               <button
@@ -153,8 +152,17 @@ export function FilterChipCarousel({
               </button>
             ))}
           </div>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={() => onChange({})}
+            className="text-forest shrink-0 text-xs font-medium whitespace-nowrap underline"
+          >
+            {t.filters.clearFilters}
+          </button>
+        </div>
+      )}
+
+      <p className="text-ink-muted text-center text-xs">{resultsLabel}</p>
 
       <Sheet open={openField !== null} onOpenChange={(open) => !open && setOpenField(null)}>
         <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream">
