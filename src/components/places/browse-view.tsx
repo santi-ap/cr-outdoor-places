@@ -6,12 +6,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePlaces } from '@/lib/places/use-places';
 import { useSavedPlaceIds } from '@/lib/places/use-saved-places';
 import { toggleSavedPlace } from '@/app/actions/list-items';
-import { PlaceCardMobile } from './place-card-mobile';
 import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
-import { ActionButton } from '@/components/ui/action-button';
-import { ViewToggle, type BrowseView as BrowseViewMode } from './view-toggle';
+import { ListDrawer } from './list-drawer';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
@@ -31,7 +29,6 @@ export function BrowseView() {
   const { t } = useLanguage();
   const [filter, setFilter] = useState<PlacesFilter>({});
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<BrowseViewMode>('map');
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
@@ -44,55 +41,24 @@ export function BrowseView() {
 
   return (
     <div className="bg-cream h-full">
-      {/* Mobile explore screen (<1024px): a Map/List toggle switches between
-          a full-height map and a full-height list — showing a compact map
-          alongside the list at once left too little room for list items on
-          an actual phone. */}
-      <div className="flex h-full flex-col lg:hidden">
-        <div className="flex flex-col gap-1 p-5 pb-0">
-          <h1 className="font-display text-bark text-[28px] leading-[1.1] font-medium">{t.browse.heading}</h1>
-          <p className="text-ink-muted text-sm">
-            {places.length} {t.filters.resultsCount}
-          </p>
+      {/* Mobile explore screen (<1024px): full-bleed map with the place
+          list living in a drawer that peeks over the bottom of the map and
+          can be dragged up to fully cover it — AllTrails-style layout, but
+          our own card style and no route-tracking features. Replaces the
+          Map/List toggle from #24. */}
+      <div className="relative h-full overflow-hidden lg:hidden">
+        <div className="absolute inset-0">
+          <PlaceMap places={places} />
         </div>
-
-        <div className="flex shrink-0 items-center gap-2 overflow-x-auto px-5 py-4">
-          <ActionButton
-            label={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
-            variant="primary"
-            size="desktop"
-            onPress={() => setSheetOpen(true)}
-          />
-          <ViewToggle
-            view={mobileView}
-            onChange={setMobileView}
-            mapLabel={t.browse.mapView}
-            listLabel={t.browse.listView}
-          />
-        </div>
-
-        {mobileView === 'map' ? (
-          <div className="rounded-card border-line mx-5 mb-4 min-h-0 flex-1 overflow-hidden border">
-            <PlaceMap places={places} />
-          </div>
-        ) : (
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-32">
-            {isLoading ? (
-              <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
-            ) : places.length === 0 ? (
-              <p className="text-ink-muted">{t.placeCard.noMatches}</p>
-            ) : (
-              places.map((place) => (
-                <PlaceCardMobile
-                  key={place.id}
-                  place={place}
-                  saved={savedIds?.has(place.id) ?? false}
-                  onToggleSave={() => toggleSaved.mutate(place.id)}
-                />
-              ))
-            )}
-          </div>
-        )}
+        <ListDrawer
+          places={places}
+          isLoading={isLoading}
+          savedIds={savedIds}
+          onToggleSave={(placeId) => toggleSaved.mutate(placeId)}
+          resultsLabel={`${places.length} ${t.filters.resultsCount}`}
+          filtersLabel={activeFilterCount > 0 ? `${t.browse.filters} (${activeFilterCount})` : t.browse.filters}
+          onOpenFilters={() => setSheetOpen(true)}
+        />
       </div>
 
       {/* Desktop explore screen (>=1024px): nav rail (global, layout.tsx)
