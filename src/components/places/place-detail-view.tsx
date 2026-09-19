@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { PlaceActions } from './place-actions';
 import { PhotoCarousel } from './photo-carousel';
 import { StarRating } from './star-rating';
+import { DirectionsButton } from './directions-button';
+import { ShareButton } from './share-button';
 import { useLanguage } from '@/lib/i18n/language-context';
 import {
   getCategoryLabels,
@@ -83,6 +85,11 @@ export function PlaceDetailView({
     .filter(Boolean)
     .join(' · ');
 
+  // No street-address field in the data model — canton/province is the
+  // closest approximation for a "where is this" label on the directions
+  // button.
+  const directionsLabel = [place.canton, place.province].filter(Boolean).join(', ') || null;
+
   return (
     <>
       {/* Mobile detail screen (<1024px). */}
@@ -97,6 +104,7 @@ export function PlaceDetailView({
             >
               <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
             </Link>
+            <ShareButton title={place.name} iconOnly className="pointer-events-auto" />
           </div>
         </div>
 
@@ -152,11 +160,12 @@ export function PlaceDetailView({
             </div>
           )}
 
-          <div>
-            <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.location}</h2>
+          <div className="flex flex-col gap-3">
+            <h2 className="font-display text-bark text-[22px] font-medium">{t.detail.location}</h2>
             <div className="rounded-2xl border-line h-[200px] overflow-hidden border">
               <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
             </div>
+            <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
           </div>
 
           {place.reviews.length > 0 && (
@@ -196,6 +205,7 @@ export function PlaceDetailView({
               <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
             </Link>
             <span className="text-ink-muted text-sm">{locationLine}</span>
+            <ShareButton title={place.name} className="ml-auto" />
           </div>
 
           <PhotoCarousel roundedClassName="rounded-[26px]" className="h-[300px]" />
@@ -241,11 +251,12 @@ export function PlaceDetailView({
                 </p>
               )}
 
-              <div>
-                <h2 className="font-display text-bark mb-3 text-xl font-medium">{t.detail.location}</h2>
+              <div className="flex flex-col gap-3">
+                <h2 className="font-display text-bark text-xl font-medium">{t.detail.location}</h2>
                 <div className="rounded-2xl border-line h-[260px] overflow-hidden border">
                   <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
                 </div>
+                <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
               </div>
 
               {place.reviews.length > 0 && (
