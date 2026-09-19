@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { SuggestionForm } from './suggestion-form';
+import { SignInNotice } from '@/components/auth/sign-in-notice';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
 
@@ -17,7 +18,7 @@ export function SuggestEditClient({ place, isSignedIn }: { place: Place; isSigne
       <h1 className="text-2xl font-semibold">{t.suggest.editHeading}</h1>
       <p className="text-muted-foreground text-sm">{t.suggest.editDescription}</p>
 
-      <SuggestionForm place={place} isSignedIn={isSignedIn} />
+      {isSignedIn ? <SuggestionForm place={place} /> : <SignInNotice message={t.suggest.signInToEdit} />}
     </main>
   );
 }

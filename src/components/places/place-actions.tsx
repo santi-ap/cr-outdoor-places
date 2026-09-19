@@ -22,6 +22,7 @@ export function PlaceActions({
   size = 'desktop',
   fullWidth,
   stacked,
+  showSaveButton = true,
 }: {
   placeId: string;
   isSignedIn: boolean;
@@ -30,6 +31,10 @@ export function PlaceActions({
   size?: Size;
   fullWidth?: boolean;
   stacked?: boolean;
+  // Mobile's header already has a SaveIconButton next to the place name —
+  // showing a second, full-width Save button in the bottom bar duplicated
+  // it. Desktop has no icon button elsewhere, so it keeps this one.
+  showSaveButton?: boolean;
 }) {
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
@@ -65,28 +70,30 @@ export function PlaceActions({
             }}
           />
         )}
-        <ActionButton
-          label={status ? t.placeActions.saved : t.placeActions.save}
-          variant="secondary"
-          size={size}
-          fullWidth={fullWidth}
-          disabled={isPending || status !== null}
-          onPress={() => {
-            if (!isSignedIn) {
-              setSignInDialogOpen(true);
-              return;
-            }
-            startTransition(async () => {
-              const result = await savePlace(placeId);
-              if (result.success) {
-                onStatusChange('saved');
-                setError(null);
-              } else {
-                setError(result.error);
+        {showSaveButton && (
+          <ActionButton
+            label={status ? t.placeActions.saved : t.placeActions.save}
+            variant="secondary"
+            size={size}
+            fullWidth={fullWidth}
+            disabled={isPending || status !== null}
+            onPress={() => {
+              if (!isSignedIn) {
+                setSignInDialogOpen(true);
+                return;
               }
-            });
-          }}
-        />
+              startTransition(async () => {
+                const result = await savePlace(placeId);
+                if (result.success) {
+                  onStatusChange('saved');
+                  setError(null);
+                } else {
+                  setError(result.error);
+                }
+              });
+            }}
+          />
+        )}
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <SignInRequiredDialog
