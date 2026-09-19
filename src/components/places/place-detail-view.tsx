@@ -117,7 +117,12 @@ export function PlaceDetailView({
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <ShareButton title={place.name} iconOnly />
-              {isSignedIn && <SaveIconButton placeId={place.id} status={status} onStatusChange={setStatus} />}
+              <SaveIconButton
+                placeId={place.id}
+                isSignedIn={isSignedIn}
+                status={status}
+                onStatusChange={setStatus}
+              />
             </div>
           </div>
 

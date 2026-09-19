@@ -14,6 +14,7 @@ const es = {
     sendMagicLink: 'Enviar enlace mágico',
     sending: 'Enviando…',
     checkEmail: 'Revisa tu correo para el enlace de acceso.',
+    signInRequiredTitle: 'Inicia sesión',
   },
   browse: {
     heading: 'Lugares para caminar',
@@ -136,6 +137,7 @@ const en: typeof es = {
     sendMagicLink: 'Send magic link',
     sending: 'Sending…',
     checkEmail: 'Check your email for a sign-in link.',
+    signInRequiredTitle: 'Sign in required',
   },
   browse: {
     heading: 'Places to walk',

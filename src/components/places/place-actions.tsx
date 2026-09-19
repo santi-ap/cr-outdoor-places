@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { cn } from 'cn';
 import { BookmarkIcon, BookmarkCheckIcon } from 'lucide-react';
 import { ActionButton } from '@/components/ui/action-button';
+import { SignInRequiredDialog } from '@/components/auth/sign-in-required-dialog';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { savePlace, markVisited } from '@/app/actions/list-items';
 
@@ -33,21 +34,9 @@ export function PlaceActions({
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [signInDialogOpen, setSignInDialogOpen] = useState(false);
 
   const rowClassName = cn('flex gap-2', stacked && 'flex-col');
-
-  if (!isSignedIn) {
-    return (
-      <div
-        className={cn(
-          'border-line bg-sand rounded-2xl border px-4 py-3',
-          fullWidth ? 'w-full' : 'w-auto',
-        )}
-      >
-        <p className="text-ink-body text-sm">{t.placeActions.signInPrompt}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -59,7 +48,11 @@ export function PlaceActions({
             size={size}
             fullWidth={fullWidth}
             disabled={isPending || status === 'visited'}
-            onPress={() =>
+            onPress={() => {
+              if (!isSignedIn) {
+                setSignInDialogOpen(true);
+                return;
+              }
               startTransition(async () => {
                 const result = await markVisited(placeId);
                 if (result.success) {
@@ -68,8 +61,8 @@ export function PlaceActions({
                 } else {
                   setError(result.error);
                 }
-              })
-            }
+              });
+            }}
           />
         )}
         <ActionButton
@@ -78,7 +71,11 @@ export function PlaceActions({
           size={size}
           fullWidth={fullWidth}
           disabled={isPending || status !== null}
-          onPress={() =>
+          onPress={() => {
+            if (!isSignedIn) {
+              setSignInDialogOpen(true);
+              return;
+            }
             startTransition(async () => {
               const result = await savePlace(placeId);
               if (result.success) {
@@ -87,11 +84,16 @@ export function PlaceActions({
               } else {
                 setError(result.error);
               }
-            })
-          }
+            });
+          }}
         />
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
+      <SignInRequiredDialog
+        open={signInDialogOpen}
+        onOpenChange={setSignInDialogOpen}
+        message={t.placeActions.signInPrompt}
+      />
     </div>
   );
 }
@@ -101,38 +103,52 @@ export function PlaceActions({
 // PlaceActions bar above, rather than a second parallel implementation.
 export function SaveIconButton({
   placeId,
+  isSignedIn,
   status,
   onStatusChange,
   className,
 }: {
   placeId: string;
+  isSignedIn: boolean;
   status: Status;
   onStatusChange: (status: Status) => void;
   className?: string;
 }) {
   const { t } = useLanguage();
   const [isPending, startTransition] = useTransition();
+  const [signInDialogOpen, setSignInDialogOpen] = useState(false);
   const saved = status !== null;
 
   return (
-    <button
-      type="button"
-      aria-pressed={saved}
-      aria-label={saved ? t.placeActions.saved : t.placeActions.save}
-      disabled={isPending || saved}
-      onClick={() =>
-        startTransition(async () => {
-          const result = await savePlace(placeId);
-          if (result.success) onStatusChange('saved');
-        })
-      }
-      className={cn(
-        'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border font-medium transition-colors',
-        saved ? 'border-forest bg-forest text-cream' : 'border-line bg-cream text-clay',
-        className,
-      )}
-    >
-      {saved ? <BookmarkCheckIcon className="size-4" /> : <BookmarkIcon className="size-4" />}
-    </button>
+    <>
+      <button
+        type="button"
+        aria-pressed={saved}
+        aria-label={saved ? t.placeActions.saved : t.placeActions.save}
+        disabled={isPending || saved}
+        onClick={() => {
+          if (!isSignedIn) {
+            setSignInDialogOpen(true);
+            return;
+          }
+          startTransition(async () => {
+            const result = await savePlace(placeId);
+            if (result.success) onStatusChange('saved');
+          });
+        }}
+        className={cn(
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border font-medium transition-colors',
+          saved ? 'border-forest bg-forest text-cream' : 'border-line bg-cream text-clay',
+          className,
+        )}
+      >
+        {saved ? <BookmarkCheckIcon className="size-4" /> : <BookmarkIcon className="size-4" />}
+      </button>
+      <SignInRequiredDialog
+        open={signInDialogOpen}
+        onOpenChange={setSignInDialogOpen}
+        message={t.placeActions.signInPrompt}
+      />
+    </>
   );
 }

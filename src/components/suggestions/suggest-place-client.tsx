@@ -16,7 +16,7 @@ export function SuggestPlaceClient({ isSignedIn }: { isSignedIn: boolean }) {
       <h1 className="text-2xl font-semibold">{t.suggest.newPlaceHeading}</h1>
       <p className="text-muted-foreground text-sm">{t.suggest.newPlaceDescription}</p>
 
-      {isSignedIn ? <SuggestionForm /> : <p className="text-sm">{t.suggest.signInToSuggest}</p>}
+      <SuggestionForm isSignedIn={isSignedIn} />
     </main>
   );
 }

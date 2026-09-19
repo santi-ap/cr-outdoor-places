@@ -17,7 +17,7 @@ export function SuggestEditClient({ place, isSignedIn }: { place: Place; isSigne
       <h1 className="text-2xl font-semibold">{t.suggest.editHeading}</h1>
       <p className="text-muted-foreground text-sm">{t.suggest.editDescription}</p>
 
-      {isSignedIn ? <SuggestionForm place={place} /> : <p className="text-sm">{t.suggest.signInToEdit}</p>}
+      <SuggestionForm place={place} isSignedIn={isSignedIn} />
     </main>
   );
 }
