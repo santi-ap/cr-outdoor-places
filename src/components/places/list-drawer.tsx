@@ -29,10 +29,14 @@ const DRAG_COMMIT_THRESHOLD_PX = 8;
 // started from instead of advancing to the next snap point.
 const DRAG_RELEASE_THRESHOLD_PX = 60;
 
-function restingHeight(state: DrawerState) {
-  if (state === 'full') return 0;
-  if (state === 'peek') return PEEK_HEIGHT_PX;
-  return LOW_HEIGHT_PX;
+// 'full' isn't just "100% - 0px" (that's translateY(100%), which pushes
+// the whole drawer off-screen below the viewport, not fully open) — it
+// needs its own translateY(0px) base, since the drawer's own height
+// already spans the full container.
+function restingTransformBase(state: DrawerState): string {
+  if (state === 'full') return '0px';
+  if (state === 'peek') return `calc(100% - ${PEEK_HEIGHT_PX}px)`;
+  return `calc(100% - ${LOW_HEIGHT_PX}px)`;
 }
 
 export function ListDrawer({
@@ -132,7 +136,7 @@ export function ListDrawer({
     <div
       className="rounded-t-[28px] border-line bg-cream absolute inset-x-0 top-6 bottom-0 flex flex-col border shadow-[0_-8px_24px_rgba(0,0,0,0.12)]"
       style={{
-        transform: `translateY(calc(100% - ${restingHeight(state)}px + ${dragDeltaY}px))`,
+        transform: `translateY(calc(${restingTransformBase(state)} + ${dragDeltaY}px))`,
         transition: isDragging ? 'none' : 'transform 220ms ease-out',
       }}
     >
