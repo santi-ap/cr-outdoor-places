@@ -9,7 +9,7 @@ import { useLanguage } from '@/lib/i18n/language-context';
 // storage) — a few differently-tinted/patterned placeholder slides stand in
 // so the carousel interaction (swipe/arrows/dots) is real, without spending
 // tokens or storage on generated or fetched imagery (Issue #34).
-const SLIDE_STYLES: CSSProperties[] = [
+export const SLIDE_STYLES: CSSProperties[] = [
   {
     backgroundColor: '#E3D6C1',
     backgroundImage:

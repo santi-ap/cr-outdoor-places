@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePlaces } from '@/lib/places/use-places';
 import { useSavedPlaceIds } from '@/lib/places/use-saved-places';
 import { toggleSavedPlace } from '@/app/actions/list-items';
+import { SignInRequiredDialog } from '@/components/auth/sign-in-required-dialog';
 import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
@@ -35,6 +36,7 @@ export function BrowseView() {
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
+  const [signInDialogOpen, setSignInDialogOpen] = useState(false);
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
   const visiblePlaces = trimmedQuery
@@ -43,7 +45,15 @@ export function BrowseView() {
 
   const toggleSaved = useMutation({
     mutationFn: (placeId: string) => toggleSavedPlace(placeId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['saved-place-ids'] }),
+    onSuccess: (result) => {
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ['saved-place-ids'] });
+      } else {
+        // Signed out — toggleSavedPlace resolves with success:false rather
+        // than throwing, so this is the only place that failure surfaces.
+        setSignInDialogOpen(true);
+      }
+    },
   });
 
   return (
@@ -123,6 +133,12 @@ export function BrowseView() {
         filter={filter}
         onChange={setFilter}
         matchCount={visiblePlaces.length}
+      />
+
+      <SignInRequiredDialog
+        open={signInDialogOpen}
+        onOpenChange={setSignInDialogOpen}
+        message={t.placeActions.signInPrompt}
       />
     </div>
   );
