@@ -6,56 +6,16 @@ import { PlaceCardMobile } from './place-card-mobile';
 import { FilterChipCarousel } from './filter-chip-carousel';
 import { PlaceSearchInput } from './place-search-input';
 import { useLanguage } from '@/lib/i18n/language-context';
+import {
+  type DrawerState,
+  getDrawerStateSnapshot,
+  getServerDrawerStateSnapshot,
+  subscribeDrawerState,
+  setDrawerState,
+  PEEK_HEIGHT_PX,
+  LOW_HEIGHT_PX,
+} from '@/lib/places/drawer-state';
 import type { Place, PlacesFilter } from '@/lib/validation/schemas';
-
-// Three snap points, drag-adjacent only (low <-> peek <-> full), matching
-// the order they naturally appear top-to-bottom of a drag gesture.
-type DrawerState = 'low' | 'peek' | 'full';
-
-// Persisted across a round trip to a place's detail page and back — the
-// drawer otherwise unmounts on navigation and would always reset to
-// 'peek'. sessionStorage (not a DB-backed preference) since this is a
-// per-tab UI convenience, not something that needs to follow the user
-// across devices. Modeled as a tiny external store (read via
-// useSyncExternalStore) rather than component state seeded in an effect,
-// so the server/first-client-render value ('peek', sessionStorage isn't
-// available during SSR) and the real restored value can differ without a
-// hydration mismatch — that's exactly what this hook is for.
-const DRAWER_STATE_STORAGE_KEY = 'cr-outdoor-places:explore-drawer-state';
-const drawerStateListeners = new Set<() => void>();
-
-function isDrawerState(value: string | null): value is DrawerState {
-  return value === 'low' || value === 'peek' || value === 'full';
-}
-
-function getDrawerStateSnapshot(): DrawerState {
-  const stored = sessionStorage.getItem(DRAWER_STATE_STORAGE_KEY);
-  return isDrawerState(stored) ? stored : 'peek';
-}
-
-function getServerDrawerStateSnapshot(): DrawerState {
-  return 'peek';
-}
-
-function subscribeDrawerState(onStoreChange: () => void) {
-  drawerStateListeners.add(onStoreChange);
-  return () => drawerStateListeners.delete(onStoreChange);
-}
-
-function setDrawerState(next: DrawerState) {
-  sessionStorage.setItem(DRAWER_STATE_STORAGE_KEY, next);
-  drawerStateListeners.forEach((listener) => listener());
-}
-
-// "peek" (the default) shows the search bar, results count, filter row,
-// and a hint of the first card. "low" shows just enough of the header
-// (search + filters) for those to stay usable while the map dominates the
-// screen — the extra MOBILE_TAB_BAR_CLEARANCE_PX keeps that content clear
-// of the floating MobileTabBar pill (~76px reserved the same way
-// place-detail-view.tsx's sticky action bar clears it).
-const PEEK_HEIGHT_PX = 340;
-const MOBILE_TAB_BAR_CLEARANCE_PX = 76;
-const LOW_HEIGHT_PX = 190 + MOBILE_TAB_BAR_CLEARANCE_PX;
 
 // A pointer move below this (and not more vertical than horizontal) is
 // still a tap/native-scroll candidate, not a drawer drag.

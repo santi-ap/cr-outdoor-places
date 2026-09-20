@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { MapContainer, TileLayer, Marker, Tooltip, useMapEvent } from 'react-leaflet';
@@ -8,8 +8,22 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { XIcon } from 'lucide-react';
 import { PlacePills } from './place-pills';
+import {
+  getDrawerHeightPx,
+  getDrawerStateSnapshot,
+  getServerDrawerStateSnapshot,
+  subscribeDrawerState,
+} from '@/lib/places/drawer-state';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
+
+// Clearance between the preview panel and whatever's below it, so the
+// panel never overlaps that content — just the fixed 12px inset from the
+// screen edge when there's no drawer to clear.
+const PANEL_BOTTOM_INSET_PX = 12;
+// Extra breathing room between the panel and the drawer's own top edge,
+// when there is one, so the two don't touch.
+const PANEL_DRAWER_GAP_PX = 16;
 
 // A pin matching the app's forest-green brand color instead of Leaflet's
 // default blue marker (which also needed its image paths pointed at a CDN
@@ -59,10 +73,16 @@ export function PlaceMap({
   places,
   center = COSTA_RICA_CENTER,
   zoom = 8,
+  hasDrawer = false,
 }: {
   places: Place[];
   center?: [number, number];
   zoom?: number;
+  // True only where a ListDrawer sits over this map (mobile Explore) — the
+  // preview panel then keeps clear of the drawer's current top edge
+  // instead of using a plain fixed inset, which only makes sense where
+  // there's no drawer to avoid.
+  hasDrawer?: boolean;
 }) {
   const { t } = useLanguage();
   const [currentZoom, setCurrentZoom] = useState(zoom);
@@ -70,6 +90,11 @@ export function PlaceMap({
   const showLabels = currentZoom >= LABEL_ZOOM_THRESHOLD;
   const selectedPlace = places.find((place) => place.id === selectedPlaceId) ?? null;
   const mapRef = useRef<L.Map | null>(null);
+  const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
+  const drawerHeightPx = hasDrawer ? getDrawerHeightPx(drawerState) : 0;
+  const panelBottomPx = Number.isFinite(drawerHeightPx)
+    ? drawerHeightPx + (hasDrawer ? PANEL_DRAWER_GAP_PX : PANEL_BOTTOM_INSET_PX)
+    : null;
 
   // Next.js's client-side route cache can "reappear" this component's DOM
   // node on a back/forward navigation instead of a full unmount+remount,
@@ -134,10 +159,16 @@ export function PlaceMap({
           component's own subtree no matter how high, since the drawer
           (a later sibling with its own stacking context) would still
           paint over it. A portal escapes that entirely, so the preview
-          reliably shows above the drawer instead of hidden behind it. */}
+          reliably shows above the drawer instead of hidden behind it.
+
+          panelBottomPx keeps a real gap above the drawer's current top
+          edge (not just a higher stacking order) — when hasDrawer and the
+          drawer is fully expanded there's no map showing to preview
+          over, so panelBottomPx is null and nothing renders. */}
       {selectedPlace &&
+        panelBottomPx !== null &&
         createPortal(
-          <div className="fixed inset-x-3 bottom-3 z-[2000]">
+          <div className="fixed inset-x-3 z-[2000]" style={{ bottom: panelBottomPx }}>
             <div className="rounded-card bg-rail relative overflow-hidden shadow-lg">
               <Link
                 href={`/places/${selectedPlace.id}`}

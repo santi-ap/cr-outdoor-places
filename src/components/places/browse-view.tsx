@@ -82,7 +82,7 @@ export function BrowseView() {
           Map/List toggle from #24. */}
       <div className="relative h-full overflow-hidden lg:hidden">
         <div className="absolute inset-0">
-          <PlaceMap places={visiblePlaces} />
+          <PlaceMap places={visiblePlaces} hasDrawer />
         </div>
         <ListDrawer
           places={visiblePlaces}
