@@ -7,6 +7,7 @@ import { usePlaces } from '@/lib/places/use-places';
 import { useSavedPlaceIds } from '@/lib/places/use-saved-places';
 import { toggleSavedPlace } from '@/app/actions/list-items';
 import { SignInRequiredDialog } from '@/components/auth/sign-in-required-dialog';
+import { useIsSignedIn } from '@/lib/auth/use-is-signed-in';
 import { PlaceCardDesktop } from './place-card-desktop';
 import { FilterSheetMobile } from './filter-sheet-mobile';
 import { FilterPanelDesktop } from './filter-panel-desktop';
@@ -37,6 +38,7 @@ export function BrowseView() {
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
   const [signInDialogOpen, setSignInDialogOpen] = useState(false);
+  const isSignedIn = useIsSignedIn();
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
   const visiblePlaces = trimmedQuery
@@ -50,11 +52,26 @@ export function BrowseView() {
         queryClient.invalidateQueries({ queryKey: ['saved-place-ids'] });
       } else {
         // Signed out — toggleSavedPlace resolves with success:false rather
-        // than throwing, so this is the only place that failure surfaces.
+        // than throwing, so this is the only place that failure surfaces
+        // for a session that expired between page load and this tap.
         setSignInDialogOpen(true);
       }
     },
   });
+
+  // Skips the round trip to the server action entirely when we already
+  // know (from the local session, no network call) that it's just going
+  // to fail with "sign in required" — that's what made the dialog feel
+  // slow to appear.
+  function handleToggleSave(placeId: string) {
+    if (isSignedIn === false) {
+      setSignInDialogOpen(true);
+      return;
+    }
+    toggleSaved.mutate(placeId);
+  }
+
+  const savingPlaceId = toggleSaved.isPending ? toggleSaved.variables : null;
 
   return (
     <div className="bg-cream h-full">
@@ -71,7 +88,8 @@ export function BrowseView() {
           places={visiblePlaces}
           isLoading={isLoading}
           savedIds={savedIds}
-          onToggleSave={(placeId) => toggleSaved.mutate(placeId)}
+          savingPlaceId={savingPlaceId}
+          onToggleSave={handleToggleSave}
           resultsLabel={`${visiblePlaces.length} ${t.filters.resultsCount}`}
           onOpenFilters={() => setSheetOpen(true)}
           filter={filter}
@@ -117,7 +135,8 @@ export function BrowseView() {
                     key={place.id}
                     place={place}
                     saved={savedIds?.has(place.id) ?? false}
-                    onToggleSave={() => toggleSaved.mutate(place.id)}
+                    saving={savingPlaceId === place.id}
+                    onToggleSave={() => handleToggleSave(place.id)}
                   />
                 ))}
               </div>

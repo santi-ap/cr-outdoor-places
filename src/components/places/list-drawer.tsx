@@ -78,6 +78,7 @@ export function ListDrawer({
   places,
   isLoading,
   savedIds,
+  savingPlaceId,
   onToggleSave,
   resultsLabel,
   onOpenFilters,
@@ -89,6 +90,7 @@ export function ListDrawer({
   places: Place[];
   isLoading: boolean;
   savedIds: Set<string> | undefined;
+  savingPlaceId: string | null;
   onToggleSave: (placeId: string) => void;
   resultsLabel: string;
   onOpenFilters: () => void;
@@ -256,6 +258,7 @@ export function ListDrawer({
                 key={place.id}
                 place={place}
                 saved={savedIds?.has(place.id) ?? false}
+                saving={savingPlaceId === place.id}
                 onToggleSave={() => onToggleSave(place.id)}
               />
             ))}
