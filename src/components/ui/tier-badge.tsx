@@ -19,12 +19,12 @@ const TIER_STYLES: Record<Tier, string> = {
 // the detail page's own pill row.
 const SIZE_STYLES = {
   sm: 'px-[7px] py-0.5 text-[10px]',
-  md: 'px-[11px] py-1.5 text-[12.5px]',
+  md: 'px-[9px] py-1 text-[11.5px]',
 } as const;
 
 const ICON_SIZE = {
   sm: 'size-2.5',
-  md: 'size-3.5',
+  md: 'size-3',
 } as const;
 
 export function TierBadge({

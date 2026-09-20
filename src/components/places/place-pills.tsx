@@ -51,8 +51,8 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
   pills.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
   pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
-  const starSize = size === 'md' ? 'size-3.5' : 'size-2.5';
-  const starPadding = size === 'md' ? 'px-[11px] py-1.5 text-[12.5px]' : 'px-[7px] py-0.5 text-[10px]';
+  const starSize = size === 'md' ? 'size-3' : 'size-2.5';
+  const starPadding = size === 'md' ? 'px-[9px] py-1 text-[11.5px]' : 'px-[7px] py-0.5 text-[10px]';
 
   return (
     <>

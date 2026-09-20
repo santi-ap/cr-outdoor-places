@@ -16,9 +16,9 @@ export function FilterPanelDesktop({
   const { t } = useLanguage();
 
   return (
-    <div className="border-line bg-cream w-[296px] shrink-0 rounded-2xl border p-5">
-      <h2 className="font-display text-bark mb-1 text-xl font-medium">{t.browse.filters}</h2>
-      <p className="text-ink-muted mb-4 text-sm">
+    <div className="border-line bg-cream w-[264px] shrink-0 rounded-2xl border p-4">
+      <h2 className="font-display text-bark mb-1 text-lg font-medium">{t.browse.filters}</h2>
+      <p className="text-ink-muted mb-3.5 text-[13px]">
         {matchCount} {t.filters.resultsCount}
       </p>
       <PlaceFilters filter={filter} onChange={onChange} />

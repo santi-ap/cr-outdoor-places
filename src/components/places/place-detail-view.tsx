@@ -113,17 +113,17 @@ export function PlaceDetailView({
         <div className="sticky top-4 z-20 h-0 px-4">
           <BackButton href="/" ariaLabel={t.detail.backToMap} />
         </div>
-        <div className="relative h-[220px] shrink-0">
+        <div className="relative h-[190px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
         </div>
 
-        <div className="flex flex-col gap-5 p-5 pb-56">
+        <div className="flex flex-col gap-4 p-4 pb-56">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="font-display text-bark text-[32px] leading-[1.05] font-medium text-wrap-pretty">
+              <h1 className="font-display text-bark text-[27px] leading-[1.05] font-medium text-wrap-pretty">
                 {place.name}
               </h1>
-              <p className="text-ink-muted mt-1.5 text-sm">{locationLine}</p>
+              <p className="text-ink-muted mt-1 text-[13px]">{locationLine}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <ShareButton title={place.name} iconOnly />
@@ -152,17 +152,17 @@ export function PlaceDetailView({
           )}
 
           {place.description && (
-            <p className="text-ink-body text-[15.5px] leading-relaxed text-wrap-pretty">{place.description}</p>
+            <p className="text-ink-body text-[14px] leading-relaxed text-wrap-pretty">{place.description}</p>
           )}
 
           {practical.length > 0 && (
             <div>
-              <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.practicalInfo}</h2>
+              <h2 className="font-display text-bark mb-2.5 text-[19px] font-medium">{t.detail.practicalInfo}</h2>
               <div className="border-line divide-line divide-y rounded-2xl border">
                 {practical.map((row) => (
-                  <div key={row.label} className="flex flex-col gap-0.5 px-4 py-3">
-                    <span className="text-ink-muted text-sm">{row.label}</span>
-                    <span className="text-sm font-medium text-wrap-pretty">{row.value}</span>
+                  <div key={row.label} className="flex flex-col gap-0.5 px-3.5 py-2.5">
+                    <span className="text-ink-muted text-[13px]">{row.label}</span>
+                    <span className="text-[13px] font-medium text-wrap-pretty">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -171,9 +171,9 @@ export function PlaceDetailView({
 
           <PlaceContact place={place} t={t.detail} />
 
-          <div className="flex flex-col gap-3">
-            <h2 className="font-display text-bark text-[22px] font-medium">{t.detail.location}</h2>
-            <div className="rounded-2xl border-line h-[200px] overflow-hidden border">
+          <div className="flex flex-col gap-2.5">
+            <h2 className="font-display text-bark text-[19px] font-medium">{t.detail.location}</h2>
+            <div className="rounded-2xl border-line h-[170px] overflow-hidden border">
               <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
             </div>
             <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
@@ -181,7 +181,7 @@ export function PlaceDetailView({
 
           {place.reviews.length > 0 && (
             <div>
-              <h2 className="font-display text-bark mb-3 text-[22px] font-medium">{t.detail.reviews}</h2>
+              <h2 className="font-display text-bark mb-2.5 text-[19px] font-medium">{t.detail.reviews}</h2>
               <ReviewsList reviews={place.reviews} />
             </div>
           )}
@@ -214,22 +214,22 @@ export function PlaceDetailView({
 
       {/* Desktop detail screen (>=1024px). */}
       <div className="hidden h-full overflow-y-auto lg:block">
-        <div className="mx-auto flex max-w-[1100px] flex-col gap-6 p-10">
+        <div className="mx-auto flex max-w-[1100px] flex-col gap-5 p-8">
           <div className="flex items-center gap-3">
             <BackButton href="/" ariaLabel={t.detail.backToMap} className="sticky top-4 z-20" />
             <span className="text-ink-muted text-sm">{locationLine}</span>
             <ShareButton title={place.name} className="ml-auto" />
           </div>
 
-          <PhotoCarousel roundedClassName="rounded-[26px]" className="h-[300px]" />
+          <PhotoCarousel roundedClassName="rounded-[26px]" className="h-[260px]" />
 
-          <div className="flex items-start gap-10">
-            <div className="flex min-w-0 flex-1 flex-col gap-6">
+          <div className="flex items-start gap-8">
+            <div className="flex min-w-0 flex-1 flex-col gap-5">
               <div>
-                <h1 className="font-display text-bark max-w-[620px] text-[44px] leading-[1.04] font-medium text-wrap-pretty">
+                <h1 className="font-display text-bark max-w-[620px] text-[36px] leading-[1.04] font-medium text-wrap-pretty">
                   {place.name}
                 </h1>
-                <p className="text-ink-muted mt-2 text-sm">{locationLine}</p>
+                <p className="text-ink-muted mt-1.5 text-[13px]">{locationLine}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {badges.map((b) => (
                     <TierBadge key={b.label} label={b.label} tier={b.tier} icon={b.icon} size="md" />
@@ -248,16 +248,16 @@ export function PlaceDetailView({
               </div>
 
               {place.description && (
-                <p className="text-ink-body max-w-[640px] text-base leading-relaxed text-wrap-pretty">
+                <p className="text-ink-body max-w-[640px] text-[14px] leading-relaxed text-wrap-pretty">
                   {place.description}
                 </p>
               )}
 
               <PlaceContact place={place} t={t.detail} />
 
-              <div className="flex flex-col gap-3">
-                <h2 className="font-display text-bark text-xl font-medium">{t.detail.location}</h2>
-                <div className="rounded-2xl border-line h-[260px] overflow-hidden border">
+              <div className="flex flex-col gap-2.5">
+                <h2 className="font-display text-bark text-lg font-medium">{t.detail.location}</h2>
+                <div className="rounded-2xl border-line h-[220px] overflow-hidden border">
                   <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
                 </div>
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
@@ -265,7 +265,7 @@ export function PlaceDetailView({
 
               {place.reviews.length > 0 && (
                 <div>
-                  <h2 className="font-display text-bark mb-3 text-xl font-medium">{t.detail.reviews}</h2>
+                  <h2 className="font-display text-bark mb-2.5 text-lg font-medium">{t.detail.reviews}</h2>
                   <ReviewsList reviews={place.reviews} />
                 </div>
               )}
@@ -275,15 +275,15 @@ export function PlaceDetailView({
               </Link>
             </div>
 
-            <div className="border-line bg-cream flex w-[340px] shrink-0 flex-col gap-4 rounded-2xl border p-6">
+            <div className="border-line bg-cream flex w-[300px] shrink-0 flex-col gap-3.5 rounded-2xl border p-5">
               {practical.length > 0 && (
                 <>
-                  <h2 className="font-display text-bark text-xl font-medium">{t.detail.practicalInfo}</h2>
+                  <h2 className="font-display text-bark text-lg font-medium">{t.detail.practicalInfo}</h2>
                   <div className="flex flex-col">
                     {practical.map((row) => (
-                      <div key={row.label} className="border-line-soft flex flex-col gap-0.5 border-b py-3">
-                        <span className="text-ink-muted text-sm">{row.label}</span>
-                        <span className="text-sm font-medium text-wrap-pretty">{row.value}</span>
+                      <div key={row.label} className="border-line-soft flex flex-col gap-0.5 border-b py-2.5">
+                        <span className="text-ink-muted text-[13px]">{row.label}</span>
+                        <span className="text-[13px] font-medium text-wrap-pretty">{row.value}</span>
                       </div>
                     ))}
                   </div>
@@ -309,14 +309,14 @@ export function PlaceDetailView({
 // Read-only mock reviews (Issue #36) — no "write a review" UI anywhere.
 function ReviewsList({ reviews }: { reviews: PlaceReview[] }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3.5">
       {reviews.map((review, i) => (
-        <div key={i} className="border-line-soft border-b pb-4 last:border-b-0 last:pb-0">
+        <div key={i} className="border-line-soft border-b pb-3.5 last:border-b-0 last:pb-0">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-bark text-sm font-medium">{review.author}</span>
-            <StarRating value={review.rating} size={14} />
+            <span className="text-bark text-[13px] font-medium">{review.author}</span>
+            <StarRating value={review.rating} size={13} />
           </div>
-          <p className="text-ink-body mt-1.5 text-sm leading-relaxed">{review.text}</p>
+          <p className="text-ink-body mt-1.5 text-[13px] leading-relaxed">{review.text}</p>
         </div>
       ))}
     </div>

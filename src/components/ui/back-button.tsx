@@ -25,11 +25,11 @@ export function BackButton({
       aria-label={label ? undefined : ariaLabel}
       className={cn(
         'bg-sand text-bark inline-flex shrink-0 items-center gap-2 rounded-2xl shadow-md',
-        label ? 'h-11 px-4 text-sm font-medium whitespace-nowrap' : 'h-11 w-11 justify-center',
+        label ? 'h-11 px-3.5 text-[13px] font-medium whitespace-nowrap' : 'h-11 w-11 justify-center',
         className,
       )}
     >
-      <ArrowLeftIcon className="size-5 shrink-0" />
+      <ArrowLeftIcon className="size-[18px] shrink-0" />
       {label}
     </Link>
   );

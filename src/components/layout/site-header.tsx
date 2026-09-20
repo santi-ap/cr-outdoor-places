@@ -9,11 +9,11 @@ export function SiteHeader() {
   const { t } = useLanguage();
 
   return (
-    <header className="flex shrink-0 items-center justify-between gap-2 border-b p-3 lg:hidden">
-      <Link href="/" className="font-display text-lg font-semibold">
+    <header className="flex shrink-0 items-center justify-between gap-2 border-b p-2.5 lg:hidden">
+      <Link href="/" className="font-display text-base font-semibold">
         {t.brand}
       </Link>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <LanguageToggle />
         <AuthStatus />
       </div>

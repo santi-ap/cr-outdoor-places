@@ -17,8 +17,8 @@ export function SuggestPlaceClient({ isSignedIn }: { isSignedIn: boolean }) {
         className="sticky top-4 z-20 self-start"
       />
 
-      <h1 className="text-2xl font-semibold">{t.suggest.newPlaceHeading}</h1>
-      <p className="text-muted-foreground text-sm">{t.suggest.newPlaceDescription}</p>
+      <h1 className="text-xl font-semibold">{t.suggest.newPlaceHeading}</h1>
+      <p className="text-muted-foreground text-[13px]">{t.suggest.newPlaceDescription}</p>
 
       {isSignedIn ? <SuggestionForm /> : <SignInNotice message={t.suggest.signInToSuggest} />}
     </main>

@@ -22,7 +22,7 @@ export function TabBarMobile({ items, docked = false }: { items: TabBarItem[]; d
       className={cn(
         'border-line-strong bg-cream flex items-center',
         docked
-          ? 'w-full justify-around border-t px-2 py-2.5'
+          ? 'w-full justify-around border-t px-2 py-2'
           : 'mx-auto w-fit gap-1 rounded-pill border p-1 shadow-lg',
       )}
     >
@@ -34,7 +34,7 @@ export function TabBarMobile({ items, docked = false }: { items: TabBarItem[]; d
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'rounded-pill px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200',
+              'rounded-pill px-3.5 py-2 text-[13px] font-medium whitespace-nowrap transition-colors duration-200',
               active ? 'bg-forest text-cream' : 'text-ink-muted hover:text-bark',
             )}
           >

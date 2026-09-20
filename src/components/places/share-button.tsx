@@ -43,7 +43,7 @@ export function ShareButton({
       aria-label={copied ? t.detail.linkCopied : t.detail.share}
       className={cn(
         'border-line bg-cream text-bark flex items-center justify-center gap-2 rounded-2xl border font-medium',
-        iconOnly ? 'h-11 w-11 shrink-0' : 'px-4 py-3 text-sm',
+        iconOnly ? 'h-11 w-11 shrink-0' : 'px-3.5 py-2.5 text-[13px]',
         className,
       )}
     >

@@ -51,8 +51,8 @@ export function MyListClient({
 
   if (!isSignedIn) {
     return (
-      <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold">{t.header.myList}</h1>
+      <div className="flex flex-col gap-5">
+        <h1 className="text-xl font-semibold">{t.header.myList}</h1>
         <ListSection title={t.myList.saved} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
         <ListSection title={t.myList.visited} items={[]} isPending={false} toggleLabel="" onToggle={() => {}} onRemove={() => {}} />
         <SignInNotice message={t.placeActions.signInPrompt} />
@@ -61,8 +61,8 @@ export function MyListClient({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t.header.myList}</h1>
+    <div className="flex flex-col gap-5">
+      <h1 className="text-xl font-semibold">{t.header.myList}</h1>
       <ListSection
         title={t.myList.saved}
         items={saved}
@@ -101,17 +101,17 @@ function ListSection({
   const { t } = useLanguage();
   return (
     <section>
-      <h2 className="mb-2 text-lg font-medium">
+      <h2 className="mb-1.5 text-base font-medium">
         {title} ({items.length})
       </h2>
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t.myList.empty}</p>
+        <p className="text-[13px] text-muted-foreground">{t.myList.empty}</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-1.5">
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-2 rounded-md border p-2.5 sm:flex-row sm:items-center sm:justify-between"
             >
               <Link href={`/places/${item.place.id}`} className="font-medium hover:underline">
                 {item.place.name}

@@ -32,17 +32,17 @@ export function PlaceContact({ place, t }: { place: Place; t: Labels }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-display text-bark text-[22px] font-medium">{t.contact}</h2>
-      <div className="flex flex-col gap-2">
+      <h2 className="font-display text-bark text-[19px] font-medium">{t.contact}</h2>
+      <div className="flex flex-col gap-1.5">
         {place.website && (
           <a
             href={normalizeWebsiteHref(place.website)}
             target="_blank"
             rel="noopener noreferrer"
-            className="border-line bg-cream flex items-center gap-3 rounded-2xl border px-4 py-3"
+            className="border-line bg-cream flex items-center gap-3 rounded-2xl border px-3.5 py-2.5"
           >
             <GlobeIcon className="text-clay size-4 shrink-0" />
-            <span className="text-bark min-w-0 flex-1 truncate text-sm font-medium">
+            <span className="text-bark min-w-0 flex-1 truncate text-[13px] font-medium">
               {websiteDisplayLabel(place.website)}
             </span>
           </a>
@@ -50,10 +50,10 @@ export function PlaceContact({ place, t }: { place: Place; t: Labels }) {
         {place.phone && (
           <a
             href={`tel:${place.phone}`}
-            className="border-line bg-cream flex items-center gap-3 rounded-2xl border px-4 py-3"
+            className="border-line bg-cream flex items-center gap-3 rounded-2xl border px-3.5 py-2.5"
           >
             <PhoneIcon className="text-clay size-4 shrink-0" />
-            <span className="text-bark min-w-0 flex-1 truncate text-sm font-medium">{place.phone}</span>
+            <span className="text-bark min-w-0 flex-1 truncate text-[13px] font-medium">{place.phone}</span>
           </a>
         )}
         {place.whatsapp && (
@@ -61,7 +61,7 @@ export function PlaceContact({ place, t }: { place: Place; t: Labels }) {
             href={whatsappHref(place.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white"
+            className="flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-white"
             style={{ backgroundColor: '#25D366' }}
           >
             <WhatsAppIcon className="size-4" />
