@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ArrowLeftIcon } from 'lucide-react';
+import { FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
+import { BackButton } from '@/components/ui/back-button';
 import { PlaceActions, SaveIconButton, type Status } from './place-actions';
 import { PhotoCarousel } from './photo-carousel';
 import { StarRating } from './star-rating';
@@ -55,19 +56,26 @@ export function PlaceDetailView({
   const costTypeLabels = getCostTypeLabels(language);
   const petFriendlyLabels = getPetFriendlyLabels(language);
 
-  const badges: { label: string; tier: Tier }[] = [];
+  // Icons match the ones the list-view cards already use for the same
+  // fields (#47), so the same information reads consistently wherever it
+  // shows up.
+  const badges: { label: string; tier: Tier; icon?: typeof FootprintsIcon }[] = [];
   if (place.difficulty) {
-    badges.push({ label: difficultyLabels[place.difficulty], tier: DIFFICULTY_TIER[place.difficulty] });
+    badges.push({
+      label: difficultyLabels[place.difficulty],
+      tier: DIFFICULTY_TIER[place.difficulty],
+      icon: FootprintsIcon,
+    });
   }
-  badges.push({ label: costTypeLabels[place.cost_type], tier: 'neutral' });
+  badges.push({ label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
   badges.push({ label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
 
-  const stats: { value: string; label: string }[] = [];
+  const stats: { value: string; label: string; icon: typeof FootprintsIcon }[] = [];
   if (place.distance_m) {
-    stats.push({ value: formatDistance(place.distance_m, language), label: t.detail.distanceStat });
+    stats.push({ value: formatDistance(place.distance_m, language), label: t.detail.distanceStat, icon: RulerIcon });
   }
   if (place.duration_min) {
-    stats.push({ value: formatDuration(place.duration_min, language), label: t.detail.durationStat });
+    stats.push({ value: formatDuration(place.duration_min, language), label: t.detail.durationStat, icon: ClockIcon });
   }
 
   const practical: { label: string; value: string }[] = [];
@@ -99,13 +107,7 @@ export function PlaceDetailView({
       <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
         <div className="relative h-[220px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
-          <Link
-            href="/"
-            aria-label={t.detail.backToMap}
-            className="border-line bg-cream text-bark absolute top-4 left-4 flex h-11 w-11 items-center justify-center rounded-2xl border"
-          >
-            <ArrowLeftIcon className="size-5" />
-          </Link>
+          <BackButton href="/" ariaLabel={t.detail.backToMap} className="absolute top-4 left-4" />
         </div>
 
         <div className="flex flex-col gap-5 p-5 pb-56">
@@ -129,7 +131,7 @@ export function PlaceDetailView({
 
           <div className="flex flex-wrap gap-2">
             {badges.map((b) => (
-              <TierBadge key={b.label} label={b.label} tier={b.tier} size="md" />
+              <TierBadge key={b.label} label={b.label} tier={b.tier} icon={b.icon} size="md" />
             ))}
             {place.confidence === 'unverified' && <Badge variant="destructive">{t.detail.unverified}</Badge>}
           </div>
@@ -147,7 +149,10 @@ export function PlaceDetailView({
               {stats.map((s) => (
                 <div key={s.label} className="flex flex-1 flex-col gap-0.5 px-4 py-3.5">
                   <span className="font-display text-bark text-xl">{s.value}</span>
-                  <span className="text-ink-muted text-xs">{s.label}</span>
+                  <span className="text-ink-muted flex items-center gap-1 text-xs">
+                    <s.icon className="size-3" />
+                    {s.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -216,13 +221,7 @@ export function PlaceDetailView({
       <div className="hidden h-full overflow-y-auto lg:block">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-6 p-10">
           <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              aria-label={t.detail.backToMap}
-              className="border-line bg-cream flex h-11 w-11 items-center justify-center rounded-2xl border"
-            >
-              <span className="border-bark -ml-0.5 block h-2.5 w-2.5 rotate-45 border-b-2 border-l-2" />
-            </Link>
+            <BackButton href="/" ariaLabel={t.detail.backToMap} />
             <span className="text-ink-muted text-sm">{locationLine}</span>
             <ShareButton title={place.name} className="ml-auto" />
           </div>
@@ -238,7 +237,7 @@ export function PlaceDetailView({
                 <p className="text-ink-muted mt-2 text-sm">{locationLine}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {badges.map((b) => (
-                    <TierBadge key={b.label} label={b.label} tier={b.tier} size="md" />
+                    <TierBadge key={b.label} label={b.label} tier={b.tier} icon={b.icon} size="md" />
                   ))}
                   {place.confidence === 'unverified' && (
                     <Badge variant="destructive">{t.detail.unverified}</Badge>
@@ -258,7 +257,10 @@ export function PlaceDetailView({
                   {stats.map((s) => (
                     <div key={s.label} className="flex flex-1 flex-col gap-1 px-4.5 py-4">
                       <span className="font-display text-bark text-2xl">{s.value}</span>
-                      <span className="text-ink-muted text-[13px]">{s.label}</span>
+                      <span className="text-ink-muted flex items-center gap-1 text-[13px]">
+                        <s.icon className="size-3" />
+                        {s.label}
+                      </span>
                     </div>
                   ))}
                 </div>
