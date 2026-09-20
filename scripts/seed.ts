@@ -355,6 +355,9 @@ const BASE_PLACES: PlaceInsert[] = [
   // is real) rather than by a distinct source tag.
   // ---------------------------------------------------------------------
   {
+    // Fabricated contact info too, same as the rest of this entry — for
+    // exercising the "Contacto" section on the detail page (website +
+    // phone here, no whatsapp).
     name: 'Playa Mock Grande',
     description: 'Fabricated test place: a wide sand beach with easy flat walking above the tideline.',
     category: 'beach',
@@ -370,6 +373,9 @@ const BASE_PLACES: PlaceInsert[] = [
     cost_amount: null,
     pet_friendly: 'yes',
     hours_text: 'Open 24 hours',
+    website: 'playamockgrande.cr',
+    phone: '+506 2000 1111',
+    whatsapp: null,
     source: 'seed',
     confidence: 'unverified',
   },
@@ -410,6 +416,9 @@ const BASE_PLACES: PlaceInsert[] = [
     pet_friendly: 'no',
     hours_text:
       'Daily 5:00 a.m.–2:00 p.m. only (must exit before dark); last entry 10:00 a.m.; closed during heavy rain advisories',
+    website: 'cerroficticio.cr',
+    phone: '+506 2000 2222',
+    whatsapp: '50620002222',
     source: 'seed',
     confidence: 'unverified',
   },
@@ -448,6 +457,9 @@ const BASE_PLACES: PlaceInsert[] = [
     cost_amount: null,
     pet_friendly: 'yes',
     hours_text: 'Daily 6:00 a.m.–6:00 p.m.',
+    website: null,
+    phone: null,
+    whatsapp: '50630003333',
     source: 'seed',
     confidence: 'unverified',
   },
@@ -508,6 +520,9 @@ const BASE_PLACES: PlaceInsert[] = [
     cost_amount: null,
     pet_friendly: 'yes',
     hours_text: 'Daily 6:00 a.m.–8:00 p.m.',
+    website: null,
+    phone: '+506 2000 4444',
+    whatsapp: null,
     source: 'seed',
     confidence: 'unverified',
   },
@@ -527,6 +542,9 @@ const BASE_PLACES: PlaceInsert[] = [
     cost_amount: '₡2,500 (national); $8 (foreigner)',
     pet_friendly: 'no',
     hours_text: 'Daily 7:30 a.m.–3:30 p.m.',
+    website: 'reservamockadicional.cr',
+    phone: null,
+    whatsapp: '50620005555',
     source: 'seed',
     confidence: 'unverified',
   },
