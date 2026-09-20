@@ -45,6 +45,9 @@ const EMPTY: FieldValues = {
   cost_amount: '',
   pet_friendly: '',
   hours_text: '',
+  website: '',
+  phone: '',
+  whatsapp: '',
   source: '',
   confidence: '',
 };
@@ -67,6 +70,9 @@ function placeToFieldValues(place: Place): FieldValues {
     cost_amount: place.cost_amount ?? '',
     pet_friendly: place.pet_friendly,
     hours_text: place.hours_text ?? '',
+    website: place.website ?? '',
+    phone: place.phone ?? '',
+    whatsapp: place.whatsapp ?? '',
   };
 }
 
@@ -85,6 +91,9 @@ const NULLABLE_FIELDS = new Set([
   'duration_min',
   'cost_amount',
   'hours_text',
+  'website',
+  'phone',
+  'whatsapp',
 ]);
 
 function parseFieldValue(
@@ -289,6 +298,34 @@ export function SuggestionForm({ place }: { place?: Place }) {
           onChange={(e) => setField('hours_text', e.target.value)}
         />
       </Field>
+
+      <Field label={t.suggest.fields.website}>
+        <Input
+          type="url"
+          placeholder={t.suggest.websitePlaceholder}
+          value={values.website}
+          onChange={(e) => setField('website', e.target.value)}
+        />
+      </Field>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field label={t.suggest.fields.phone}>
+          <Input
+            type="tel"
+            placeholder={t.suggest.phonePlaceholder}
+            value={values.phone}
+            onChange={(e) => setField('phone', e.target.value)}
+          />
+        </Field>
+        <Field label={t.suggest.fields.whatsapp}>
+          <Input
+            type="tel"
+            placeholder={t.suggest.whatsappPlaceholder}
+            value={values.whatsapp}
+            onChange={(e) => setField('whatsapp', e.target.value)}
+          />
+        </Field>
+      </div>
 
       <Button type="submit" disabled={isPending}>
         {isPending ? t.suggest.submitting : t.suggest.submit}

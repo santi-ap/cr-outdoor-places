@@ -155,12 +155,15 @@ export type Database = {
           lng: number
           name: string
           pet_friendly: string
+          phone: string | null
           province: string | null
           rating: number | null
           reviews: Json
           source: string
           terrain: string | null
           updated_at: string
+          website: string | null
+          whatsapp: string | null
         }
         Insert: {
           canton?: string | null
@@ -179,12 +182,15 @@ export type Database = {
           lng: number
           name: string
           pet_friendly?: string
+          phone?: string | null
           province?: string | null
           rating?: number | null
           reviews?: Json
           source?: string
           terrain?: string | null
           updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Update: {
           canton?: string | null
@@ -203,12 +209,15 @@ export type Database = {
           lng?: number
           name?: string
           pet_friendly?: string
+          phone?: string | null
           province?: string | null
           rating?: number | null
           reviews?: Json
           source?: string
           terrain?: string | null
           updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }

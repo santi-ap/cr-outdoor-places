@@ -12,6 +12,7 @@ import { PhotoCarousel } from './photo-carousel';
 import { StarRating } from './star-rating';
 import { DirectionsButton } from './directions-button';
 import { ShareButton } from './share-button';
+import { PlaceContact } from './place-contact';
 import { useLanguage } from '@/lib/i18n/language-context';
 import {
   getCategoryLabels,
@@ -160,6 +161,8 @@ export function PlaceDetailView({
             </div>
           )}
 
+          <PlaceContact place={place} t={t.detail} />
+
           <div className="flex flex-col gap-3">
             <h2 className="font-display text-bark text-[22px] font-medium">{t.detail.location}</h2>
             <div className="rounded-2xl border-line h-[200px] overflow-hidden border">
@@ -241,6 +244,8 @@ export function PlaceDetailView({
                   {place.description}
                 </p>
               )}
+
+              <PlaceContact place={place} t={t.detail} />
 
               <div className="flex flex-col gap-3">
                 <h2 className="font-display text-bark text-xl font-medium">{t.detail.location}</h2>
