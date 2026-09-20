@@ -104,9 +104,17 @@ export function PlaceDetailView({
     <>
       {/* Mobile detail screen (<1024px). */}
       <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
+        {/* A zero-height sticky wrapper: BackButton overlays the photo at
+            its natural (unscrolled) position, then stays pinned there
+            while the page scrolls — position:fixed would work too, but
+            relative to the viewport rather than this scroll container, so
+            it'd sit under (or over) the global SiteHeader above it
+            instead of respecting this page's own layout. */}
+        <div className="sticky top-4 z-20 h-0 px-4">
+          <BackButton href="/" ariaLabel={t.detail.backToMap} />
+        </div>
         <div className="relative h-[220px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
-          <BackButton href="/" ariaLabel={t.detail.backToMap} className="absolute top-4 left-4" />
         </div>
 
         <div className="flex flex-col gap-5 p-5 pb-56">
@@ -208,7 +216,7 @@ export function PlaceDetailView({
       <div className="hidden h-full overflow-y-auto lg:block">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-6 p-10">
           <div className="flex items-center gap-3">
-            <BackButton href="/" ariaLabel={t.detail.backToMap} />
+            <BackButton href="/" ariaLabel={t.detail.backToMap} className="sticky top-4 z-20" />
             <span className="text-ink-muted text-sm">{locationLine}</span>
             <ShareButton title={place.name} className="ml-auto" />
           </div>
