@@ -12,11 +12,13 @@ const TIER_STYLES: Record<Tier, string> = {
 };
 
 const SIZE_STYLES = {
+  xs: 'px-[7px] py-0.5 text-[10px]',
   sm: 'px-[9px] py-1 text-[11.5px]',
   md: 'px-[11px] py-1.5 text-[12.5px]',
 } as const;
 
 const ICON_SIZE = {
+  xs: 'size-2.5',
   sm: 'size-3',
   md: 'size-3.5',
 } as const;
