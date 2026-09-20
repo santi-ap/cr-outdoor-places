@@ -36,14 +36,15 @@ export function setDrawerState(next: DrawerState) {
 }
 
 // "peek" shows the search bar, results count, filter row, and a hint of
-// the first card. "low" shows just enough of the header for those to stay
-// usable while the map dominates the screen — the extra
-// MOBILE_TAB_BAR_CLEARANCE_PX keeps that content clear of the floating
-// MobileTabBar pill (~76px reserved the same way place-detail-view.tsx's
-// sticky action bar clears it).
+// the first card, with MobileTabBar floating over the map as its usual
+// pill. "low" hides the card list entirely and docks MobileTabBar to a
+// full-width bar flush with the screen's bottom edge (see MobileTabBar)
+// instead, to maximize visible map — the drawer only needs to clear that
+// docked bar's own height, not the floating pill's separate clearance.
 export const PEEK_HEIGHT_PX = 340;
-const MOBILE_TAB_BAR_CLEARANCE_PX = 76;
-export const LOW_HEIGHT_PX = 190 + MOBILE_TAB_BAR_CLEARANCE_PX;
+export const LOW_CONTENT_HEIGHT_PX = 190;
+export const DOCKED_TAB_BAR_HEIGHT_PX = 64;
+export const LOW_HEIGHT_PX = LOW_CONTENT_HEIGHT_PX + DOCKED_TAB_BAR_HEIGHT_PX;
 
 // How much of the viewport, measured from the bottom, the drawer
 // currently covers — used by anything that needs to stay clear of it.
