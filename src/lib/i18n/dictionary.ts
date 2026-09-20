@@ -59,8 +59,6 @@ const es = {
   },
   detail: {
     backToMap: 'Volver al mapa',
-    distanceStat: 'recorrido',
-    durationStat: 'caminando',
     practicalInfo: 'Datos prácticos',
     entrance: 'Entrada',
     hours: 'Horario',
@@ -182,8 +180,6 @@ const en: typeof es = {
   },
   detail: {
     backToMap: 'Back to map',
-    distanceStat: 'main route',
-    durationStat: 'walking',
     practicalInfo: 'Practical info',
     entrance: 'Entrance',
     hours: 'Hours',
