@@ -48,7 +48,7 @@ export function DirectionsButton({
   const triggerContent = (
     <>
       <MapPinIcon className="text-clay size-4 shrink-0" />
-      <span className="text-bark min-w-0 flex-1 truncate text-sm font-medium">
+      <span className="text-bark min-w-0 flex-1 truncate text-[13px] font-medium">
         {locationLabel ?? t.detail.getDirections}
       </span>
       <ChevronRightIcon className="text-ink-muted size-4 shrink-0" />
@@ -67,15 +67,15 @@ export function DirectionsButton({
             render={
               <button
                 type="button"
-                className="border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left"
+                className="border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left"
               />
             }
           >
             {triggerContent}
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream gap-3 pb-6">
+          <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream gap-2.5 pb-5">
             <SheetHeader className="pb-0">
-              <SheetTitle className="font-display text-lg font-medium">{t.detail.getDirections}</SheetTitle>
+              <SheetTitle className="font-display text-base font-medium">{t.detail.getDirections}</SheetTitle>
             </SheetHeader>
             <MapAppRow links={links} />
           </SheetContent>
@@ -89,7 +89,7 @@ export function DirectionsButton({
             render={
               <button
                 type="button"
-                className="border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left"
+                className="border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left"
               />
             }
           >
@@ -111,7 +111,7 @@ function MapAppRow({
   links: { label: string; href: string; icon: ComponentType<{ className?: string }>; bg: string }[];
 }) {
   return (
-    <div className="flex items-center justify-center gap-5 px-2">
+    <div className="flex items-center justify-center gap-4 px-2">
       {links.map((link) => (
         <a
           key={link.label}
@@ -122,7 +122,7 @@ function MapAppRow({
           className={cn('flex flex-col items-center gap-1.5')}
         >
           <span
-            className="flex h-12 w-12 items-center justify-center rounded-full text-white shadow-sm"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-white shadow-sm"
             style={{ backgroundColor: link.bg }}
           >
             <link.icon className="size-5" />

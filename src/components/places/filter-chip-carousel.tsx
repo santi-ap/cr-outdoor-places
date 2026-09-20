@@ -116,11 +116,11 @@ export function FilterChipCarousel({
           the rest of the page but can scroll all the way to the screen
           edges rather than stopping at that margin. */}
       <div className="no-scrollbar overflow-x-auto pb-0.5">
-        <div className="flex items-center gap-2 px-5">
+        <div className="flex items-center gap-2 px-4">
           <button
             type="button"
             onClick={onOpenAllFilters}
-            className="border-forest bg-forest text-cream rounded-control shrink-0 border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap"
+            className="border-forest bg-forest text-cream rounded-control shrink-0 border-[1.5px] px-3 py-1.5 text-[13px] font-medium whitespace-nowrap"
           >
             {t.filters.allFilters}
           </button>
@@ -130,7 +130,7 @@ export function FilterChipCarousel({
               type="button"
               onClick={() => setOpenField(field.key)}
               className={cn(
-                'rounded-control shrink-0 border-[1.5px] px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-colors',
+                'rounded-control shrink-0 border-[1.5px] px-3 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors',
                 field.count > 0
                   ? 'border-forest text-forest bg-cream'
                   : 'border-line-strong bg-cream text-ink-muted',
@@ -146,16 +146,16 @@ export function FilterChipCarousel({
       {selectedPills.length > 0 && (
         <div className="flex items-center gap-2">
           <div className="no-scrollbar min-w-0 flex-1 overflow-x-auto pb-0.5">
-            <div className="flex items-center gap-1.5 pl-5">
+            <div className="flex items-center gap-1.5 pl-4">
               {selectedPills.map((pill) => (
                 <button
                   key={pill.key}
                   type="button"
                   onClick={pill.onRemove}
-                  className="border-forest bg-forest/10 text-forest rounded-pill flex shrink-0 items-center gap-1 border px-3 py-1 text-xs font-medium whitespace-nowrap"
+                  className="border-forest bg-forest/10 text-forest rounded-pill flex shrink-0 items-center gap-1 border px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap"
                 >
                   {pill.label}
-                  <XIcon className="size-3" />
+                  <XIcon className="size-2.5" />
                 </button>
               ))}
             </div>
@@ -163,7 +163,7 @@ export function FilterChipCarousel({
           <button
             type="button"
             onClick={() => onChange({})}
-            className="text-forest shrink-0 pr-5 text-xs font-medium whitespace-nowrap underline"
+            className="text-forest shrink-0 pr-4 text-xs font-medium whitespace-nowrap underline"
           >
             {t.filters.clearFilters}
           </button>

@@ -8,8 +8,8 @@ import { cn } from 'cn';
 // only the text should ever differ between callers.
 export function SignInNotice({ message, className }: { message: string; className?: string }) {
   return (
-    <div className={cn('border-line bg-sand rounded-2xl border px-4 py-3', className)}>
-      <p className="text-ink-body text-sm">{message}</p>
+    <div className={cn('border-line bg-sand rounded-2xl border px-3.5 py-2.5', className)}>
+      <p className="text-ink-body text-[13px]">{message}</p>
     </div>
   );
 }

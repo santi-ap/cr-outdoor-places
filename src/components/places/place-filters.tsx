@@ -45,7 +45,7 @@ export function PlaceFilters({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <FieldGroup label={t.filters.category}>
         <MultiSelectField
           values={filter.category ?? []}

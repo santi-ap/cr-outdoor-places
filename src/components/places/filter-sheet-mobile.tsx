@@ -24,12 +24,12 @@ export function FilterSheetMobile({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream no-scrollbar max-h-[85vh] overflow-y-auto">
         <SheetHeader>
-          <SheetTitle className="font-display text-2xl font-medium">{t.browse.filters}</SheetTitle>
-          <p className="text-ink-muted text-sm">
+          <SheetTitle className="font-display text-xl font-medium">{t.browse.filters}</SheetTitle>
+          <p className="text-ink-muted text-[13px]">
             {matchCount} {t.filters.resultsCount}
           </p>
         </SheetHeader>
-        <div className="px-4 pb-6">
+        <div className="px-4 pb-5">
           <PlaceFilters filter={filter} onChange={onChange} />
         </div>
       </SheetContent>

@@ -8,8 +8,8 @@ const VARIANT_STYLES = {
 } as const;
 
 const SIZE_STYLES = {
-  mobile: 'min-h-[52px] px-5 py-[15px] text-[15px]',
-  desktop: 'min-h-11 px-[22px] py-[13px] text-[15px]',
+  mobile: 'min-h-[48px] px-4 py-3 text-[14px]',
+  desktop: 'min-h-11 px-[18px] py-[11px] text-[14px]',
 } as const;
 
 type ActionButtonProps = {

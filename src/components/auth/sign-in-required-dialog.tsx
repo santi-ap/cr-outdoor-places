@@ -25,8 +25,8 @@ export function SignInRequiredDialog({
         className="rounded-t-sheet border-line bg-cream sm:inset-x-auto sm:right-1/2 sm:bottom-6 sm:w-full sm:max-w-sm sm:translate-x-1/2 sm:rounded-2xl sm:border"
       >
         <SheetHeader>
-          <SheetTitle className="font-display text-xl font-medium">{t.auth.signInRequiredTitle}</SheetTitle>
-          <SheetDescription className="text-ink-body text-sm">{message}</SheetDescription>
+          <SheetTitle className="font-display text-lg font-medium">{t.auth.signInRequiredTitle}</SheetTitle>
+          <SheetDescription className="text-ink-body text-[13px]">{message}</SheetDescription>
         </SheetHeader>
       </SheetContent>
     </Sheet>

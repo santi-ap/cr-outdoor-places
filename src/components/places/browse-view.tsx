@@ -133,14 +133,14 @@ export function BrowseView() {
       {/* Desktop explore screen (>=1024px): nav rail (global, layout.tsx)
           + content column (real map + 3-column card grid) + filter panel. */}
       <div className="hidden h-full overflow-y-auto lg:block">
-        <div className="mx-auto flex max-w-[1100px] gap-7 p-10">
-          <div className="flex min-w-0 flex-1 flex-col gap-6">
-            <div className="flex flex-col gap-4">
+        <div className="mx-auto flex max-w-[1100px] gap-6 p-8">
+          <div className="flex min-w-0 flex-1 flex-col gap-5">
+            <div className="flex flex-col gap-3">
               <div>
-                <h1 className="font-display text-bark text-[40px] leading-[1.05] font-medium">
+                <h1 className="font-display text-bark text-[32px] leading-[1.05] font-medium">
                   {t.browse.heading}
                 </h1>
-                <p className="text-ink-muted mt-1.5 text-sm">
+                <p className="text-ink-muted mt-1 text-[13px]">
                   {visiblePlaces.length} {t.filters.resultsCount}
                 </p>
               </div>
@@ -151,7 +151,7 @@ export function BrowseView() {
               />
             </div>
 
-            <div className="rounded-card-lg border-line h-[300px] shrink-0 overflow-hidden border">
+            <div className="rounded-card-lg border-line h-[240px] shrink-0 overflow-hidden border">
               <PlaceMap places={visiblePlaces} />
             </div>
 
@@ -160,7 +160,7 @@ export function BrowseView() {
             ) : visiblePlaces.length === 0 ? (
               <p className="text-ink-muted">{t.placeCard.noMatches}</p>
             ) : (
-              <div className="grid grid-cols-2 gap-5 xl:grid-cols-3">
+              <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
                 {visiblePlaces.map((place) => (
                   <PlaceCardDesktop
                     key={place.id}

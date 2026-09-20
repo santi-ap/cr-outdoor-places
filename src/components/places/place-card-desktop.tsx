@@ -29,7 +29,7 @@ export function PlaceCardDesktop({
         className="absolute inset-0 z-0"
         aria-label={place.name}
       />
-      <PlaceCardPhoto placeId={place.id} className="h-[172px]" />
+      <PlaceCardPhoto placeId={place.id} className="h-[152px]" />
       <button
         type="button"
         aria-pressed={saved}
@@ -49,12 +49,12 @@ export function PlaceCardDesktop({
           </svg>
         )}
       </button>
-      <div className="pointer-events-none flex flex-1 flex-col gap-2 p-4">
-        <span className="font-display text-bark text-2xl font-medium text-wrap-pretty">{place.name}</span>
-        <p className="text-ink-muted text-sm">
+      <div className="pointer-events-none flex flex-1 flex-col gap-1.5 p-3.5">
+        <span className="font-display text-bark text-xl font-medium text-wrap-pretty">{place.name}</span>
+        <p className="text-ink-muted text-[12.5px]">
           {[place.province, categoryLabels[place.category] ?? place.category].filter(Boolean).join(' · ')}
         </p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2">
+        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1.5">
           <PlacePills place={place} size="md" />
         </div>
       </div>

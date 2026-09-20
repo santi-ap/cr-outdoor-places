@@ -26,7 +26,7 @@ export function PlaceCardMobile({
     <div className="rounded-card bg-rail relative flex flex-col overflow-hidden">
       <Link href={`/places/${place.id}`} className="absolute inset-0 z-0" aria-label={place.name} />
 
-      <PlaceCardPhoto placeId={place.id} className="h-[172px]" />
+      <PlaceCardPhoto placeId={place.id} className="h-[148px]" />
 
       <button
         type="button"
@@ -48,14 +48,14 @@ export function PlaceCardMobile({
         )}
       </button>
 
-      <div className="pointer-events-none flex flex-col gap-1.5 p-3.5">
-        <span className="text-bark font-display text-[19px] leading-snug font-medium text-wrap-pretty">
+      <div className="pointer-events-none flex flex-col gap-1 p-3">
+        <span className="text-bark font-display text-base leading-snug font-medium text-wrap-pretty">
           {place.name}
         </span>
-        <p className="text-ink-muted truncate text-[12.5px]">
+        <p className="text-ink-muted truncate text-[11.5px]">
           {[place.province, categoryLabels[place.category] ?? place.category].filter(Boolean).join(' · ')}
         </p>
-        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+        <div className="flex flex-wrap items-center gap-1 pt-0.5">
           <PlacePills place={place} size="sm" />
         </div>
       </div>

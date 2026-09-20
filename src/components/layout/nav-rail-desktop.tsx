@@ -20,12 +20,12 @@ export function NavRailDesktop() {
   ];
 
   return (
-    <aside className="bg-rail border-line hidden h-full w-[244px] shrink-0 flex-col border-r lg:flex">
-      <Link href="/" className="font-display text-bark p-6 text-xl font-medium">
+    <aside className="bg-rail border-line hidden h-full w-[212px] shrink-0 flex-col border-r lg:flex">
+      <Link href="/" className="font-display text-bark p-5 text-lg font-medium">
         {t.brand}
       </Link>
 
-      <nav aria-label="Primary" className="flex flex-col gap-1 px-4">
+      <nav aria-label="Primary" className="flex flex-col gap-1 px-3.5">
         {items.map((item) => {
           const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           return (
@@ -34,7 +34,7 @@ export function NavRailDesktop() {
               href={item.href}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'rounded-control px-3 py-2.5 text-sm font-medium transition-colors',
+                'rounded-control px-2.5 py-2 text-[13px] font-medium transition-colors',
                 active ? 'bg-forest text-cream' : 'text-ink-muted hover:text-bark',
               )}
             >
@@ -44,7 +44,7 @@ export function NavRailDesktop() {
         })}
       </nav>
 
-      <div className="border-line mt-auto flex flex-col gap-3 border-t p-4">
+      <div className="border-line mt-auto flex flex-col gap-2.5 border-t p-3.5">
         {stats && stats.visited > 0 && (
           <p className="text-ink-muted text-xs">
             {stats.visited} {t.navRail.visitedOf} {stats.total} {t.navRail.visitedSuffix}

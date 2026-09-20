@@ -172,7 +172,7 @@ export function ListDrawer({
           every gap here to fit the search bar, filter row, and (when
           filters are active) the selected-filter pills + results count
           without clipping. */}
-      <div className={cn('flex shrink-0 flex-col', isLow ? 'gap-1.5 pb-1.5' : 'gap-3 pb-3')} {...dragHandlers}>
+      <div className={cn('flex shrink-0 flex-col', isLow ? 'gap-1.5 pb-1.5' : 'gap-2.5 pb-2.5')} {...dragHandlers}>
         {!isFull && (
           <button
             type="button"
@@ -180,7 +180,7 @@ export function ListDrawer({
             aria-label={isFull ? t.browse.mapView : t.browse.listView}
             className={cn(
               'flex cursor-grab items-center justify-center active:cursor-grabbing',
-              isLow ? 'pt-1.5 pb-0.5' : 'pt-3 pb-1',
+              isLow ? 'pt-1.5 pb-0.5' : 'pt-2.5 pb-1',
             )}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -195,20 +195,20 @@ export function ListDrawer({
           </button>
         )}
 
-        <div className={cn('flex items-center gap-2 px-5', isFull ? 'pt-5' : isLow ? 'pt-0' : 'pt-2')}>
+        <div className={cn('flex items-center gap-2 px-4', isFull ? 'pt-4' : isLow ? 'pt-0' : 'pt-1.5')}>
           <div className="min-w-0 flex-1">
             <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
           </div>
           <div
             className={cn(
               'shrink-0 overflow-hidden transition-all duration-200 ease-out',
-              isFull ? 'w-[68px] opacity-100' : 'w-0 opacity-0',
+              isFull ? 'w-[60px] opacity-100' : 'w-0 opacity-0',
             )}
           >
             <button
               type="button"
               onClick={() => setDrawerState('peek')}
-              className="bg-moss border-moss flex h-11 w-[68px] items-center justify-center rounded-control border text-sm font-medium whitespace-nowrap text-[#23281C]"
+              className="bg-moss border-moss flex h-11 w-[60px] items-center justify-center rounded-control border text-[13px] font-medium whitespace-nowrap text-[#23281C]"
             >
               {t.browse.mapView}
             </button>
@@ -227,7 +227,7 @@ export function ListDrawer({
           state shows besides the map itself. */}
       {!isLow && (
         <div
-          className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-24"
+          className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-20"
           style={!isFull ? { touchAction: 'none' } : undefined}
           {...(!isFull ? dragHandlers : {})}
         >
@@ -236,7 +236,7 @@ export function ListDrawer({
           ) : orderedPlaces.length === 0 ? (
             <p className="text-ink-muted">{t.placeCard.noMatches}</p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {orderedPlaces.map((place) => (
                 <PlaceCardMobile
                   key={place.id}
