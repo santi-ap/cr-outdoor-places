@@ -9,6 +9,7 @@ import { LanguageProvider } from '@/lib/i18n/language-context';
 import { SiteHeader } from '@/components/layout/site-header';
 import { NavRailDesktop } from '@/components/layout/nav-rail-desktop';
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
+import { TouchActiveStateFix } from '@/components/providers/touch-active-state-fix';
 
 const hankenGrotesk = Hanken_Grotesk({
   variable: '--font-hanken-grotesk',
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${hankenGrotesk.variable} ${newsreader.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden lg:flex-row">
+        <TouchActiveStateFix />
         <LanguageProvider>
           <QueryProvider>
             <SiteHeader />

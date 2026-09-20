@@ -164,6 +164,40 @@
   html {
     @apply font-sans;
   }
+
+  /* Replaces the browser's default tap flash with our own :active
+     feedback below, instead of showing both. */
+  a[href],
+  button:not(:disabled),
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Every pressable element gets *some* visible feedback on tap — on
+   mobile there's no hover state to lean on, so without this a button
+   feels unresponsive until whatever it triggers finishes. Scoped to
+   touch-primary devices (no hover) so it doesn't fight existing hover:
+   styles on desktop. Enabling :active to fire reliably on iOS Safari
+   also needs a no-op touchstart listener somewhere in the page — see
+   TouchActiveStateFix in the root layout. */
+@media (hover: none) {
+  a[href]:active,
+  button:not(:disabled):active,
+  [role='button']:active {
+    opacity: 0.7;
+    transition: opacity 75ms ease-out;
+  }
+
+  /* The full-card/panel tap targets (#40) are deliberately invisible
+     (an absolutely-positioned Link with no background, so decorative
+     content underneath can stay non-interactive) — dimming *it* on
+     :active has nothing to visibly dim. Darken the visible card itself
+     instead, via the invisible link's :active state. */
+  .rounded-card:has(> a.absolute.inset-0:active),
+  .rounded-card-lg:has(> a.absolute.inset-0:active) {
+    filter: brightness(0.96);
+  }
 }
 
 /* Hides the scroll track/thumb while keeping the element scrollable —
