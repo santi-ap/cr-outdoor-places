@@ -46,6 +46,7 @@ export function ListDrawer({
   onFilterChange,
   searchQuery,
   onSearchChange,
+  pinnedPlaceId,
 }: {
   places: Place[];
   isLoading: boolean;
@@ -58,6 +59,10 @@ export function ListDrawer({
   onFilterChange: (filter: PlacesFilter) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  // The place last previewed from a pin tap while the drawer was docked
+  // (low) — surfaced as the first card once the drawer comes back up,
+  // since the docked preview card itself disappears at that point.
+  pinnedPlaceId?: string | null;
 }) {
   const { t } = useLanguage();
   const state = useSyncExternalStore(
@@ -135,6 +140,12 @@ export function ListDrawer({
   };
 
   const isFull = state === 'full';
+  const isLow = state === 'low';
+
+  const orderedPlaces =
+    pinnedPlaceId && places.some((place) => place.id === pinnedPlaceId)
+      ? [places.find((place) => place.id === pinnedPlaceId)!, ...places.filter((place) => place.id !== pinnedPlaceId)]
+      : places;
 
   return (
     <div
@@ -202,29 +213,34 @@ export function ListDrawer({
         />
       </div>
 
-      <div
-        className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-24"
-        style={!isFull ? { touchAction: 'none' } : undefined}
-        {...(!isFull ? dragHandlers : {})}
-      >
-        {isLoading ? (
-          <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
-        ) : places.length === 0 ? (
-          <p className="text-ink-muted">{t.placeCard.noMatches}</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {places.map((place) => (
-              <PlaceCardMobile
-                key={place.id}
-                place={place}
-                saved={savedIds?.has(place.id) ?? false}
-                saving={savingPlaceId === place.id}
-                onToggleSave={() => onToggleSave(place.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Docked (low) hides the card list entirely to maximize the map —
+          the header above (search + filters, still visible) is all this
+          state shows besides the map itself. */}
+      {!isLow && (
+        <div
+          className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-24"
+          style={!isFull ? { touchAction: 'none' } : undefined}
+          {...(!isFull ? dragHandlers : {})}
+        >
+          {isLoading ? (
+            <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
+          ) : orderedPlaces.length === 0 ? (
+            <p className="text-ink-muted">{t.placeCard.noMatches}</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {orderedPlaces.map((place) => (
+                <PlaceCardMobile
+                  key={place.id}
+                  place={place}
+                  saved={savedIds?.has(place.id) ?? false}
+                  saving={savingPlaceId === place.id}
+                  onToggleSave={() => onToggleSave(place.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
