@@ -56,9 +56,9 @@ export function PlaceDetailView({
   const costTypeLabels = getCostTypeLabels(language);
   const petFriendlyLabels = getPetFriendlyLabels(language);
 
-  // Icons match the ones the list-view cards already use for the same
-  // fields (#47), so the same information reads consistently wherever it
-  // shows up.
+  // Icons and pill treatment match the list-view cards for the same
+  // fields (#47) — distance/duration used to render as a separate stat
+  // box here; now they're pills alongside the rest, same as list view.
   const badges: { label: string; tier: Tier; icon?: typeof FootprintsIcon }[] = [];
   if (place.difficulty) {
     badges.push({
@@ -67,16 +67,14 @@ export function PlaceDetailView({
       icon: FootprintsIcon,
     });
   }
-  badges.push({ label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
-  badges.push({ label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
-
-  const stats: { value: string; label: string; icon: typeof FootprintsIcon }[] = [];
   if (place.distance_m) {
-    stats.push({ value: formatDistance(place.distance_m, language), label: t.detail.distanceStat, icon: RulerIcon });
+    badges.push({ label: formatDistance(place.distance_m, language), tier: 'neutral', icon: RulerIcon });
   }
   if (place.duration_min) {
-    stats.push({ value: formatDuration(place.duration_min, language), label: t.detail.durationStat, icon: ClockIcon });
+    badges.push({ label: formatDuration(place.duration_min, language), tier: 'neutral', icon: ClockIcon });
   }
+  badges.push({ label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
+  badges.push({ label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
 
   const practical: { label: string; value: string }[] = [];
   if (place.cost_amount || place.cost_type !== 'unknown') {
@@ -141,20 +139,6 @@ export function PlaceDetailView({
               <StarRating value={place.rating} />
               <span className="text-bark text-sm font-medium">{place.rating.toFixed(1)}</span>
               <span className="text-ink-muted text-sm">({place.reviews.length})</span>
-            </div>
-          )}
-
-          {stats.length > 0 && (
-            <div className="border-line divide-line flex divide-x rounded-2xl border">
-              {stats.map((s) => (
-                <div key={s.label} className="flex flex-1 flex-col gap-0.5 px-4 py-3.5">
-                  <span className="font-display text-bark text-xl">{s.value}</span>
-                  <span className="text-ink-muted flex items-center gap-1 text-xs">
-                    <s.icon className="size-3" />
-                    {s.label}
-                  </span>
-                </div>
-              ))}
             </div>
           )}
 
@@ -251,20 +235,6 @@ export function PlaceDetailView({
                   </div>
                 )}
               </div>
-
-              {stats.length > 0 && (
-                <div className="border-line divide-line flex max-w-[520px] divide-x rounded-2xl border">
-                  {stats.map((s) => (
-                    <div key={s.label} className="flex flex-1 flex-col gap-1 px-4.5 py-4">
-                      <span className="font-display text-bark text-2xl">{s.value}</span>
-                      <span className="text-ink-muted flex items-center gap-1 text-[13px]">
-                        <s.icon className="size-3" />
-                        {s.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               {place.description && (
                 <p className="text-ink-body max-w-[640px] text-base leading-relaxed text-wrap-pretty">
