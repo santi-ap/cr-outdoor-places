@@ -12,7 +12,12 @@ export function SuggestEditClient({ place, isSignedIn }: { place: Place; isSigne
 
   return (
     <main className="max-lg:no-scrollbar mx-auto flex h-full max-w-2xl flex-col gap-4 overflow-y-auto p-4 pb-24 lg:pb-4">
-      <BackButton href={`/places/${place.id}`} label={backLabel} ariaLabel={backLabel} className="self-start" />
+      <BackButton
+        href={`/places/${place.id}`}
+        label={backLabel}
+        ariaLabel={backLabel}
+        className="sticky top-4 z-20 self-start"
+      />
 
       <h1 className="text-2xl font-semibold">{t.suggest.editHeading}</h1>
       <p className="text-muted-foreground text-sm">{t.suggest.editDescription}</p>
