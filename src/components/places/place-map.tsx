@@ -266,11 +266,12 @@ export function PlaceMap({
                     column's natural height (flex row default
                     align-items: stretch), so it still fills the card
                     when pills wrap to 3 rows instead of the card just
-                    growing past a fixed-height thumbnail. Narrower and
-                    with smaller pills/text than the peek/full panel —
-                    this card competes with the map itself for space, so
-                    it's tuned to fit real phone widths (~375-430px)
-                    without wrapping past 2 rows for a typical place. */}
+                    growing past a fixed-height thumbnail. Pills are the
+                    same `sm` size used everywhere else in the mobile
+                    Explore flow (#58) — only this card's own layout
+                    (thumbnail width, padding, name size) stays tighter
+                    than the peek/full panel, since it alone competes
+                    with the map for space. */}
                 <div className="w-[72px] shrink-0" style={SLIDE_STYLES[0]} />
                 <button
                   type="button"
@@ -285,7 +286,7 @@ export function PlaceMap({
                     {selectedPlace.name}
                   </span>
                   <div className="flex flex-wrap items-center gap-1">
-                    <PlacePills place={selectedPlace} size="xs" />
+                    <PlacePills place={selectedPlace} size="sm" />
                   </div>
                 </div>
               </div>
