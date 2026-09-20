@@ -17,7 +17,7 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
 // category) — shown identically on the list-view cards (#47) and the
 // map's selected-place preview, so the field/icon set lives in one place
 // instead of drifting across separate copies.
-export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' | 'md' }) {
+export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'xs' | 'sm' | 'md' }) {
   const { language } = useLanguage();
   const categoryLabels = getCategoryLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
@@ -51,8 +51,13 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
   pills.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
   pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
-  const starSize = size === 'md' ? 'size-3.5' : 'size-3';
-  const starPadding = size === 'md' ? 'px-[11px] py-1.5 text-[12.5px]' : 'px-[9px] py-1 text-[11.5px]';
+  const starSize = size === 'md' ? 'size-3.5' : size === 'xs' ? 'size-2.5' : 'size-3';
+  const starPadding =
+    size === 'md'
+      ? 'px-[11px] py-1.5 text-[12.5px]'
+      : size === 'xs'
+        ? 'px-[7px] py-0.5 text-[10px]'
+        : 'px-[9px] py-1 text-[11.5px]';
 
   return (
     <>

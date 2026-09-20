@@ -266,22 +266,26 @@ export function PlaceMap({
                     column's natural height (flex row default
                     align-items: stretch), so it still fills the card
                     when pills wrap to 3 rows instead of the card just
-                    growing past a fixed-height thumbnail. */}
-                <div className="w-[88px] shrink-0" style={SLIDE_STYLES[0]} />
+                    growing past a fixed-height thumbnail. Narrower and
+                    with smaller pills/text than the peek/full panel —
+                    this card competes with the map itself for space, so
+                    it's tuned to fit real phone widths (~375-430px)
+                    without wrapping past 2 rows for a typical place. */}
+                <div className="w-[72px] shrink-0" style={SLIDE_STYLES[0]} />
                 <button
                   type="button"
                   aria-label={t.browse.closePreview}
                   onClick={() => selectPlace(null)}
-                  className="bg-cream text-bark absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
+                  className="bg-cream text-bark absolute top-1.5 right-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full shadow-sm"
                 >
-                  <XIcon className="size-3.5" />
+                  <XIcon className="size-3" />
                 </button>
-                <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3 pr-9">
-                  <span className="text-bark font-display line-clamp-1 text-sm leading-snug font-medium text-wrap-pretty">
+                <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-center gap-1 p-2.5 pr-7">
+                  <span className="text-bark font-display line-clamp-1 text-[13px] leading-snug font-medium text-wrap-pretty">
                     {selectedPlace.name}
                   </span>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <PlacePills place={selectedPlace} size="sm" />
+                  <div className="flex flex-wrap items-center gap-1">
+                    <PlacePills place={selectedPlace} size="xs" />
                   </div>
                 </div>
               </div>
