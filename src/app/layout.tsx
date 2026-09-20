@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist_Mono, Hanken_Grotesk, Newsreader } from 'next/font/google';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import './globals.css';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { LanguageProvider } from '@/lib/i18n/language-context';

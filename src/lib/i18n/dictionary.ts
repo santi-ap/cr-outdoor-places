@@ -25,6 +25,7 @@ const es = {
     listView: 'Lista',
     searchPlaceholder: 'Buscar por nombre…',
     clearSearch: 'Limpiar búsqueda',
+    closePreview: 'Cerrar vista previa',
   },
   filters: {
     category: 'Categoría',
@@ -146,6 +147,7 @@ const en: typeof es = {
     listView: 'List',
     searchPlaceholder: 'Search by name…',
     clearSearch: 'Clear search',
+    closePreview: 'Close preview',
   },
   filters: {
     category: 'Category',
