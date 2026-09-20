@@ -166,13 +166,22 @@ export function ListDrawer({
           Dragging from anywhere in this header (still not the card list
           below) still collapses it back — the Map button is just a more
           discoverable, explicit way to do the same thing. */}
-      <div className="flex shrink-0 flex-col gap-3 pb-3" {...dragHandlers}>
+      {/* Docked (low) has the least vertical room of any state (the drawer
+          only spans LOW_CONTENT_HEIGHT_PX) and, unlike peek/full, never
+          needs slack below the header for a card list — so it tightens
+          every gap here to fit the search bar, filter row, and (when
+          filters are active) the selected-filter pills + results count
+          without clipping. */}
+      <div className={cn('flex shrink-0 flex-col', isLow ? 'gap-1.5 pb-1.5' : 'gap-3 pb-3')} {...dragHandlers}>
         {!isFull && (
           <button
             type="button"
             aria-expanded={isFull}
             aria-label={isFull ? t.browse.mapView : t.browse.listView}
-            className="flex cursor-grab items-center justify-center pt-3 pb-1 active:cursor-grabbing"
+            className={cn(
+              'flex cursor-grab items-center justify-center active:cursor-grabbing',
+              isLow ? 'pt-1.5 pb-0.5' : 'pt-3 pb-1',
+            )}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -186,7 +195,7 @@ export function ListDrawer({
           </button>
         )}
 
-        <div className={cn('flex items-center gap-2 px-5', isFull ? 'pt-5' : 'pt-2')}>
+        <div className={cn('flex items-center gap-2 px-5', isFull ? 'pt-5' : isLow ? 'pt-0' : 'pt-2')}>
           <div className="min-w-0 flex-1">
             <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
           </div>
