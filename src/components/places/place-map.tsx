@@ -25,14 +25,15 @@ const PANEL_BOTTOM_INSET_PX = 12;
 // Extra breathing room between the panel and the drawer's own top edge,
 // when there is one, so the two don't touch.
 const PANEL_DRAWER_GAP_PX = 16;
-// Fixed height of the docked-low preview card (thumbnail + pills) — used
-// both for its layout and to work out how much of the map behind it a
-// selected pin needs to clear.
-const DOCKED_PREVIEW_HEIGHT_PX = 92;
-// Visual height of selectedMarkerIcon (see its iconSize below) plus a
-// little breathing room, so the auto-pan leaves the whole pin glyph clear
-// of the card, not just its anchor point.
-const SELECTED_PIN_CLEARANCE_PX = 48 + 12;
+// Minimum height of the docked-low preview card (thumbnail + pills) — the
+// card grows past this when a place's pills wrap to more rows (up to 3:
+// rating/difficulty/distance, duration/cost, category) so nothing gets
+// clipped. The auto-pan effect below measures the card's real rendered
+// height rather than assuming this minimum, since it varies.
+const DOCKED_PREVIEW_MIN_HEIGHT_PX = 92;
+// Extra breathing room to keep between the pin's tip and the card's top
+// edge, so the pin doesn't end up sitting flush against it.
+const SELECTED_PIN_MARGIN_PX = 12;
 
 // A pin matching the app's forest-green brand color instead of Leaflet's
 // default blue marker (which also needed its image paths pointed at a CDN
@@ -137,6 +138,7 @@ export function PlaceMap({
   const showLabels = interactivePins && currentZoom >= LABEL_ZOOM_THRESHOLD;
   const selectedPlace = interactivePins ? (places.find((place) => place.id === selectedPlaceId) ?? null) : null;
   const mapRef = useRef<L.Map | null>(null);
+  const previewCardRef = useRef<HTMLDivElement | null>(null);
   const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
   const drawerHeightPx = hasDrawer ? getDrawerHeightPx(drawerState) : 0;
   const panelBottomPx = Number.isFinite(drawerHeightPx)
@@ -168,10 +170,15 @@ export function PlaceMap({
   useEffect(() => {
     if (!isDockedLow || !selectedPlace || panelBottomPx === null) return;
     const map = mapRef.current;
-    if (!map) return;
-    const pinScreenY = map.latLngToContainerPoint([selectedPlace.lat, selectedPlace.lng]).y;
-    const cardTopY = map.getSize().y - panelBottomPx - DOCKED_PREVIEW_HEIGHT_PX;
-    const overlapPx = pinScreenY - SELECTED_PIN_CLEARANCE_PX - cardTopY;
+    const cardHeightPx = previewCardRef.current?.getBoundingClientRect().height;
+    if (!map || !cardHeightPx) return;
+    // latLngToContainerPoint gives the pin's anchor point, which for
+    // selectedMarkerIcon (iconAnchor [18,48], the full iconSize) is the
+    // glyph's own tip — its lowest, southmost-on-screen point, and so the
+    // one that actually needs to clear the card above it.
+    const pinTipY = map.latLngToContainerPoint([selectedPlace.lat, selectedPlace.lng]).y;
+    const cardTopY = map.getSize().y - panelBottomPx - cardHeightPx;
+    const overlapPx = pinTipY - cardTopY + SELECTED_PIN_MARGIN_PX;
     if (overlapPx > 0) {
       map.panBy([0, overlapPx], { animate: true });
     }
@@ -246,15 +253,21 @@ export function PlaceMap({
             // peek/full, unchanged.
             <div className="fixed inset-x-3 z-[2000]" style={{ bottom: panelBottomPx }}>
               <div
+                ref={previewCardRef}
                 className="rounded-card bg-rail relative flex overflow-hidden shadow-lg"
-                style={{ height: DOCKED_PREVIEW_HEIGHT_PX }}
+                style={{ minHeight: DOCKED_PREVIEW_MIN_HEIGHT_PX }}
               >
                 <Link
                   href={`/places/${selectedPlace.id}`}
                   className="absolute inset-0 z-0"
                   aria-label={selectedPlace.name}
                 />
-                <div className="h-full w-[88px] shrink-0" style={SLIDE_STYLES[0]} />
+                {/* No explicit height: stretches to match the pills
+                    column's natural height (flex row default
+                    align-items: stretch), so it still fills the card
+                    when pills wrap to 3 rows instead of the card just
+                    growing past a fixed-height thumbnail. */}
+                <div className="w-[88px] shrink-0" style={SLIDE_STYLES[0]} />
                 <button
                   type="button"
                   aria-label={t.browse.closePreview}
