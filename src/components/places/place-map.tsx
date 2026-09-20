@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { MapContainer, TileLayer, Marker, Tooltip, useMapEvent } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -68,10 +69,26 @@ export function PlaceMap({
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const showLabels = currentZoom >= LABEL_ZOOM_THRESHOLD;
   const selectedPlace = places.find((place) => place.id === selectedPlaceId) ?? null;
+  const mapRef = useRef<L.Map | null>(null);
+
+  // Next.js's client-side route cache can "reappear" this component's DOM
+  // node on a back/forward navigation instead of a full unmount+remount,
+  // but Leaflet stashes an internal id directly on the container element
+  // and refuses to initialize a new map on a node that still has one —
+  // "Map container is already initialized." Clearing it on unmount lets
+  // a later reappear/remount succeed instead of throwing.
+  useEffect(() => {
+    const map = mapRef.current;
+    return () => {
+      const container = map?.getContainer() as (HTMLElement & { _leaflet_id?: number }) | undefined;
+      if (container) container._leaflet_id = undefined;
+    };
+  }, []);
 
   return (
     <div className="relative h-full w-full">
       <MapContainer
+        ref={mapRef}
         center={center}
         zoom={zoom}
         // isolate traps Leaflet's internal z-index:1000 control layer inside
@@ -108,34 +125,45 @@ export function PlaceMap({
       {/* A tap on a pin previews it here — name + the same at-a-glance
           pills the list-view cards use — instead of jumping straight to
           the full detail page. Tapping the same pin again (or the close
-          button) dismisses it. */}
-      {selectedPlace && (
-        <div className="absolute inset-x-3 bottom-3 z-[1000]">
-          <div className="rounded-card bg-rail relative overflow-hidden shadow-lg">
-            <Link
-              href={`/places/${selectedPlace.id}`}
-              className="absolute inset-0 z-0"
-              aria-label={selectedPlace.name}
-            />
-            <button
-              type="button"
-              aria-label={t.browse.closePreview}
-              onClick={() => setSelectedPlaceId(null)}
-              className="bg-cream text-bark absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
-            >
-              <XIcon className="size-3.5" />
-            </button>
-            <div className="pointer-events-none flex flex-col gap-1.5 p-3.5 pr-10">
-              <span className="text-bark font-display text-base leading-snug font-medium text-wrap-pretty">
-                {selectedPlace.name}
-              </span>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <PlacePills place={selectedPlace} size="sm" />
+          button) dismisses it.
+
+          Portaled to document.body rather than rendered in place: the
+          Explore drawer's own root has an inline `transform` style (for
+          its drag animation), and `transform` always creates a new
+          stacking context — that traps any z-index inside this
+          component's own subtree no matter how high, since the drawer
+          (a later sibling with its own stacking context) would still
+          paint over it. A portal escapes that entirely, so the preview
+          reliably shows above the drawer instead of hidden behind it. */}
+      {selectedPlace &&
+        createPortal(
+          <div className="fixed inset-x-3 bottom-3 z-[2000]">
+            <div className="rounded-card bg-rail relative overflow-hidden shadow-lg">
+              <Link
+                href={`/places/${selectedPlace.id}`}
+                className="absolute inset-0 z-0"
+                aria-label={selectedPlace.name}
+              />
+              <button
+                type="button"
+                aria-label={t.browse.closePreview}
+                onClick={() => setSelectedPlaceId(null)}
+                className="bg-cream text-bark absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
+              >
+                <XIcon className="size-3.5" />
+              </button>
+              <div className="pointer-events-none flex flex-col gap-1.5 p-3.5 pr-10">
+                <span className="text-bark font-display text-base leading-snug font-medium text-wrap-pretty">
+                  {selectedPlace.name}
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <PlacePills place={selectedPlace} size="sm" />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
