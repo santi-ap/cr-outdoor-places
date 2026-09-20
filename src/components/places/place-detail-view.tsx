@@ -166,7 +166,7 @@ export function PlaceDetailView({
           <div className="flex flex-col gap-3">
             <h2 className="font-display text-bark text-[22px] font-medium">{t.detail.location}</h2>
             <div className="rounded-2xl border-line h-[200px] overflow-hidden border">
-              <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
+              <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
             </div>
             <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
           </div>
@@ -250,7 +250,7 @@ export function PlaceDetailView({
               <div className="flex flex-col gap-3">
                 <h2 className="font-display text-bark text-xl font-medium">{t.detail.location}</h2>
                 <div className="rounded-2xl border-line h-[260px] overflow-hidden border">
-                  <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} />
+                  <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
                 </div>
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
               </div>

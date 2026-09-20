@@ -23,7 +23,10 @@ export function PlaceSearchInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-11 rounded-pill border-0 bg-transparent pr-9 pl-10 text-sm focus-visible:ring-0"
+        // iOS Safari auto-zooms the page on focusing any input under
+        // 16px — text-base (not text-sm) here keeps it at 16px on
+        // mobile; md:text-sm still shrinks it back down on desktop.
+        className="h-11 rounded-pill border-0 bg-transparent pr-9 pl-10 text-base focus-visible:ring-0 md:text-sm"
       />
       {value.length > 0 && (
         <button

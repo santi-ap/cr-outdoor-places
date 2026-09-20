@@ -40,6 +40,21 @@ const markerIcon = L.divIcon({
   tooltipAnchor: [0, -34],
 });
 
+// The selected pin (preview panel open) needs to be obviously the one —
+// larger, with a clay accent ring, so it reads as "this one" at a glance
+// rather than looking identical to every other pin on the map.
+const selectedMarkerIcon = L.divIcon({
+  className: '',
+  html: `<svg width="36" height="48" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 2C9.716 2 3 8.716 3 17c0 12.5 15 27 15 27s15-14.5 15-27c0-8.284-6.716-15-15-15z" fill="#3f6b4c" stroke="#b98a63" stroke-width="3"/>
+    <circle cx="18" cy="17" r="6.5" fill="#f7f1e7"/>
+  </svg>`,
+  iconSize: [36, 48],
+  iconAnchor: [18, 48],
+  popupAnchor: [0, -42],
+  tooltipAnchor: [0, -42],
+});
+
 // Groups of nearby pins collapse into one numbered bubble at low zoom so
 // the map doesn't turn into a wall of overlapping markers — clicking a
 // bubble zooms in (the library's default behavior) until it's close
@@ -74,6 +89,7 @@ export function PlaceMap({
   center = COSTA_RICA_CENTER,
   zoom = 8,
   hasDrawer = false,
+  interactivePins = true,
 }: {
   places: Place[];
   center?: [number, number];
@@ -83,12 +99,18 @@ export function PlaceMap({
   // instead of using a plain fixed inset, which only makes sense where
   // there's no drawer to avoid.
   hasDrawer?: boolean;
+  // False for the place detail page's own small reference map — that map
+  // only ever shows the one place it belongs to, so a name label and a
+  // tap-to-preview panel for it would just be redundant with the page
+  // it's already sitting on. True (the default) is for the main Explore
+  // map, where both make sense.
+  interactivePins?: boolean;
 }) {
   const { t } = useLanguage();
   const [currentZoom, setCurrentZoom] = useState(zoom);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const showLabels = currentZoom >= LABEL_ZOOM_THRESHOLD;
-  const selectedPlace = places.find((place) => place.id === selectedPlaceId) ?? null;
+  const showLabels = interactivePins && currentZoom >= LABEL_ZOOM_THRESHOLD;
+  const selectedPlace = interactivePins ? (places.find((place) => place.id === selectedPlaceId) ?? null) : null;
   const mapRef = useRef<L.Map | null>(null);
   const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
   const drawerHeightPx = hasDrawer ? getDrawerHeightPx(drawerState) : 0;
@@ -132,10 +154,13 @@ export function PlaceMap({
             <Marker
               key={place.id}
               position={[place.lat, place.lng]}
-              icon={markerIcon}
-              eventHandlers={{
-                click: () => setSelectedPlaceId((current) => (current === place.id ? null : place.id)),
-              }}
+              icon={place.id === selectedPlaceId ? selectedMarkerIcon : markerIcon}
+              zIndexOffset={place.id === selectedPlaceId ? 1000 : 0}
+              eventHandlers={
+                interactivePins
+                  ? { click: () => setSelectedPlaceId((current) => (current === place.id ? null : place.id)) }
+                  : undefined
+              }
             >
               {showLabels && (
                 <Tooltip permanent direction="top" className="place-map-label">
