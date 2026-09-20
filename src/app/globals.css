@@ -178,3 +178,20 @@
     display: none;
   }
 }
+
+/* Leaflet's own tooltip chrome (border, shadow, arrow) reads as a popup,
+   not a map label — strip it down to plain text-on-cream for the
+   permanent place-name labels PlaceMap shows once zoomed in far enough. */
+.leaflet-tooltip.place-map-label {
+  background: var(--cream);
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  color: var(--bark);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 7px;
+}
+.leaflet-tooltip.place-map-label::before {
+  display: none;
+}

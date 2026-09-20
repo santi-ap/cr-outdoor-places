@@ -1,23 +1,37 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
 import Link from 'next/link';
 import type { Place } from '@/lib/validation/schemas';
 
-// The default Leaflet marker icon references image paths that bundlers
-// don't resolve correctly — point it at the CDN copy instead.
-const markerIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+// A pin matching the app's forest-green brand color instead of Leaflet's
+// default blue marker (which also needed its image paths pointed at a CDN
+// to render at all under our bundler).
+const markerIcon = L.divIcon({
+  className: '',
+  html: `<svg width="28" height="38" viewBox="0 0 28 38" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#3f6b4c"/>
+    <circle cx="14" cy="14" r="5.5" fill="#f7f1e7"/>
+  </svg>`,
+  iconSize: [28, 38],
+  iconAnchor: [14, 38],
+  popupAnchor: [0, -34],
+  tooltipAnchor: [0, -34],
 });
 
 const COSTA_RICA_CENTER: [number, number] = [9.7489, -83.7534];
+
+// Below this zoom level, place names would overlap and clutter the map —
+// permanent labels only switch on once you've zoomed in far enough that
+// pins have room to breathe.
+const LABEL_ZOOM_THRESHOLD = 11;
+
+function ZoomTracker({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
+  useMapEvent('zoomend', (e) => onZoomChange(e.target.getZoom()));
+  return null;
+}
 
 export function PlaceMap({
   places,
@@ -28,6 +42,9 @@ export function PlaceMap({
   center?: [number, number];
   zoom?: number;
 }) {
+  const [currentZoom, setCurrentZoom] = useState(zoom);
+  const showLabels = currentZoom >= LABEL_ZOOM_THRESHOLD;
+
   return (
     <MapContainer
       center={center}
@@ -38,6 +55,7 @@ export function PlaceMap({
       className="isolate h-full w-full"
       scrollWheelZoom
     >
+      <ZoomTracker onZoomChange={setCurrentZoom} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -49,6 +67,11 @@ export function PlaceMap({
               {place.name}
             </Link>
           </Popup>
+          {showLabels && (
+            <Tooltip permanent direction="top" className="place-map-label">
+              {place.name}
+            </Tooltip>
+          )}
         </Marker>
       ))}
     </MapContainer>

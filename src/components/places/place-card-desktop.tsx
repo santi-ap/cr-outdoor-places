@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
+import { Spinner } from '@/components/ui/spinner';
 import { PlaceCardPhoto } from './place-card-photo';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
@@ -18,10 +19,12 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
 export function PlaceCardDesktop({
   place,
   saved,
+  saving,
   onToggleSave,
 }: {
   place: Place;
   saved: boolean;
+  saving?: boolean;
   onToggleSave?: () => void;
 }) {
   const { t, language } = useLanguage();
@@ -70,14 +73,19 @@ export function PlaceCardDesktop({
         aria-pressed={saved}
         aria-label={saved ? t.placeActions.saved : t.placeActions.save}
         onClick={onToggleSave}
+        disabled={saving}
         className={
           'absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-2xl border transition-colors ' +
           (saved ? 'border-forest bg-forest text-cream' : 'border-line bg-cream text-clay')
         }
       >
-        <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
-          <path d="M0 0h14v18l-7-5-7 5V0z" />
-        </svg>
+        {saving ? (
+          <Spinner className="size-4 border-2" />
+        ) : (
+          <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
+            <path d="M0 0h14v18l-7-5-7 5V0z" />
+          </svg>
+        )}
       </button>
       <div className="pointer-events-none flex flex-1 flex-col gap-2 p-4">
         <span className="font-display text-bark text-2xl font-medium text-wrap-pretty">{place.name}</span>
