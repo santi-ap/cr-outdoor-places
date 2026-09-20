@@ -1,9 +1,11 @@
 'use client';
 
-import { MapPinIcon, ChevronRightIcon, MapIcon, NavigationIcon } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { MapPinIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { GoogleMapsIcon, AppleMapsIcon, WazeIcon } from '@/components/icons/map-app-icons';
 import { useLanguage } from '@/lib/i18n/language-context';
 
 // Deep-links to external map apps for the destination — this is the
@@ -26,19 +28,19 @@ export function DirectionsButton({
     {
       label: 'Google Maps',
       href: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
-      icon: MapPinIcon,
-      bg: '#EA4335',
+      icon: GoogleMapsIcon,
+      bg: '#4285F4',
     },
     {
       label: 'Apple Maps',
       href: `https://maps.apple.com/?daddr=${lat},${lng}`,
-      icon: MapIcon,
-      bg: '#0A84FF',
+      icon: AppleMapsIcon,
+      bg: '#000000',
     },
     {
       label: 'Waze',
       href: `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
-      icon: NavigationIcon,
+      icon: WazeIcon,
       bg: '#33CCFF',
     },
   ];
@@ -106,7 +108,7 @@ export function DirectionsButton({
 function MapAppRow({
   links,
 }: {
-  links: { label: string; href: string; icon: typeof MapPinIcon; bg: string }[];
+  links: { label: string; href: string; icon: ComponentType<{ className?: string }>; bg: string }[];
 }) {
   return (
     <div className="flex items-center justify-center gap-5 px-2">
