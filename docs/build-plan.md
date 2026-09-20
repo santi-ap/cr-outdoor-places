@@ -86,6 +86,9 @@ cost_type     text not null default 'unknown'  -- 'free' | 'paid' | 'unknown'
 cost_amount   text            -- free-text for prototype, e.g. "₡2000" or "$15"
 pet_friendly  text not null default 'unknown'  -- 'yes' | 'no' | 'unknown'
 hours_text    text            -- free-text for prototype, e.g. "8am–4pm daily"
+website       text            -- shown on the detail page only if set
+phone         text            -- shown on the detail page only if set
+whatsapp      text            -- digits + country code, e.g. "50688881234"; builds a wa.me deep link, no pre-filled message
 source        text not null default 'seed'     -- 'seed' | 'community'
 confidence    text not null default 'unverified' -- 'unverified' | 'verified'
 created_at    timestamptz default now()

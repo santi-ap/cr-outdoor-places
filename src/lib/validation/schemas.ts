@@ -45,6 +45,12 @@ export const placeSchema = z.object({
   cost_amount: z.string().nullable(),
   pet_friendly: petFriendlySchema,
   hours_text: z.string().nullable(),
+  website: z.string().nullable(),
+  phone: z.string().nullable(),
+  // Digits only (with country code, no symbols/spaces), e.g. "50688881234"
+  // — used to build a https://wa.me/<number> deep link, not displayed
+  // as-is.
+  whatsapp: z.string().nullable(),
   source: placeSourceSchema,
   confidence: placeConfidenceSchema,
   rating: z.number().min(1).max(5).nullable(),
@@ -67,6 +73,9 @@ export const placeInsertSchema = placeSchema
     cost_amount: true,
     pet_friendly: true,
     hours_text: true,
+    website: true,
+    phone: true,
+    whatsapp: true,
     source: true,
     confidence: true,
     rating: true,

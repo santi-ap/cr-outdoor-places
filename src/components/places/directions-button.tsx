@@ -5,7 +5,7 @@ import { MapPinIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { GoogleMapsIcon, AppleMapsIcon, WazeIcon } from '@/components/icons/map-app-icons';
+import { GoogleMapsIcon, AppleMapsIcon, WazeIcon } from '@/components/icons/brand-icons';
 import { useLanguage } from '@/lib/i18n/language-context';
 
 // Deep-links to external map apps for the destination — this is the
