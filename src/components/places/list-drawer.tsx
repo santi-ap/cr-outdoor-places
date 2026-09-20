@@ -232,14 +232,12 @@ export function ListDrawer({
             </button>
           </div>
         </div>
-        <div className="px-5">
-          <FilterChipCarousel
-            filter={filter}
-            onChange={onFilterChange}
-            onOpenAllFilters={onOpenFilters}
-            resultsLabel={resultsLabel}
-          />
-        </div>
+        <FilterChipCarousel
+          filter={filter}
+          onChange={onFilterChange}
+          onOpenAllFilters={onOpenFilters}
+          resultsLabel={resultsLabel}
+        />
       </div>
 
       <div
