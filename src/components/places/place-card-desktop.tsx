@@ -1,20 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
-import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Spinner } from '@/components/ui/spinner';
 import { PlaceCardPhoto } from './place-card-photo';
+import { PlacePills } from './place-pills';
 import { useLanguage } from '@/lib/i18n/language-context';
-import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
-import { formatDistance, formatDuration } from '@/lib/places/format';
+import { getCategoryLabels } from '@/lib/places/labels';
 import type { Place } from '@/lib/validation/schemas';
-
-const DIFFICULTY_TIER: Record<string, Tier> = {
-  easy: 'facil',
-  moderate: 'moderado',
-  hard: 'dificil',
-};
 
 export function PlaceCardDesktop({
   place,
@@ -29,36 +21,6 @@ export function PlaceCardDesktop({
 }) {
   const { t, language } = useLanguage();
   const categoryLabels = getCategoryLabels(language);
-  const difficultyLabels = getDifficultyLabels(language);
-  const costTypeLabels = getCostTypeLabels(language);
-
-  const badges: { key: string; label: string; tier: Tier; icon?: typeof FootprintsIcon }[] = [];
-  if (place.difficulty) {
-    badges.push({
-      key: 'difficulty',
-      label: difficultyLabels[place.difficulty],
-      tier: DIFFICULTY_TIER[place.difficulty],
-      icon: FootprintsIcon,
-    });
-  }
-  if (place.distance_m) {
-    badges.push({
-      key: 'distance',
-      label: formatDistance(place.distance_m, language),
-      tier: 'neutral',
-      icon: RulerIcon,
-    });
-  }
-  if (place.duration_min) {
-    badges.push({
-      key: 'duration',
-      label: formatDuration(place.duration_min, language),
-      tier: 'neutral',
-      icon: ClockIcon,
-    });
-  }
-  badges.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
-  badges.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
   return (
     <div className="rounded-card-lg bg-rail relative flex flex-col overflow-hidden">
@@ -93,15 +55,7 @@ export function PlaceCardDesktop({
           {[place.province, categoryLabels[place.category] ?? place.category].filter(Boolean).join(' · ')}
         </p>
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2">
-          {place.rating != null && (
-            <span className="border-clay text-bark rounded-pill inline-flex items-center gap-1 border px-[11px] py-1.5 text-[12.5px] font-semibold whitespace-nowrap">
-              <StarIcon className="fill-clay text-clay size-3.5" />
-              {place.rating.toFixed(1)}
-            </span>
-          )}
-          {badges.map((b) => (
-            <TierBadge key={b.key} label={b.label} tier={b.tier} icon={b.icon} size="md" />
-          ))}
+          <PlacePills place={place} size="md" />
         </div>
       </div>
     </div>
