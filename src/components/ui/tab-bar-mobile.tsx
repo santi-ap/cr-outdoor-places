@@ -9,22 +9,13 @@ export type TabBarItem = {
   href: string;
 };
 
-// docked: the low-drawer-state Explore layout flushes this to a full-width
-// bar attached to the screen's bottom edge instead of the usual floating
-// rounded pill, to give the map as much room as possible (see
-// MobileTabBar).
-export function TabBarMobile({ items, docked = false }: { items: TabBarItem[]; docked?: boolean }) {
+export function TabBarMobile({ items }: { items: TabBarItem[] }) {
   const pathname = usePathname();
 
   return (
     <nav
       aria-label="Primary"
-      className={cn(
-        'border-line-strong bg-cream flex items-center',
-        docked
-          ? 'w-full justify-around border-t px-2 py-2'
-          : 'mx-auto w-fit gap-1 rounded-pill border p-1 shadow-lg',
-      )}
+      className="border-line-strong bg-cream mx-auto flex w-fit items-center gap-1 rounded-pill border p-1 shadow-lg"
     >
       {items.map((item) => {
         const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);

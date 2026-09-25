@@ -12,7 +12,6 @@ import {
   getServerDrawerStateSnapshot,
   subscribeDrawerState,
   setDrawerState,
-  PEEK_HEIGHT_PX,
   LOW_HEIGHT_PX,
 } from '@/lib/places/drawer-state';
 import type { Place, PlacesFilter } from '@/lib/validation/schemas';
@@ -30,7 +29,6 @@ const DRAG_RELEASE_THRESHOLD_PX = 60;
 // already spans the full container.
 function restingTransformBase(state: DrawerState): string {
   if (state === 'full') return '0px';
-  if (state === 'peek') return `calc(100% - ${PEEK_HEIGHT_PX}px)`;
   return `calc(100% - ${LOW_HEIGHT_PX}px)`;
 }
 
@@ -46,7 +44,6 @@ export function ListDrawer({
   onFilterChange,
   searchQuery,
   onSearchChange,
-  pinnedPlaceId,
 }: {
   places: Place[];
   isLoading: boolean;
@@ -59,10 +56,6 @@ export function ListDrawer({
   onFilterChange: (filter: PlacesFilter) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  // The place last previewed from a pin tap while the drawer was docked
-  // (low) — surfaced as the first card once the drawer comes back up,
-  // since the docked preview card itself disappears at that point.
-  pinnedPlaceId?: string | null;
 }) {
   const { t } = useLanguage();
   const state = useSyncExternalStore(
@@ -86,9 +79,9 @@ export function ListDrawer({
   const dragDeltaYRef = useRef(0);
 
   // Drag detection is shared by the header (grab handle, search bar,
-  // results/filter row, filter carousel) and — while not fully expanded —
-  // the peeking card list below it, so "the whole area" the drawer shows
-  // can be dragged, not just the small handle. A gesture only commits to
+  // results/filter row, filter carousel) and — while fully expanded —
+  // the card list below it, so "the whole area" the drawer shows can be
+  // dragged, not just the small handle. A gesture only commits to
   // "dragging the sheet" once it moves past a small threshold and is more
   // vertical than horizontal, so plain taps (search input focus, filter
   // chip taps, card links) and the filter carousel's own horizontal
@@ -123,13 +116,10 @@ export function ListDrawer({
     dragDeltaYRef.current = 0;
     setDragDeltaY(0);
     if (Math.abs(delta) < DRAG_RELEASE_THRESHOLD_PX) return;
-    if (delta < 0) {
-      if (state === 'low') setDrawerState('peek');
-      else if (state === 'peek') setDrawerState('full');
-    } else {
-      if (state === 'full') setDrawerState('peek');
-      else if (state === 'peek') setDrawerState('low');
-    }
+    // Only two states — a drag in either direction just toggles between
+    // them, past the release threshold.
+    if (delta < 0 && state === 'low') setDrawerState('full');
+    else if (delta > 0 && state === 'full') setDrawerState('low');
   }
 
   const dragHandlers = {
@@ -140,17 +130,17 @@ export function ListDrawer({
   };
 
   const isFull = state === 'full';
-  const isLow = state === 'low';
-
-  const orderedPlaces =
-    pinnedPlaceId && places.some((place) => place.id === pinnedPlaceId)
-      ? [places.find((place) => place.id === pinnedPlaceId)!, ...places.filter((place) => place.id !== pinnedPlaceId)]
-      : places;
 
   return (
     <div
       className={cn(
-        'bg-cream absolute inset-x-0 bottom-0 flex flex-col border',
+        // z-[2050]: above the map's selected-place preview panel
+        // (z-2000, see PlaceMap) — without this, that panel (portaled to
+        // document.body, so it isn't naturally behind a later sibling)
+        // stays visibly floating on top while the drawer rises past it
+        // during the drag from low to full, instead of being covered by
+        // the drawer the way a physical sheet would cover it.
+        'bg-cream absolute inset-x-0 bottom-0 z-[2050] flex flex-col border',
         isFull ? 'top-0 rounded-none border-transparent' : 'top-6 rounded-t-[28px] border-line',
       )}
       style={{
@@ -166,22 +156,13 @@ export function ListDrawer({
           Dragging from anywhere in this header (still not the card list
           below) still collapses it back — the Map button is just a more
           discoverable, explicit way to do the same thing. */}
-      {/* Docked (low) has the least vertical room of any state (the drawer
-          only spans LOW_CONTENT_HEIGHT_PX) and, unlike peek/full, never
-          needs slack below the header for a card list — so it tightens
-          every gap here to fit the search bar, filter row, and (when
-          filters are active) the selected-filter pills + results count
-          without clipping. */}
-      <div className={cn('flex shrink-0 flex-col', isLow ? 'gap-1.5 pb-1.5' : 'gap-2.5 pb-2.5')} {...dragHandlers}>
+      <div className={cn('flex shrink-0 flex-col', isFull ? 'gap-2.5 pb-2.5' : 'gap-1.5 pb-1.5')} {...dragHandlers}>
         {!isFull && (
           <button
             type="button"
             aria-expanded={isFull}
             aria-label={isFull ? t.browse.mapView : t.browse.listView}
-            className={cn(
-              'flex cursor-grab items-center justify-center active:cursor-grabbing',
-              isLow ? 'pt-1.5 pb-0.5' : 'pt-2.5 pb-1',
-            )}
+            className="flex cursor-grab items-center justify-center pt-1.5 pb-0.5 active:cursor-grabbing"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -195,7 +176,7 @@ export function ListDrawer({
           </button>
         )}
 
-        <div className={cn('flex items-center gap-2 px-4', isFull ? 'pt-4' : isLow ? 'pt-0' : 'pt-1.5')}>
+        <div className={cn('flex items-center gap-2 px-4', isFull ? 'pt-4' : 'pt-0')}>
           <div className="min-w-0 flex-1">
             <PlaceSearchInput value={searchQuery} onChange={onSearchChange} placeholder={t.browse.searchPlaceholder} />
           </div>
@@ -207,7 +188,7 @@ export function ListDrawer({
           >
             <button
               type="button"
-              onClick={() => setDrawerState('peek')}
+              onClick={() => setDrawerState('low')}
               className="bg-moss border-moss flex h-11 w-[60px] items-center justify-center rounded-control border text-[13px] font-medium whitespace-nowrap text-[#23281C]"
             >
               {t.browse.mapView}
@@ -222,22 +203,17 @@ export function ListDrawer({
         />
       </div>
 
-      {/* Docked (low) hides the card list entirely to maximize the map —
-          the header above (search + filters, still visible) is all this
-          state shows besides the map itself. */}
-      {!isLow && (
-        <div
-          className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-20"
-          style={!isFull ? { touchAction: 'none' } : undefined}
-          {...(!isFull ? dragHandlers : {})}
-        >
+      {/* The resting (low) state hides the card list entirely — just the
+          header above (search + filters) shows besides the map itself. */}
+      {isFull && (
+        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-20">
           {isLoading ? (
             <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
-          ) : orderedPlaces.length === 0 ? (
+          ) : places.length === 0 ? (
             <p className="text-ink-muted">{t.placeCard.noMatches}</p>
           ) : (
             <div className="flex flex-col gap-2.5">
-              {orderedPlaces.map((place) => (
+              {places.map((place) => (
                 <PlaceCardMobile
                   key={place.id}
                   place={place}

@@ -8,7 +8,6 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { XIcon } from 'lucide-react';
 import { PlacePills } from './place-pills';
-import { SLIDE_STYLES } from './photo-carousel';
 import {
   getDrawerHeightPx,
   getDrawerStateSnapshot,
@@ -25,15 +24,6 @@ const PANEL_BOTTOM_INSET_PX = 12;
 // Extra breathing room between the panel and the drawer's own top edge,
 // when there is one, so the two don't touch.
 const PANEL_DRAWER_GAP_PX = 16;
-// Minimum height of the docked-low preview card (thumbnail + pills) — the
-// card grows past this when a place's pills wrap to more rows (up to 3:
-// rating/difficulty/distance, duration/cost, category) so nothing gets
-// clipped. The auto-pan effect below measures the card's real rendered
-// height rather than assuming this minimum, since it varies.
-const DOCKED_PREVIEW_MIN_HEIGHT_PX = 92;
-// Extra breathing room to keep between the pin's tip and the card's top
-// edge, so the pin doesn't end up sitting flush against it.
-const SELECTED_PIN_MARGIN_PX = 12;
 
 // A pin matching the app's forest-green brand color instead of Leaflet's
 // default blue marker (which also needed its image paths pointed at a CDN
@@ -100,8 +90,6 @@ export function PlaceMap({
   zoom = 8,
   hasDrawer = false,
   interactivePins = true,
-  selectedPlaceId: controlledSelectedPlaceId,
-  onSelectedPlaceIdChange,
 }: {
   places: Place[];
   center?: [number, number];
@@ -117,38 +105,18 @@ export function PlaceMap({
   // it's already sitting on. True (the default) is for the main Explore
   // map, where both make sense.
   interactivePins?: boolean;
-  // Controlled pin-selection, for the one caller (BrowseView's mobile
-  // Explore map) that needs to know which place is selected outside this
-  // component — so it can reorder that place to the top of ListDrawer's
-  // list once the drawer leaves the docked (low) state. Omit both props
-  // to let this component manage selection itself (the desktop mini map,
-  // and the detail page's reference map).
-  selectedPlaceId?: string | null;
-  onSelectedPlaceIdChange?: (placeId: string | null) => void;
 }) {
   const { t } = useLanguage();
   const [currentZoom, setCurrentZoom] = useState(zoom);
-  const [internalSelectedPlaceId, setInternalSelectedPlaceId] = useState<string | null>(null);
-  const isControlledSelection = controlledSelectedPlaceId !== undefined;
-  const selectedPlaceId = isControlledSelection ? controlledSelectedPlaceId : internalSelectedPlaceId;
-  function selectPlace(placeId: string | null) {
-    if (isControlledSelection) onSelectedPlaceIdChange?.(placeId);
-    else setInternalSelectedPlaceId(placeId);
-  }
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const showLabels = interactivePins && currentZoom >= LABEL_ZOOM_THRESHOLD;
   const selectedPlace = interactivePins ? (places.find((place) => place.id === selectedPlaceId) ?? null) : null;
   const mapRef = useRef<L.Map | null>(null);
-  const previewCardRef = useRef<HTMLDivElement | null>(null);
   const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
   const drawerHeightPx = hasDrawer ? getDrawerHeightPx(drawerState) : 0;
   const panelBottomPx = Number.isFinite(drawerHeightPx)
     ? drawerHeightPx + (hasDrawer ? PANEL_DRAWER_GAP_PX : PANEL_BOTTOM_INSET_PX)
     : null;
-  // Docked mode (drawer dragged all the way down): a smaller preview card
-  // with a thumbnail replaces the usual no-thumbnail panel, since the map
-  // is meant to dominate the screen here — see PlaceMap's docked branch
-  // below and drawer-state.ts's LOW_HEIGHT_PX.
-  const isDockedLow = hasDrawer && drawerState === 'low';
 
   // Next.js's client-side route cache can "reappear" this component's DOM
   // node on a back/forward navigation instead of a full unmount+remount,
@@ -163,26 +131,6 @@ export function PlaceMap({
       if (container) container._leaflet_id = undefined;
     };
   }, []);
-
-  // If the docked preview card would cover the pin it belongs to (common
-  // when the pin sits in the lower half of the screen), nudge the map so
-  // the pin stays visible above the card instead of hidden behind it.
-  useEffect(() => {
-    if (!isDockedLow || !selectedPlace || panelBottomPx === null) return;
-    const map = mapRef.current;
-    const cardHeightPx = previewCardRef.current?.getBoundingClientRect().height;
-    if (!map || !cardHeightPx) return;
-    // latLngToContainerPoint gives the pin's anchor point, which for
-    // selectedMarkerIcon (iconAnchor [18,48], the full iconSize) is the
-    // glyph's own tip — its lowest, southmost-on-screen point, and so the
-    // one that actually needs to clear the card above it.
-    const pinTipY = map.latLngToContainerPoint([selectedPlace.lat, selectedPlace.lng]).y;
-    const cardTopY = map.getSize().y - panelBottomPx - cardHeightPx;
-    const overlapPx = pinTipY - cardTopY + SELECTED_PIN_MARGIN_PX;
-    if (overlapPx > 0) {
-      map.panBy([0, overlapPx], { animate: true });
-    }
-  }, [isDockedLow, selectedPlace, panelBottomPx]);
 
   return (
     <div className="relative h-full w-full">
@@ -210,7 +158,7 @@ export function PlaceMap({
               zIndexOffset={place.id === selectedPlaceId ? 1000 : 0}
               eventHandlers={
                 interactivePins
-                  ? { click: () => selectPlace(selectedPlaceId === place.id ? null : place.id) }
+                  ? { click: () => setSelectedPlaceId((current) => (current === place.id ? null : place.id)) }
                   : undefined
               }
             >
@@ -245,79 +193,31 @@ export function PlaceMap({
       {selectedPlace &&
         panelBottomPx !== null &&
         createPortal(
-          isDockedLow ? (
-            // Docked (low) preview: a smaller card with a thumbnail, since
-            // the map is meant to dominate the screen here. This is a
-            // separate variant from the panel below, not a replacement for
-            // it — the no-thumbnail panel still applies as-is for
-            // peek/full, unchanged.
-            <div className="fixed inset-x-3 z-[2000]" style={{ bottom: panelBottomPx }}>
-              <div
-                ref={previewCardRef}
-                className="rounded-card bg-rail relative flex overflow-hidden shadow-lg"
-                style={{ minHeight: DOCKED_PREVIEW_MIN_HEIGHT_PX }}
+          <div className="fixed inset-x-3 z-[2000]" style={{ bottom: panelBottomPx }}>
+            <div className="rounded-card bg-rail relative overflow-hidden shadow-lg">
+              <Link
+                href={`/places/${selectedPlace.id}`}
+                className="absolute inset-0 z-0"
+                aria-label={selectedPlace.name}
+              />
+              <button
+                type="button"
+                aria-label={t.browse.closePreview}
+                onClick={() => setSelectedPlaceId(null)}
+                className="bg-cream text-bark absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
               >
-                <Link
-                  href={`/places/${selectedPlace.id}`}
-                  className="absolute inset-0 z-0"
-                  aria-label={selectedPlace.name}
-                />
-                {/* No explicit height: stretches to match the pills
-                    column's natural height (flex row default
-                    align-items: stretch), so it still fills the card
-                    when pills wrap to 3 rows instead of the card just
-                    growing past a fixed-height thumbnail. Pills are the
-                    same `sm` size used everywhere else in the mobile
-                    Explore flow (#58) — only this card's own layout
-                    (thumbnail width, padding, name size) stays tighter
-                    than the peek/full panel, since it alone competes
-                    with the map for space. */}
-                <div className="w-[72px] shrink-0" style={SLIDE_STYLES[0]} />
-                <button
-                  type="button"
-                  aria-label={t.browse.closePreview}
-                  onClick={() => selectPlace(null)}
-                  className="bg-cream text-bark absolute top-1.5 right-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full shadow-sm"
-                >
-                  <XIcon className="size-3" />
-                </button>
-                <div className="pointer-events-none flex min-w-0 flex-1 flex-col justify-center gap-1 p-2.5 pr-7">
-                  <span className="text-bark font-display line-clamp-1 text-[13px] leading-snug font-medium text-wrap-pretty">
-                    {selectedPlace.name}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-1">
-                    <PlacePills place={selectedPlace} size="sm" />
-                  </div>
+                <XIcon className="size-3.5" />
+              </button>
+              <div className="pointer-events-none flex flex-col gap-1.5 p-3.5 pr-10">
+                <span className="text-bark font-display text-base leading-snug font-medium text-wrap-pretty">
+                  {selectedPlace.name}
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <PlacePills place={selectedPlace} size="sm" />
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="fixed inset-x-3 z-[2000]" style={{ bottom: panelBottomPx }}>
-              <div className="rounded-card bg-rail relative overflow-hidden shadow-lg">
-                <Link
-                  href={`/places/${selectedPlace.id}`}
-                  className="absolute inset-0 z-0"
-                  aria-label={selectedPlace.name}
-                />
-                <button
-                  type="button"
-                  aria-label={t.browse.closePreview}
-                  onClick={() => selectPlace(null)}
-                  className="bg-cream text-bark absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
-                >
-                  <XIcon className="size-3.5" />
-                </button>
-                <div className="pointer-events-none flex flex-col gap-1.5 p-3.5 pr-10">
-                  <span className="text-bark font-display text-base leading-snug font-medium text-wrap-pretty">
-                    {selectedPlace.name}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <PlacePills place={selectedPlace} size="sm" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ),
+          </div>,
           document.body,
         )}
     </div>

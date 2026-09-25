@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePlaces } from '@/lib/places/use-places';
@@ -15,11 +15,6 @@ import { ListDrawer } from './list-drawer';
 import { PlaceSearchInput } from './place-search-input';
 import { normalizeForSearch } from '@/lib/places/search';
 import { useLanguage } from '@/lib/i18n/language-context';
-import {
-  getDrawerStateSnapshot,
-  getServerDrawerStateSnapshot,
-  subscribeDrawerState,
-} from '@/lib/places/drawer-state';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
 function MapLoadingFallback() {
@@ -44,26 +39,6 @@ export function BrowseView() {
   const queryClient = useQueryClient();
   const [signInDialogOpen, setSignInDialogOpen] = useState(false);
   const isSignedIn = useIsSignedIn();
-
-  // The pin selected on the mobile Explore map — lifted up from PlaceMap
-  // so it can be reordered to the top of ListDrawer's list once the
-  // drawer leaves the docked (low) state (see the effect below).
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [pinnedPlaceId, setPinnedPlaceId] = useState<string | null>(null);
-  const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
-  const previousDrawerStateRef = useRef(drawerState);
-
-  useEffect(() => {
-    const wasLow = previousDrawerStateRef.current === 'low';
-    previousDrawerStateRef.current = drawerState;
-    if (wasLow && drawerState !== 'low' && selectedPlaceId) {
-      // The docked preview card only exists in the low state — dragging
-      // the drawer back up dismisses it, and the place it was showing
-      // reappears as the list's first card instead.
-      setPinnedPlaceId(selectedPlaceId);
-      setSelectedPlaceId(null);
-    }
-  }, [drawerState, selectedPlaceId]);
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
   const visiblePlaces = trimmedQuery
@@ -107,12 +82,7 @@ export function BrowseView() {
           Map/List toggle from #24. */}
       <div className="relative h-full overflow-hidden lg:hidden">
         <div className="absolute inset-0">
-          <PlaceMap
-            places={visiblePlaces}
-            hasDrawer
-            selectedPlaceId={selectedPlaceId}
-            onSelectedPlaceIdChange={setSelectedPlaceId}
-          />
+          <PlaceMap places={visiblePlaces} hasDrawer />
         </div>
         <ListDrawer
           places={visiblePlaces}
@@ -126,7 +96,6 @@ export function BrowseView() {
           onFilterChange={setFilter}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          pinnedPlaceId={pinnedPlaceId}
         />
       </div>
 
