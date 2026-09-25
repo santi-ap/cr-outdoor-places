@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { SignInNotice } from '@/components/auth/sign-in-notice';
+import { ShareButton } from '@/components/places/share-button';
 import { toggleListItemStatus, removeListItem } from '@/app/actions/my-list';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
@@ -60,9 +61,17 @@ export function MyListClient({
     );
   }
 
+  // Relative — ShareButton resolves it against window.location.origin at
+  // share time, so this stays SSR-safe (no window access during render).
+  const sharePath =
+    items.length > 0 ? `/shared-list?places=${items.map((item) => item.place.id).join(',')}` : null;
+
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-semibold">{t.header.myList}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">{t.header.myList}</h1>
+        {sharePath && <ShareButton title={t.myList.shareTitle} url={sharePath} className="shrink-0" />}
+      </div>
       <ListSection
         title={t.myList.saved}
         items={saved}

@@ -7,10 +7,18 @@ import { useLanguage } from '@/lib/i18n/language-context';
 
 export function ShareButton({
   title,
+  url,
   iconOnly,
   className,
 }: {
   title: string;
+  // Defaults to the current page's URL (place detail pages, which are the
+  // page being shared). Callers sharing a URL other than the one they're
+  // currently on — e.g. My List generating a separate /shared-list link —
+  // pass it explicitly, absolute or relative (resolved against
+  // window.location.origin here, at share time, so callers can build it
+  // during SSR render without touching `window` themselves).
+  url?: string;
   iconOnly?: boolean;
   className?: string;
 }) {
@@ -18,17 +26,17 @@ export function ShareButton({
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
-    const url = window.location.href;
+    const shareUrl = url ? new URL(url, window.location.origin).toString() : window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title, url });
+        await navigator.share({ title, url: shareUrl });
       } catch {
         // User cancelled or the share sheet failed — nothing to recover.
       }
       return;
     }
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

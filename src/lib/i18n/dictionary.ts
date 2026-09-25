@@ -87,6 +87,12 @@ const es = {
     markVisited: 'Marcar visitado',
     markSaved: 'Marcar guardado',
     remove: 'Quitar',
+    share: 'Compartir lista',
+    shareTitle: 'Mi lista de Lugares CR',
+  },
+  sharedList: {
+    heading: 'Lista compartida',
+    empty: 'Este enlace no tiene lugares para mostrar.',
   },
   suggest: {
     backTo: 'Volver a',
@@ -218,6 +224,12 @@ const en: typeof es = {
     markVisited: 'Mark visited',
     markSaved: 'Mark saved',
     remove: 'Remove',
+    share: 'Share list',
+    shareTitle: 'My CR Outdoor Places list',
+  },
+  sharedList: {
+    heading: 'Shared list',
+    empty: "This link doesn't have any places to show.",
   },
   suggest: {
     backTo: 'Back to',
