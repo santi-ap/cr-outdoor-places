@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { PlaceCardPhoto } from './place-card-photo';
 import { PlacePills } from './place-pills';
 import { useLanguage } from '@/lib/i18n/language-context';
-import { getCategoryLabels } from '@/lib/places/labels';
+import { getCategoryLabels, getLandscapeLabels } from '@/lib/places/labels';
 import type { Place } from '@/lib/validation/schemas';
 
 export function PlaceCardDesktop({
@@ -21,6 +21,7 @@ export function PlaceCardDesktop({
 }) {
   const { t, language } = useLanguage();
   const categoryLabels = getCategoryLabels(language);
+  const landscapeLabels = getLandscapeLabels(language);
 
   return (
     <div className="rounded-card-lg bg-rail relative flex flex-col overflow-hidden">
@@ -52,7 +53,13 @@ export function PlaceCardDesktop({
       <div className="pointer-events-none flex flex-1 flex-col gap-1.5 p-3.5">
         <span className="font-display text-bark text-xl font-medium text-wrap-pretty">{place.name}</span>
         <p className="text-ink-muted text-[12.5px]">
-          {[place.province, categoryLabels[place.category] ?? place.category].filter(Boolean).join(' · ')}
+          {[
+            place.province,
+            categoryLabels[place.category ?? ''] ?? place.category,
+            landscapeLabels[place.landscape ?? ''] ?? place.landscape,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </p>
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1.5">
           <PlacePills place={place} size="md" />

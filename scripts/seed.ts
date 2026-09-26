@@ -344,11 +344,13 @@ const BASE_PLACES: PlaceInsert[] = [
   // ---------------------------------------------------------------------
   // Mock/fabricated test places (Issue #33) — NOT real, NOT verified.
   // Made-up names/coordinates (plausible but fictional locations within
-  // Costa Rica) added purely to widen UI test coverage: categories with no
-  // real example yet (beach, mountain, trail, other), a 'hard' difficulty,
-  // 'rocky' terrain, missing-optional-field edge cases, and a couple of
-  // deliberately long names/strings to keep exercising text wrapping
-  // (#21, #27). `source`/`confidence` stay within the existing enum
+  // Costa Rica) added purely to widen UI test coverage: landscape values
+  // with no real example yet (beach, mountain, trail — category is null
+  // for these, since none of them have a protection designation; see
+  // Issue #66), a 'hard' difficulty, 'rocky' terrain, missing-optional-
+  // field edge cases, and a couple of deliberately long names/strings to
+  // keep exercising text wrapping (#21, #27). `source`/`confidence` stay
+  // within the existing enum
   // ('seed' | 'community' and 'unverified' | 'verified') — there's no
   // separate "mock" value, so these are flagged by this comment block and
   // by `confidence: 'unverified'` (never 'verified', since none of this
@@ -360,7 +362,8 @@ const BASE_PLACES: PlaceInsert[] = [
     // phone here, no whatsapp).
     name: 'Playa Mock Grande',
     description: 'Fabricated test place: a wide sand beach with easy flat walking above the tideline.',
-    category: 'beach',
+    category: null,
+    landscape: 'beach',
     province: 'Guanacaste',
     canton: 'Santa Cruz',
     lat: 10.35,
@@ -382,7 +385,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Playa Ficticia del Caribe',
     description: 'Fabricated test place: a Caribbean-coast beach with a short palm-lined path.',
-    category: 'beach',
+    category: null,
+    landscape: 'beach',
     province: 'Limón',
     canton: 'Limón',
     lat: 9.98,
@@ -401,7 +405,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Cerro Ficticio',
     description: 'Fabricated test place: a steep rocky summit trail with a viewpoint at the top.',
-    category: 'mountain',
+    category: null,
+    landscape: 'mountain',
     province: 'Cartago',
     canton: 'Paraíso',
     lat: 9.83,
@@ -425,7 +430,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Montaña de Prueba',
     description: 'Fabricated test place: another steep, rocky mountain trail for testing the hard/rocky combination.',
-    category: 'mountain',
+    category: null,
+    landscape: 'mountain',
     province: 'Puntarenas',
     canton: 'Pérez Zeledón',
     lat: 9.38,
@@ -444,7 +450,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Sendero de Prueba Larguísimo con Nombre Extremadamente Extenso para Probar el Ajuste de Texto',
     description: 'Fabricated test place with a deliberately very long name, for testing text wrapping in card lists and headings.',
-    category: 'trail',
+    category: null,
+    landscape: 'trail',
     province: 'Alajuela',
     canton: 'San Ramón',
     lat: 10.09,
@@ -466,7 +473,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Sendero Corto',
     description: 'Fabricated test place: a short, simple trail for contrast against the longer test entries.',
-    category: 'trail',
+    category: null,
+    landscape: 'trail',
     province: 'Heredia',
     canton: 'Barva',
     lat: 10.02,

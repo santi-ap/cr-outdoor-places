@@ -29,6 +29,7 @@ const es = {
   },
   filters: {
     category: 'Categoría',
+    landscape: 'Paisaje',
     difficulty: 'Dificultad',
     pets: 'Mascotas',
     cost: 'Costo',
@@ -107,6 +108,7 @@ const es = {
       name: 'Nombre',
       description: 'Descripción',
       category: 'Categoría',
+      landscape: 'Paisaje',
       province: 'Provincia',
       canton: 'Cantón',
       latitude: 'Latitud',
@@ -133,7 +135,7 @@ const es = {
     submit: 'Enviar sugerencia',
     submitting: 'Enviando…',
     thanks: '¡Gracias! Tu sugerencia fue enviada para revisión.',
-    errorNameCategoryRequired: 'El nombre y la categoría son obligatorios para un lugar nuevo.',
+    errorNameCategoryRequired: 'El nombre y la categoría o el paisaje son obligatorios para un lugar nuevo.',
     errorChangeAtLeastOne: 'Cambia al menos un campo antes de enviar.',
   },
 };
@@ -166,6 +168,7 @@ const en: typeof es = {
   },
   filters: {
     category: 'Category',
+    landscape: 'Landscape',
     difficulty: 'Difficulty',
     pets: 'Pets',
     cost: 'Cost',
@@ -244,6 +247,7 @@ const en: typeof es = {
       name: 'Name',
       description: 'Description',
       category: 'Category',
+      landscape: 'Landscape',
       province: 'Province',
       canton: 'Canton',
       latitude: 'Latitude',
@@ -270,7 +274,7 @@ const en: typeof es = {
     submit: 'Submit suggestion',
     submitting: 'Submitting…',
     thanks: 'Thanks! Your suggestion has been submitted for review.',
-    errorNameCategoryRequired: 'Name and category are required for a new place.',
+    errorNameCategoryRequired: 'Name and either a category or landscape are required for a new place.',
     errorChangeAtLeastOne: 'Change at least one field before submitting.',
   },
 };

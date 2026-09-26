@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import {
   getCategoryLabels,
+  getLandscapeLabels,
   getCostTypeLabels,
   getDifficultyLabels,
   getPetFriendlyLabels,
@@ -33,6 +34,7 @@ const EMPTY: FieldValues = {
   name: '',
   description: '',
   category: '',
+  landscape: '',
   province: '',
   canton: '',
   lat: '',
@@ -57,7 +59,8 @@ function placeToFieldValues(place: Place): FieldValues {
     ...EMPTY,
     name: place.name,
     description: place.description ?? '',
-    category: place.category,
+    category: place.category ?? '',
+    landscape: place.landscape ?? '',
     province: place.province ?? '',
     canton: place.canton ?? '',
     lat: String(place.lat),
@@ -83,6 +86,8 @@ function placeToFieldValues(place: Place): FieldValues {
 const NUMBER_FIELDS = new Set(['lat', 'lng', 'distance_m', 'duration_min']);
 const NULLABLE_FIELDS = new Set([
   'description',
+  'category',
+  'landscape',
   'province',
   'canton',
   'difficulty',
@@ -133,6 +138,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
   const [isPending, startTransition] = useTransition();
 
   const categoryLabels = getCategoryLabels(language);
+  const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const terrainLabels = getTerrainLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
@@ -145,7 +151,10 @@ export function SuggestionForm({ place }: { place?: Place }) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!place && (values.name.trim() === '' || values.category.trim() === '')) {
+    if (
+      !place &&
+      (values.name.trim() === '' || (values.category.trim() === '' && values.landscape.trim() === ''))
+    ) {
       setError(t.suggest.errorNameCategoryRequired);
       setStatus('error');
       return;
@@ -197,6 +206,15 @@ export function SuggestionForm({ place }: { place?: Place }) {
           options={categoryLabels}
           placeholder={t.suggest.selectCategory}
           onChange={(v) => setField('category', v)}
+        />
+      </Field>
+
+      <Field label={t.suggest.fields.landscape}>
+        <EnumSelect
+          value={values.landscape}
+          options={landscapeLabels}
+          placeholder={t.suggest.notSet}
+          onChange={(v) => setField('landscape', v)}
         />
       </Field>
 

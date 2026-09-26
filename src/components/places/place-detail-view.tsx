@@ -16,6 +16,7 @@ import { PlaceContact } from './place-contact';
 import { useLanguage } from '@/lib/i18n/language-context';
 import {
   getCategoryLabels,
+  getLandscapeLabels,
   getCostTypeLabels,
   getDifficultyLabels,
   getPetFriendlyLabels,
@@ -52,6 +53,7 @@ export function PlaceDetailView({
   const [status, setStatus] = useState<Status>(initialStatus);
 
   const categoryLabels = getCategoryLabels(language);
+  const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const terrainLabels = getTerrainLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
@@ -91,7 +93,11 @@ export function PlaceDetailView({
     practical.push({ label: t.detail.terrain, value: terrainLabels[place.terrain] });
   }
 
-  const locationLine = [place.province, categoryLabels[place.category] ?? place.category]
+  const locationLine = [
+    place.province,
+    categoryLabels[place.category ?? ''] ?? place.category,
+    landscapeLabels[place.landscape ?? ''] ?? place.landscape,
+  ]
     .filter(Boolean)
     .join(' · ');
 

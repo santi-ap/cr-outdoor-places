@@ -3,7 +3,13 @@
 import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { useLanguage } from '@/lib/i18n/language-context';
-import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels, getPetFriendlyLabels } from '@/lib/places/labels';
+import {
+  getCategoryLabels,
+  getLandscapeLabels,
+  getDifficultyLabels,
+  getCostTypeLabels,
+  getPetFriendlyLabels,
+} from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
 import type { Place } from '@/lib/validation/schemas';
 
@@ -20,6 +26,7 @@ const DIFFICULTY_TIER: Record<string, Tier> = {
 export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' | 'md' }) {
   const { language } = useLanguage();
   const categoryLabels = getCategoryLabels(language);
+  const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
   const petFriendlyLabels = getPetFriendlyLabels(language);
@@ -51,7 +58,12 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
   }
   pills.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
   pills.push({ key: 'pet_friendly', label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
-  pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
+  if (place.category) {
+    pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
+  }
+  if (place.landscape) {
+    pills.push({ key: 'landscape', label: landscapeLabels[place.landscape] ?? place.landscape, tier: 'neutral' });
+  }
 
   const starSize = size === 'md' ? 'size-3' : 'size-2.5';
   const starPadding = size === 'md' ? 'px-[9px] py-1 text-[11.5px]' : 'px-[7px] py-0.5 text-[10px]';

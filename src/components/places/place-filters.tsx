@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { MultiSelectField, DistanceFilterField } from './filter-field';
 import {
   getCategoryLabels,
+  getLandscapeLabels,
   getDifficultyLabels,
   getPetFriendlyFilterLabels,
   getCostTypeFilterLabels,
@@ -12,7 +13,7 @@ import {
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
-type MultiValueKey = 'category' | 'difficulty' | 'pet_friendly' | 'cost_type';
+type MultiValueKey = 'category' | 'landscape' | 'difficulty' | 'pet_friendly' | 'cost_type';
 
 export function PlaceFilters({
   filter,
@@ -51,6 +52,14 @@ export function PlaceFilters({
           values={filter.category ?? []}
           options={getCategoryLabels(language)}
           onChange={(v) => setValues('category', v)}
+        />
+      </FieldGroup>
+
+      <FieldGroup label={t.filters.landscape}>
+        <MultiSelectField
+          values={filter.landscape ?? []}
+          options={getLandscapeLabels(language)}
+          onChange={(v) => setValues('landscape', v)}
         />
       </FieldGroup>
 

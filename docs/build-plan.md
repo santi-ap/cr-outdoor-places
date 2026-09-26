@@ -73,7 +73,8 @@ Auth note: magic-link email auth via Supabase is barely more setup than skipping
 id            uuid primary key
 name          text not null
 description   text
-category      text not null  -- 'national_park' | 'municipal_park' | 'private_reserve' | 'beach' | 'mountain' | 'trail' | 'other'
+category      text            -- 'national_park' | 'municipal_park' | 'private_reserve' | 'other' | null (protection/administrative designation)
+landscape     text            -- 'beach' | 'mountain' | 'forest' | 'trail' | 'field' | 'other' | null (physical terrain/feature; split from category in migration 20260926000000, Issue #66)
 province      text
 canton        text
 lat           double precision not null
