@@ -10,12 +10,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { category, difficulty, pet_friendly, cost_type, max_distance_m } = parsed.data;
+  const { category, landscape, difficulty, pet_friendly, cost_type, max_distance_m } = parsed.data;
 
   const supabase = await createServerSupabaseClient();
   let query = supabase.from('places').select('*');
 
   if (category?.length) query = query.in('category', category);
+  // `landscape` is an array column (a place can be more than one) --
+  // matches if any selected filter value overlaps it, not `.in()`.
+  if (landscape?.length) query = query.overlaps('landscape', landscape);
   if (difficulty?.length) query = query.in('difficulty', difficulty);
   if (pet_friendly?.length) query = query.in('pet_friendly', pet_friendly);
   if (cost_type?.length) query = query.in('cost_type', cost_type);

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { MultiSelectField, DistanceFilterField } from './filter-field';
 import {
   getCategoryLabels,
+  getLandscapeLabels,
   getDifficultyLabels,
   getPetFriendlyFilterLabels,
   getCostTypeFilterLabels,
@@ -15,8 +16,14 @@ import {
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
-type FilterKey = 'category' | 'difficulty' | 'pet_friendly' | 'cost_type' | 'max_distance_m';
-type MultiValueKey = 'category' | 'difficulty' | 'pet_friendly' | 'cost_type';
+type FilterKey =
+  | 'category'
+  | 'landscape'
+  | 'difficulty'
+  | 'pet_friendly'
+  | 'cost_type'
+  | 'max_distance_m';
+type MultiValueKey = 'category' | 'landscape' | 'difficulty' | 'pet_friendly' | 'cost_type';
 
 // A horizontally-scrollable row of filter buttons ("All filters" plus one
 // per field), each opening a compact multi-select drawer for just that
@@ -39,6 +46,7 @@ export function FilterChipCarousel({
   const [openField, setOpenField] = useState<FilterKey | null>(null);
 
   const categoryLabels = getCategoryLabels(language);
+  const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const petFriendlyLabels = getPetFriendlyFilterLabels(language);
   const costTypeLabels = getCostTypeFilterLabels(language);
@@ -69,6 +77,7 @@ export function FilterChipCarousel({
 
   const fields: { key: FilterKey; label: string; count: number }[] = [
     { key: 'category', label: t.filters.category, count: filter.category?.length ?? 0 },
+    { key: 'landscape', label: t.filters.landscape, count: filter.landscape?.length ?? 0 },
     { key: 'difficulty', label: t.filters.difficulty, count: filter.difficulty?.length ?? 0 },
     { key: 'pet_friendly', label: t.filters.pets, count: filter.pet_friendly?.length ?? 0 },
     { key: 'cost_type', label: t.filters.cost, count: filter.cost_type?.length ?? 0 },
@@ -80,6 +89,11 @@ export function FilterChipCarousel({
       key: `category:${v}`,
       label: categoryLabels[v] ?? v,
       onRemove: () => removeValue('category', v),
+    })),
+    ...(filter.landscape ?? []).map((v) => ({
+      key: `landscape:${v}`,
+      label: landscapeLabels[v] ?? v,
+      onRemove: () => removeValue('landscape', v),
     })),
     ...(filter.difficulty ?? []).map((v) => ({
       key: `difficulty:${v}`,
@@ -195,6 +209,13 @@ export function FilterChipCarousel({
                 values={filter.category ?? []}
                 options={categoryLabels}
                 onChange={(v) => setValues('category', v)}
+              />
+            )}
+            {openField === 'landscape' && (
+              <MultiSelectField
+                values={filter.landscape ?? []}
+                options={landscapeLabels}
+                onChange={(v) => setValues('landscape', v)}
               />
             )}
             {openField === 'difficulty' && (

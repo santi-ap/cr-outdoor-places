@@ -6,9 +6,6 @@ const categoryLabelsEn: LabelMap = {
   national_park: 'National park',
   municipal_park: 'Municipal park',
   private_reserve: 'Private reserve',
-  beach: 'Beach',
-  mountain: 'Mountain',
-  trail: 'Trail',
   other: 'Other',
 };
 
@@ -16,9 +13,24 @@ const categoryLabelsEs: LabelMap = {
   national_park: 'Parque nacional',
   municipal_park: 'Parque municipal',
   private_reserve: 'Reserva privada',
+  other: 'Otro',
+};
+
+const landscapeLabelsEn: LabelMap = {
+  beach: 'Beach',
+  mountain: 'Mountain',
+  forest: 'Forest',
+  trail: 'Trail',
+  field: 'Field',
+  other: 'Other',
+};
+
+const landscapeLabelsEs: LabelMap = {
   beach: 'Playa',
   mountain: 'Montaña',
+  forest: 'Bosque',
   trail: 'Sendero',
+  field: 'Campo',
   other: 'Otro',
 };
 
@@ -78,6 +90,10 @@ function byLanguage(language: Language, es: LabelMap, en: LabelMap): LabelMap {
 
 export function getCategoryLabels(language: Language) {
   return byLanguage(language, categoryLabelsEs, categoryLabelsEn);
+}
+
+export function getLandscapeLabels(language: Language) {
+  return byLanguage(language, landscapeLabelsEs, landscapeLabelsEn);
 }
 
 export function getDifficultyLabels(language: Language) {

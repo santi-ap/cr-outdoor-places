@@ -1,14 +1,18 @@
 import { z } from 'zod';
 
+// Protection/administrative designation. Split from landscape (physical
+// terrain/feature) in migration 20260926000000 -- see Issue #66.
 export const placeCategorySchema = z.enum([
   'national_park',
   'municipal_park',
   'private_reserve',
-  'beach',
-  'mountain',
-  'trail',
   'other',
 ]);
+
+// Physical terrain/feature. Distinct from `terrainSchema` below, which is
+// the walking-surface material (paved/dirt/rocky/mixed) shown separately
+// on the detail page.
+export const landscapeSchema = z.enum(['beach', 'mountain', 'forest', 'trail', 'field', 'other']);
 
 export const difficultySchema = z.enum(['easy', 'moderate', 'hard']);
 export const terrainSchema = z.enum(['paved', 'dirt', 'rocky', 'mixed']);
@@ -32,7 +36,10 @@ export const placeSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
   description: z.string().nullable(),
-  category: placeCategorySchema,
+  category: placeCategorySchema.nullable(),
+  // A place can be more than one landscape at once (e.g. a national park
+  // that's both beach and rainforest) -- see Issue #66.
+  landscape: z.array(landscapeSchema),
   province: z.string().nullable(),
   canton: z.string().nullable(),
   lat: z.number().min(-90).max(90),
@@ -63,6 +70,8 @@ export const placeInsertSchema = placeSchema
   .omit({ id: true, created_at: true, updated_at: true })
   .partial({
     description: true,
+    category: true,
+    landscape: true,
     province: true,
     canton: true,
     difficulty: true,
@@ -137,6 +146,7 @@ function commaSeparated<T extends z.ZodTypeAny>(schema: T) {
 
 export const placesFilterSchema = z.object({
   category: commaSeparated(placeCategorySchema),
+  landscape: commaSeparated(landscapeSchema),
   difficulty: commaSeparated(difficultySchema),
   pet_friendly: commaSeparated(petFriendlySchema),
   cost_type: commaSeparated(costTypeSchema),

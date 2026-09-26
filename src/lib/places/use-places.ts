@@ -4,6 +4,7 @@ import type { Place, PlacesFilter } from '@/lib/validation/schemas';
 async function fetchPlaces(filter: PlacesFilter): Promise<Place[]> {
   const params = new URLSearchParams();
   if (filter.category?.length) params.set('category', filter.category.join(','));
+  if (filter.landscape?.length) params.set('landscape', filter.landscape.join(','));
   if (filter.difficulty?.length) params.set('difficulty', filter.difficulty.join(','));
   if (filter.pet_friendly?.length) params.set('pet_friendly', filter.pet_friendly.join(','));
   if (filter.cost_type?.length) params.set('cost_type', filter.cost_type.join(','));

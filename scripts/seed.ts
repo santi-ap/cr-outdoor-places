@@ -82,6 +82,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       '72-hectare urban park in the heart of San José — flat, paved paths, lake, and open lawns.',
     category: 'municipal_park',
+    landscape: ['field'],
     province: 'San José',
     canton: 'San José',
     lat: 9.9356,
@@ -104,6 +105,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Municipal park in Montes de Oca, popular for walking and running; free entry 5–8am for exercisers.',
     category: 'municipal_park',
+    landscape: [],
     province: 'San José',
     canton: 'Montes de Oca',
     lat: 9.9431,
@@ -126,6 +128,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       "Costa Rica's oldest water park, fed by a natural spring; pools plus walking areas.",
     category: 'private_reserve',
+    landscape: [],
     province: 'Heredia',
     canton: 'Belén',
     lat: 9.9781,
@@ -147,6 +150,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'University of Costa Rica-run botanical garden famous for its orchid collection; flat, easy trails.',
     category: 'private_reserve',
+    landscape: ['trail'],
     province: 'Cartago',
     canton: 'Cartago',
     lat: 9.8396,
@@ -169,6 +173,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Active volcano with a paved path to the main crater viewpoint. Advance online reservation required via SINAC.',
     category: 'national_park',
+    landscape: ['mountain'],
     province: 'Alajuela',
     canton: 'Poás',
     lat: 10.2,
@@ -190,6 +195,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       "Costa Rica's highest volcano; paved path to the main crater overlook, sparse high-elevation terrain.",
     category: 'national_park',
+    landscape: ['mountain'],
     province: 'Cartago',
     canton: 'Oreamuno',
     lat: 9.9792,
@@ -211,6 +217,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Private eco-park with paved/stepped walkways to five waterfalls plus wildlife exhibits.',
     category: 'private_reserve',
+    landscape: [],
     province: 'Alajuela',
     canton: 'Poás',
     lat: 10.2017,
@@ -233,6 +240,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Beach-and-rainforest-trail combo park with abundant wildlife. Advance SINAC reservation required.',
     category: 'national_park',
+    landscape: ['beach', 'forest', 'trail'],
     province: 'Puntarenas',
     canton: 'Quepos',
     lat: 9.3756,
@@ -257,6 +265,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Cloud forest national park with three entrance sectors (Zurquí, Quebrada González, Barva); moderate–hard trails.',
     category: 'national_park',
+    landscape: ['forest', 'trail'],
     province: 'Heredia/San José/Limón',
     canton: 'Vázquez de Coronado (Zurquí sector)',
     lat: 10.05,
@@ -279,6 +288,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Private cloud forest reserve with suspension bridges and moderate trails through primary forest.',
     category: 'private_reserve',
+    landscape: ['forest', 'trail'],
     province: 'Puntarenas',
     canton: 'Puntarenas',
     lat: 10.3025,
@@ -302,6 +312,7 @@ const BASE_PLACES: PlaceInsert[] = [
     description:
       'Community forest reserve (Grecia Forest Reserve) on the slopes of Poás; easy walking trails.',
     category: 'private_reserve',
+    landscape: ['forest', 'trail'],
     province: 'Alajuela',
     canton: 'Grecia',
     lat: 10.09,
@@ -324,6 +335,7 @@ const BASE_PLACES: PlaceInsert[] = [
     name: 'Cahuita National Park',
     description: 'Coastal jungle park with beach and reef; Kelly Creek entrance is donation-based.',
     category: 'national_park',
+    landscape: ['beach', 'forest'],
     province: 'Limón',
     canton: 'Talamanca',
     lat: 9.7292,
@@ -344,11 +356,13 @@ const BASE_PLACES: PlaceInsert[] = [
   // ---------------------------------------------------------------------
   // Mock/fabricated test places (Issue #33) — NOT real, NOT verified.
   // Made-up names/coordinates (plausible but fictional locations within
-  // Costa Rica) added purely to widen UI test coverage: categories with no
-  // real example yet (beach, mountain, trail, other), a 'hard' difficulty,
-  // 'rocky' terrain, missing-optional-field edge cases, and a couple of
-  // deliberately long names/strings to keep exercising text wrapping
-  // (#21, #27). `source`/`confidence` stay within the existing enum
+  // Costa Rica) added purely to widen UI test coverage: landscape values
+  // with no real example yet (beach, mountain, trail — category is null
+  // for these, since none of them have a protection designation; see
+  // Issue #66), a 'hard' difficulty, 'rocky' terrain, missing-optional-
+  // field edge cases, and a couple of deliberately long names/strings to
+  // keep exercising text wrapping (#21, #27). `source`/`confidence` stay
+  // within the existing enum
   // ('seed' | 'community' and 'unverified' | 'verified') — there's no
   // separate "mock" value, so these are flagged by this comment block and
   // by `confidence: 'unverified'` (never 'verified', since none of this
@@ -360,7 +374,8 @@ const BASE_PLACES: PlaceInsert[] = [
     // phone here, no whatsapp).
     name: 'Playa Mock Grande',
     description: 'Fabricated test place: a wide sand beach with easy flat walking above the tideline.',
-    category: 'beach',
+    category: null,
+    landscape: ['beach'],
     province: 'Guanacaste',
     canton: 'Santa Cruz',
     lat: 10.35,
@@ -382,7 +397,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Playa Ficticia del Caribe',
     description: 'Fabricated test place: a Caribbean-coast beach with a short palm-lined path.',
-    category: 'beach',
+    category: null,
+    landscape: ['beach'],
     province: 'Limón',
     canton: 'Limón',
     lat: 9.98,
@@ -401,7 +417,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Cerro Ficticio',
     description: 'Fabricated test place: a steep rocky summit trail with a viewpoint at the top.',
-    category: 'mountain',
+    category: null,
+    landscape: ['mountain', 'trail'],
     province: 'Cartago',
     canton: 'Paraíso',
     lat: 9.83,
@@ -425,7 +442,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Montaña de Prueba',
     description: 'Fabricated test place: another steep, rocky mountain trail for testing the hard/rocky combination.',
-    category: 'mountain',
+    category: null,
+    landscape: ['mountain', 'trail'],
     province: 'Puntarenas',
     canton: 'Pérez Zeledón',
     lat: 9.38,
@@ -444,7 +462,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Sendero de Prueba Larguísimo con Nombre Extremadamente Extenso para Probar el Ajuste de Texto',
     description: 'Fabricated test place with a deliberately very long name, for testing text wrapping in card lists and headings.',
-    category: 'trail',
+    category: null,
+    landscape: ['trail'],
     province: 'Alajuela',
     canton: 'San Ramón',
     lat: 10.09,
@@ -466,7 +485,8 @@ const BASE_PLACES: PlaceInsert[] = [
   {
     name: 'Sendero Corto',
     description: 'Fabricated test place: a short, simple trail for contrast against the longer test entries.',
-    category: 'trail',
+    category: null,
+    landscape: ['trail'],
     province: 'Heredia',
     canton: 'Barva',
     lat: 10.02,
@@ -489,6 +509,7 @@ const BASE_PLACES: PlaceInsert[] = [
     name: 'Mirador Genérico',
     description: null,
     category: 'other',
+    landscape: [],
     province: null,
     canton: null,
     lat: 9.6,
@@ -508,6 +529,7 @@ const BASE_PLACES: PlaceInsert[] = [
     name: 'Parque Mock Municipal Extra',
     description: 'Fabricated test place: an additional municipal park for wider category coverage.',
     category: 'municipal_park',
+    landscape: [],
     province: 'San José',
     canton: 'Curridabat',
     lat: 9.92,
@@ -530,6 +552,7 @@ const BASE_PLACES: PlaceInsert[] = [
     name: 'Reserva Mock Adicional',
     description: 'Fabricated test place: an additional private reserve for wider category coverage.',
     category: 'private_reserve',
+    landscape: [],
     province: 'Alajuela',
     canton: 'Zarcero',
     lat: 10.19,

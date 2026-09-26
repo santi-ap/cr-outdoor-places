@@ -140,7 +140,7 @@ export type Database = {
       places: {
         Row: {
           canton: string | null
-          category: string
+          category: string | null
           confidence: string
           cost_amount: string | null
           cost_type: string
@@ -151,6 +151,7 @@ export type Database = {
           duration_min: number | null
           hours_text: string | null
           id: string
+          landscape: string[]
           lat: number
           lng: number
           name: string
@@ -167,7 +168,7 @@ export type Database = {
         }
         Insert: {
           canton?: string | null
-          category: string
+          category?: string | null
           confidence?: string
           cost_amount?: string | null
           cost_type?: string
@@ -178,6 +179,7 @@ export type Database = {
           duration_min?: number | null
           hours_text?: string | null
           id?: string
+          landscape?: string[]
           lat: number
           lng: number
           name: string
@@ -194,7 +196,7 @@ export type Database = {
         }
         Update: {
           canton?: string | null
-          category?: string
+          category?: string | null
           confidence?: string
           cost_amount?: string | null
           cost_type?: string
@@ -205,6 +207,7 @@ export type Database = {
           duration_min?: number | null
           hours_text?: string | null
           id?: string
+          landscape?: string[]
           lat?: number
           lng?: number
           name?: string
