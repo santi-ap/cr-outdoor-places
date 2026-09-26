@@ -56,7 +56,7 @@ export function PlaceCardDesktop({
           {[
             place.province,
             categoryLabels[place.category ?? ''] ?? place.category,
-            landscapeLabels[place.landscape ?? ''] ?? place.landscape,
+            ...place.landscape.map((value) => landscapeLabels[value] ?? value),
           ]
             .filter(Boolean)
             .join(' · ')}

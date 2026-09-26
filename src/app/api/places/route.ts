@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
   let query = supabase.from('places').select('*');
 
   if (category?.length) query = query.in('category', category);
-  if (landscape?.length) query = query.in('landscape', landscape);
+  // `landscape` is an array column (a place can be more than one) --
+  // matches if any selected filter value overlaps it, not `.in()`.
+  if (landscape?.length) query = query.overlaps('landscape', landscape);
   if (difficulty?.length) query = query.in('difficulty', difficulty);
   if (pet_friendly?.length) query = query.in('pet_friendly', pet_friendly);
   if (cost_type?.length) query = query.in('cost_type', cost_type);

@@ -37,7 +37,9 @@ export const placeSchema = z.object({
   name: z.string().min(1),
   description: z.string().nullable(),
   category: placeCategorySchema.nullable(),
-  landscape: landscapeSchema.nullable(),
+  // A place can be more than one landscape at once (e.g. a national park
+  // that's both beach and rainforest) -- see Issue #66.
+  landscape: z.array(landscapeSchema),
   province: z.string().nullable(),
   canton: z.string().nullable(),
   lat: z.number().min(-90).max(90),

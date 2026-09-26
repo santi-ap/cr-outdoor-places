@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { MultiSelectField } from '@/components/places/filter-field';
 import {
   getCategoryLabels,
   getLandscapeLabels,
@@ -25,16 +26,19 @@ import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place, PlaceInsert } from '@/lib/validation/schemas';
 
 // rating/reviews are mock/seed-only display data (Issue #36) — not exposed
-// here, since suggestions never touch them.
+// here, since suggestions never touch them. `landscape` is excluded from
+// the generic string-per-field mapping below and handled on its own — a
+// place can be more than one landscape at once, so it's a string array,
+// not a single string like every other field here.
 type FieldValues = {
-  [K in keyof Omit<PlaceInsert, 'rating' | 'reviews'>]-?: string;
-};
+  [K in keyof Omit<PlaceInsert, 'rating' | 'reviews' | 'landscape'>]-?: string;
+} & { landscape: string[] };
 
 const EMPTY: FieldValues = {
   name: '',
   description: '',
   category: '',
-  landscape: '',
+  landscape: [],
   province: '',
   canton: '',
   lat: '',
@@ -60,7 +64,7 @@ function placeToFieldValues(place: Place): FieldValues {
     name: place.name,
     description: place.description ?? '',
     category: place.category ?? '',
-    landscape: place.landscape ?? '',
+    landscape: place.landscape,
     province: place.province ?? '',
     canton: place.canton ?? '',
     lat: String(place.lat),
@@ -87,7 +91,6 @@ const NUMBER_FIELDS = new Set(['lat', 'lng', 'distance_m', 'duration_min']);
 const NULLABLE_FIELDS = new Set([
   'description',
   'category',
-  'landscape',
   'province',
   'canton',
   'difficulty',
@@ -116,15 +119,22 @@ function parseFieldValue(
   return { skip: false, value: trimmed };
 }
 
+function arraysEqual(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((value, i) => value === b[i]);
+}
+
 function buildChanges(values: FieldValues, original: FieldValues | null): Partial<PlaceInsert> {
   const changes: Record<string, unknown> = {};
   for (const key of Object.keys(values) as (keyof FieldValues)[]) {
-    if (key === 'source' || key === 'confidence') continue;
-    const raw = values[key];
+    if (key === 'source' || key === 'confidence' || key === 'landscape') continue;
+    const raw = values[key] as string;
     if (original && raw === original[key]) continue; // edit mode: unchanged
-    const parsed = parseFieldValue(key, raw);
+    const parsed = parseFieldValue(key as keyof PlaceInsert, raw);
     if (parsed.skip) continue;
     changes[key] = parsed.value;
+  }
+  if (!original || !arraysEqual(values.landscape, original.landscape)) {
+    changes.landscape = values.landscape;
   }
   return changes as Partial<PlaceInsert>;
 }
@@ -148,12 +158,16 @@ export function SuggestionForm({ place }: { place?: Place }) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
+  function setLandscape(values: string[]) {
+    setValues((prev) => ({ ...prev, landscape: values }));
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (
       !place &&
-      (values.name.trim() === '' || (values.category.trim() === '' && values.landscape.trim() === ''))
+      (values.name.trim() === '' || (values.category.trim() === '' && values.landscape.length === 0))
     ) {
       setError(t.suggest.errorNameCategoryRequired);
       setStatus('error');
@@ -210,12 +224,7 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </Field>
 
       <Field label={t.suggest.fields.landscape}>
-        <EnumSelect
-          value={values.landscape}
-          options={landscapeLabels}
-          placeholder={t.suggest.notSet}
-          onChange={(v) => setField('landscape', v)}
-        />
+        <MultiSelectField values={values.landscape} options={landscapeLabels} onChange={setLandscape} />
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

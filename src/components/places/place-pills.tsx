@@ -61,8 +61,8 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
   if (place.category) {
     pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
   }
-  if (place.landscape) {
-    pills.push({ key: 'landscape', label: landscapeLabels[place.landscape] ?? place.landscape, tier: 'neutral' });
+  for (const value of place.landscape) {
+    pills.push({ key: `landscape:${value}`, label: landscapeLabels[value] ?? value, tier: 'neutral' });
   }
 
   const starSize = size === 'md' ? 'size-3' : 'size-2.5';

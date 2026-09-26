@@ -1,8 +1,3 @@
-// NOTE: `places.category`/`places.landscape` here are hand-patched to match
-// migration 20260926000000_split_category_landscape.sql, not regenerated
-// via `npm run gen:types` -- that migration hasn't been pushed to the
-// linked project yet (Issue #66). Re-run `npm run gen:types` once it has,
-// to pick up anything this hand-edit missed.
 export type Json =
   | string
   | number
@@ -156,7 +151,7 @@ export type Database = {
           duration_min: number | null
           hours_text: string | null
           id: string
-          landscape: string | null
+          landscape: string[]
           lat: number
           lng: number
           name: string
@@ -184,7 +179,7 @@ export type Database = {
           duration_min?: number | null
           hours_text?: string | null
           id?: string
-          landscape?: string | null
+          landscape?: string[]
           lat: number
           lng: number
           name: string
@@ -212,7 +207,7 @@ export type Database = {
           duration_min?: number | null
           hours_text?: string | null
           id?: string
-          landscape?: string | null
+          landscape?: string[]
           lat?: number
           lng?: number
           name?: string
