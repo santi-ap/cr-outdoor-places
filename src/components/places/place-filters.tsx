@@ -6,8 +6,8 @@ import { MultiSelectField, DistanceFilterField } from './filter-field';
 import {
   getCategoryLabels,
   getDifficultyLabels,
-  getPetFriendlyLabels,
-  getCostTypeLabels,
+  getPetFriendlyFilterLabels,
+  getCostTypeFilterLabels,
 } from '@/lib/places/labels';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
@@ -65,7 +65,7 @@ export function PlaceFilters({
       <FieldGroup label={t.filters.pets}>
         <MultiSelectField
           values={filter.pet_friendly ?? []}
-          options={getPetFriendlyLabels(language)}
+          options={getPetFriendlyFilterLabels(language)}
           onChange={(v) => setValues('pet_friendly', v)}
         />
       </FieldGroup>
@@ -73,7 +73,7 @@ export function PlaceFilters({
       <FieldGroup label={t.filters.cost}>
         <MultiSelectField
           values={filter.cost_type ?? []}
-          options={getCostTypeLabels(language)}
+          options={getCostTypeFilterLabels(language)}
           onChange={(v) => setValues('cost_type', v)}
         />
       </FieldGroup>

@@ -3,7 +3,7 @@
 import { StarIcon, FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { useLanguage } from '@/lib/i18n/language-context';
-import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels } from '@/lib/places/labels';
+import { getCategoryLabels, getDifficultyLabels, getCostTypeLabels, getPetFriendlyLabels } from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
 import type { Place } from '@/lib/validation/schemas';
 
@@ -22,6 +22,7 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
   const categoryLabels = getCategoryLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const costTypeLabels = getCostTypeLabels(language);
+  const petFriendlyLabels = getPetFriendlyLabels(language);
 
   const pills: { key: string; label: string; tier: Tier; icon?: typeof FootprintsIcon }[] = [];
   if (place.difficulty) {
@@ -49,6 +50,7 @@ export function PlacePills({ place, size = 'sm' }: { place: Place; size?: 'sm' |
     });
   }
   pills.push({ key: 'cost', label: costTypeLabels[place.cost_type], tier: 'neutral', icon: DollarSignIcon });
+  pills.push({ key: 'pet_friendly', label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
   pills.push({ key: 'category', label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
 
   const starSize = size === 'md' ? 'size-3' : 'size-2.5';

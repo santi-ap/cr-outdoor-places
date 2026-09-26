@@ -41,8 +41,8 @@ const petFriendlyLabelsEn: LabelMap = {
 };
 
 const petFriendlyLabelsEs: LabelMap = {
-  yes: 'Se permiten perros',
-  no: 'Sin perros',
+  yes: 'Mascotas',
+  no: 'No mascotas',
   unknown: 'Política de mascotas desconocida',
 };
 
@@ -90,6 +90,21 @@ export function getPetFriendlyLabels(language: Language) {
 
 export function getCostTypeLabels(language: Language) {
   return byLanguage(language, costTypeLabelsEs, costTypeLabelsEn);
+}
+
+// Filter UIs shouldn't offer "unknown" as something to filter by — nobody
+// wants to search for "pet policy unknown" — but the full label maps above
+// still need the 'unknown' entry for display (detail page, suggestion form).
+function withoutUnknown(labels: LabelMap): LabelMap {
+  return Object.fromEntries(Object.entries(labels).filter(([key]) => key !== 'unknown'));
+}
+
+export function getPetFriendlyFilterLabels(language: Language) {
+  return withoutUnknown(getPetFriendlyLabels(language));
+}
+
+export function getCostTypeFilterLabels(language: Language) {
+  return withoutUnknown(getCostTypeLabels(language));
 }
 
 export function getTerrainLabels(language: Language) {
