@@ -63,7 +63,7 @@ const es = {
     practicalInfo: 'Datos prácticos',
     entrance: 'Entrada',
     hours: 'Horario',
-    pets: 'Perros',
+    pets: 'Mascotas',
     terrain: 'Terreno',
     suggestEdit: 'Sugerir una edición',
     photoPlaceholder: 'Foto no disponible',

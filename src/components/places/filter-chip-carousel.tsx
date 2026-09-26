@@ -9,8 +9,8 @@ import { MultiSelectField, DistanceFilterField } from './filter-field';
 import {
   getCategoryLabels,
   getDifficultyLabels,
-  getPetFriendlyLabels,
-  getCostTypeLabels,
+  getPetFriendlyFilterLabels,
+  getCostTypeFilterLabels,
 } from '@/lib/places/labels';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
@@ -40,8 +40,8 @@ export function FilterChipCarousel({
 
   const categoryLabels = getCategoryLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
-  const petFriendlyLabels = getPetFriendlyLabels(language);
-  const costTypeLabels = getCostTypeLabels(language);
+  const petFriendlyLabels = getPetFriendlyFilterLabels(language);
+  const costTypeLabels = getCostTypeFilterLabels(language);
 
   function setValues<K extends MultiValueKey>(key: K, values: string[]) {
     const next = { ...filter };
