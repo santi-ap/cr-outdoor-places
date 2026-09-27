@@ -149,6 +149,7 @@ export type Database = {
           difficulty: string | null
           distance_m: number | null
           duration_min: number | null
+          hours: Json
           hours_text: string | null
           id: string
           landscape: string[]
@@ -177,6 +178,7 @@ export type Database = {
           difficulty?: string | null
           distance_m?: number | null
           duration_min?: number | null
+          hours?: Json
           hours_text?: string | null
           id?: string
           landscape?: string[]
@@ -205,6 +207,7 @@ export type Database = {
           difficulty?: string | null
           distance_m?: number | null
           duration_min?: number | null
+          hours?: Json
           hours_text?: string | null
           id?: string
           landscape?: string[]

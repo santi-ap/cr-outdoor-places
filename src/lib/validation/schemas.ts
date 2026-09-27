@@ -32,6 +32,24 @@ export const placeReviewSchema = z.object({
   text: z.string().min(1),
 });
 
+export const weekdaySchema = z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+
+// A "HH:MM" 24-hour time, e.g. "08:00" or "16:30" -- matches <input
+// type="time">'s own value format, so the picker needs no conversion.
+const timeOfDaySchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+
+// Structured open hours (Issue #75) -- a place can have more than one
+// day-group with different hours (e.g. weekday vs. weekend), so this is an
+// array, not a single {days, opens, closes}. `hours_text` alongside it is
+// kept as free-text notes for exceptions that don't fit this shape (e.g.
+// "closed during heavy rain advisories", "reservation required").
+export const hoursRuleSchema = z.object({
+  days: z.array(weekdaySchema).min(1),
+  opens: timeOfDaySchema,
+  closes: timeOfDaySchema,
+});
+export const hoursSchema = z.array(hoursRuleSchema);
+
 export const placeSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
@@ -51,6 +69,7 @@ export const placeSchema = z.object({
   cost_type: costTypeSchema,
   cost_amount: z.string().nullable(),
   pet_friendly: petFriendlySchema,
+  hours: hoursSchema,
   hours_text: z.string().nullable(),
   website: z.string().nullable(),
   phone: z.string().nullable(),
@@ -81,6 +100,7 @@ export const placeInsertSchema = placeSchema
     cost_type: true,
     cost_amount: true,
     pet_friendly: true,
+    hours: true,
     hours_text: true,
     website: true,
     phone: true,
@@ -155,6 +175,8 @@ export const placesFilterSchema = z.object({
 
 export type Place = z.infer<typeof placeSchema>;
 export type PlaceReview = z.infer<typeof placeReviewSchema>;
+export type Weekday = z.infer<typeof weekdaySchema>;
+export type HoursRule = z.infer<typeof hoursRuleSchema>;
 export type PlacesFilter = z.infer<typeof placesFilterSchema>;
 export type PlaceInsert = z.infer<typeof placeInsertSchema>;
 export type List = z.infer<typeof listSchema>;
