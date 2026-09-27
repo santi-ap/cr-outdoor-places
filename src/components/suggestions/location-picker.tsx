@@ -77,6 +77,12 @@ export function LocationPicker({
           ? `${t.suggest.locationPicked} ${lat.toFixed(4)}, ${lng.toFixed(4)}`
           : t.suggest.locationHint}
       </p>
+      {/* Directions (DirectionsButton, elsewhere) deep-link straight to
+          this pin -- pinning some other point inside the place (not its
+          entrance) sends people to the wrong side with no way in. Shown
+          regardless of whether a pin is placed yet, since it matters for
+          the initial placement too, not just as a correction afterward. */}
+      <p className="text-clay-dark text-[12px] font-medium">{t.suggest.locationEntranceHint}</p>
     </div>
   );
 }

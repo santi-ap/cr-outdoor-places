@@ -149,6 +149,8 @@ const es = {
     notSet: 'No definido',
     locationHint: 'Toca el mapa para marcar dónde está el lugar.',
     locationPicked: 'Ubicación marcada:',
+    locationEntranceHint:
+      'Trata de marcar la entrada del lugar, no solo un punto dentro — así "Cómo llegar" no lleva al lado equivocado.',
     costAmountPlaceholder: 'ej. ₡2000',
     hoursPlaceholder: 'ej. 8am–4pm todos los días',
     websitePlaceholder: 'https://ejemplo.com',
@@ -311,6 +313,8 @@ const en: typeof es = {
     notSet: 'Not set',
     locationHint: 'Tap the map to mark where the place is.',
     locationPicked: 'Location marked:',
+    locationEntranceHint:
+      "Try to mark the entrance, not just a point inside — that way \"Get directions\" doesn't send people to the wrong side.",
     costAmountPlaceholder: 'e.g. ₡2000',
     hoursPlaceholder: 'e.g. 8am–4pm daily',
     websitePlaceholder: 'https://example.com',
