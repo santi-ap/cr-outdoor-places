@@ -1,13 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { FootprintsIcon, RulerIcon, ClockIcon, DollarSignIcon } from 'lucide-react';
+import { cn } from 'cn';
+import {
+  FootprintsIcon,
+  RulerIcon,
+  ClockIcon,
+  DollarSignIcon,
+  MountainIcon,
+  PawPrintIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  PencilIcon,
+  FlagIcon,
+} from 'lucide-react';
 import { TierBadge, type Tier } from '@/components/ui/tier-badge';
 import { Badge } from '@/components/ui/badge';
 import { BackButton } from '@/components/ui/back-button';
-import { PlaceActions, SaveIconButton, type Status } from './place-actions';
+import { PlaceActions, type Status } from './place-actions';
 import { PhotoCarousel } from './photo-carousel';
 import { StarRating } from './star-rating';
 import { DirectionsButton } from './directions-button';
@@ -52,6 +64,22 @@ export function PlaceDetailView({
   // below stay in sync about whether the place is already saved.
   const [status, setStatus] = useState<Status>(initialStatus);
 
+  // Mobile-only (5b redesign, Issue #78): the sticky Info/Mapa/Reseñas tabs
+  // scroll their section into view and highlight on click — not a true
+  // scroll-spy, since the mockup itself is a static preview with no real
+  // scroll position to track; this stays simple and doesn't fight the
+  // user's own scrolling.
+  const [activeTab, setActiveTab] = useState<'info' | 'map' | 'reviews'>('info');
+  const infoSectionRef = useRef<HTMLDivElement>(null);
+  const mapSectionRef = useRef<HTMLDivElement>(null);
+  const reviewsSectionRef = useRef<HTMLDivElement>(null);
+  const [hoursExpanded, setHoursExpanded] = useState(false);
+
+  function goToSection(tab: typeof activeTab, ref: React.RefObject<HTMLDivElement | null>) {
+    setActiveTab(tab);
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   const categoryLabels = getCategoryLabels(language);
   const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
@@ -93,6 +121,50 @@ export function PlaceDetailView({
     practical.push({ label: t.detail.terrain, value: terrainLabels[place.terrain] });
   }
 
+  // Mobile-only (5b redesign, Issue #78) — a differently-composed pill row
+  // (difficulty/category/cost/pets, no distance or duration) and an icon
+  // card grid for practical facts, instead of the shared `badges`/
+  // `practical` above (which the desktop layout below still uses
+  // untouched). Recorrido combines distance+duration into one card,
+  // matching the mockup; hours moves to its own collapsible row instead
+  // of a grid card.
+  const mobilePills: { label: string; tier: Tier }[] = [];
+  if (place.difficulty) {
+    mobilePills.push({ label: difficultyLabels[place.difficulty], tier: DIFFICULTY_TIER[place.difficulty] });
+  }
+  if (place.category) {
+    mobilePills.push({ label: categoryLabels[place.category] ?? place.category, tier: 'neutral' });
+  }
+  mobilePills.push({ label: costTypeLabels[place.cost_type], tier: 'neutral' });
+  mobilePills.push({ label: petFriendlyLabels[place.pet_friendly], tier: 'neutral' });
+
+  const factCards: { icon: typeof FootprintsIcon; label: string; value: string }[] = [];
+  if (place.distance_m || place.duration_min) {
+    factCards.push({
+      icon: FootprintsIcon,
+      label: t.detail.route,
+      value: [
+        place.distance_m ? formatDistance(place.distance_m, language) : null,
+        place.duration_min ? formatDuration(place.duration_min, language) : null,
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    });
+  }
+  if (place.terrain) {
+    factCards.push({ icon: MountainIcon, label: t.detail.terrain, value: terrainLabels[place.terrain] });
+  }
+  if (place.cost_amount || place.cost_type !== 'unknown') {
+    factCards.push({
+      icon: DollarSignIcon,
+      label: t.detail.entrance,
+      value: place.cost_amount ?? costTypeLabels[place.cost_type],
+    });
+  }
+  if (place.pet_friendly !== 'unknown') {
+    factCards.push({ icon: PawPrintIcon, label: t.detail.pets, value: petFriendlyLabels[place.pet_friendly] });
+  }
+
   const locationLine = [
     place.province,
     categoryLabels[place.category ?? ''] ?? place.category,
@@ -108,114 +180,222 @@ export function PlaceDetailView({
 
   return (
     <>
-      {/* Mobile detail screen (<1024px). */}
+      {/* Mobile detail screen (<1024px) — "5b" redesign, Issue #78. */}
       <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
-        {/* A zero-height sticky wrapper: BackButton overlays the photo at
-            its natural (unscrolled) position, then stays pinned there
-            while the page scrolls — position:fixed would work too, but
-            relative to the viewport rather than this scroll container, so
-            it'd sit under (or over) the global SiteHeader above it
-            instead of respecting this page's own layout. */}
-        <div className="sticky top-4 z-20 h-0 px-4">
-          <BackButton href="/" ariaLabel={t.detail.backToMap} />
-        </div>
-        <div className="relative h-[190px] shrink-0">
+        {/* Back + share overlay the photo directly now, instead of back
+            living in its own sticky strip above it and share sitting down
+            in the title row — matches 5b. */}
+        <div className="relative h-[260px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
+          <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-between">
+            <BackButton href="/" ariaLabel={t.detail.backToMap} className="pointer-events-auto" />
+            <ShareButton title={place.name} iconOnly className="pointer-events-auto" />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-4 p-4 pb-56">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+        <div className="flex flex-col gap-4 pb-56">
+          <div className="flex flex-col gap-3 px-4 pt-4">
+            <div className="flex flex-col gap-1">
+              <div className="text-ink-muted flex items-center gap-1.5 text-[13px]">
+                {place.province && <span>{place.province}</span>}
+                {place.rating != null && place.reviews.length > 0 && (
+                  <>
+                    {place.province && <span>·</span>}
+                    <StarRating value={place.rating} size={12} />
+                    <span className="text-bark font-medium">{place.rating.toFixed(1)}</span>
+                    <button
+                      type="button"
+                      onClick={() => goToSection('reviews', reviewsSectionRef)}
+                      className="text-ink-muted"
+                    >
+                      ({place.reviews.length})
+                    </button>
+                  </>
+                )}
+              </div>
               <h1 className="font-display text-bark text-[27px] leading-[1.05] font-medium text-wrap-pretty">
                 {place.name}
               </h1>
-              <p className="text-ink-muted mt-1 text-[13px]">{locationLine}</p>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <ShareButton title={place.name} iconOnly />
-              <SaveIconButton
-                placeId={place.id}
-                isSignedIn={isSignedIn}
-                status={status}
-                onStatusChange={setStatus}
-              />
+
+            <div className="flex flex-wrap gap-1.5">
+              {mobilePills.map((pill) => (
+                <TierBadge key={pill.label} label={pill.label} tier={pill.tier} size="md" />
+              ))}
+              {place.confidence === 'unverified' && <Badge variant="destructive">{t.detail.unverified}</Badge>}
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {badges.map((b) => (
-              <TierBadge key={b.label} label={b.label} tier={b.tier} icon={b.icon} size="md" />
-            ))}
-            {place.confidence === 'unverified' && <Badge variant="destructive">{t.detail.unverified}</Badge>}
+          {/* Sticky anchor tabs — not true scroll-spy (see goToSection),
+              just click-to-jump with the clicked tab highlighted. */}
+          <div className="border-line bg-cream sticky top-0 z-10 flex gap-1 border-y px-4 py-2">
+            <button
+              type="button"
+              onClick={() => goToSection('info', infoSectionRef)}
+              className={cn(
+                'h-10 flex-1 rounded-xl text-[14px] font-semibold transition-colors',
+                activeTab === 'info' ? 'bg-bark text-cream' : 'text-ink-muted',
+              )}
+            >
+              {t.detail.tabInfo}
+            </button>
+            <button
+              type="button"
+              onClick={() => goToSection('map', mapSectionRef)}
+              className={cn(
+                'h-10 flex-1 rounded-xl text-[14px] font-semibold transition-colors',
+                activeTab === 'map' ? 'bg-bark text-cream' : 'text-ink-muted',
+              )}
+            >
+              {t.detail.tabMap}
+            </button>
+            {place.reviews.length > 0 && (
+              <button
+                type="button"
+                onClick={() => goToSection('reviews', reviewsSectionRef)}
+                className={cn(
+                  'h-10 flex-1 rounded-xl text-[14px] font-semibold transition-colors',
+                  activeTab === 'reviews' ? 'bg-bark text-cream' : 'text-ink-muted',
+                )}
+              >
+                {t.detail.reviews} <span className="font-medium opacity-70">{place.reviews.length}</span>
+              </button>
+            )}
           </div>
 
-          {place.rating != null && place.reviews.length > 0 && (
-            <div className="flex items-center gap-2">
-              <StarRating value={place.rating} />
-              <span className="text-bark text-sm font-medium">{place.rating.toFixed(1)}</span>
-              <span className="text-ink-muted text-sm">({place.reviews.length})</span>
+          <div ref={infoSectionRef} className="flex flex-col gap-4 px-4">
+            {place.description && (
+              <p className="text-ink-body text-[14px] leading-relaxed text-wrap-pretty">{place.description}</p>
+            )}
+
+            {factCards.length > 0 && (
+              <div>
+                <h2 className="font-display text-bark mb-2.5 text-[19px] font-medium">
+                  {t.detail.practicalInfo}
+                </h2>
+                <div className="grid grid-cols-2 gap-2">
+                  {factCards.map((card) => (
+                    <div key={card.label} className="bg-rail flex flex-col gap-1.5 rounded-2xl p-3">
+                      <card.icon className="text-forest size-4 shrink-0" />
+                      <span className="text-ink-muted text-[12px]">{card.label}</span>
+                      <span className="text-[14px] leading-snug font-semibold text-wrap-pretty">{card.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {place.hours_text && (
+              <div className="border-line rounded-2xl border">
+                <button
+                  type="button"
+                  aria-expanded={hoursExpanded}
+                  onClick={() => setHoursExpanded((v) => !v)}
+                  className="flex w-full items-center justify-between px-3.5 py-3"
+                >
+                  <span className="flex items-center gap-2 text-[14px] font-semibold">
+                    <ClockIcon className="text-forest size-4 shrink-0" />
+                    {t.detail.hours}
+                  </span>
+                  <ChevronDownIcon
+                    className={cn('text-ink-muted size-4 shrink-0 transition-transform', hoursExpanded && 'rotate-180')}
+                  />
+                </button>
+                {hoursExpanded && (
+                  <p className="text-ink-body border-line-soft border-t px-3.5 py-2.5 text-[13px] leading-relaxed">
+                    {place.hours_text}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <PlaceContact place={place} t={t.detail} />
+          </div>
+
+          <div ref={mapSectionRef} className="flex flex-col gap-2.5 px-4">
+            <h2 className="font-display text-bark text-[19px] font-medium">{t.detail.location}</h2>
+            <div className="border-line overflow-hidden rounded-2xl border">
+              <div className="h-[170px]">
+                <PlaceMap
+                  places={[place]}
+                  center={[place.lat, place.lng]}
+                  zoom={LOCATION_MAP_ZOOM}
+                  interactivePins={false}
+                />
+              </div>
+              <div className="bg-rail flex items-center justify-between gap-2 px-3.5 py-2.5">
+                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">
+                  {directionsLabel ?? place.name}
+                </span>
+                <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} variant="pill" />
+              </div>
             </div>
-          )}
+          </div>
 
-          {place.description && (
-            <p className="text-ink-body text-[14px] leading-relaxed text-wrap-pretty">{place.description}</p>
-          )}
-
-          {practical.length > 0 && (
-            <div>
-              <h2 className="font-display text-bark mb-2.5 text-[19px] font-medium">{t.detail.practicalInfo}</h2>
-              <div className="border-line divide-line divide-y rounded-2xl border">
-                {practical.map((row) => (
-                  <div key={row.label} className="flex flex-col gap-0.5 px-3.5 py-2.5">
-                    <span className="text-ink-muted text-[13px]">{row.label}</span>
-                    <span className="text-[13px] font-medium text-wrap-pretty">{row.value}</span>
+          {place.reviews.length > 0 && (
+            <div ref={reviewsSectionRef} id="reviews" className="flex flex-col gap-2.5">
+              <div className="flex items-baseline justify-between gap-3 px-4">
+                <h2 className="font-display text-bark text-[19px] font-medium">{t.detail.reviews}</h2>
+                {place.rating != null && (
+                  <span className="flex items-center gap-1.5 text-[14px] font-semibold">
+                    <StarRating value={place.rating} size={13} />
+                    {place.rating.toFixed(1)}
+                    <span className="text-ink-muted font-normal">· {place.reviews.length}</span>
+                  </span>
+                )}
+              </div>
+              <div className="no-scrollbar -mx-0 flex gap-2.5 overflow-x-auto px-4 pb-1">
+                {place.reviews.map((review, i) => (
+                  <div key={i} className="bg-rail flex w-[264px] shrink-0 flex-col gap-2.5 rounded-2xl p-3.5">
+                    <StarRating value={review.rating} size={12} />
+                    <p className="text-ink-body line-clamp-3 text-[14px] leading-relaxed">{review.text}</p>
+                    <div className="mt-auto flex items-center gap-2">
+                      <span className="bg-clay/20 text-clay-dark flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold">
+                        {review.author
+                          .split(' ')
+                          .map((part) => part[0])
+                          .slice(0, 2)
+                          .join('')
+                          .toUpperCase()}
+                      </span>
+                      <span className="text-bark text-[13px] font-medium">{review.author}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <PlaceContact place={place} t={t.detail} />
-
-          <div className="flex flex-col gap-2.5">
-            <h2 className="font-display text-bark text-[19px] font-medium">{t.detail.location}</h2>
-            <div className="rounded-2xl border-line h-[170px] overflow-hidden border">
-              <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
-            </div>
-            <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
+          <div className="border-line flex flex-col border-t px-4">
+            <Link
+              href={`/places/${place.id}/suggest-edit`}
+              className="border-line-soft flex items-center gap-2.5 border-b py-3.5 text-[14px]"
+            >
+              <PencilIcon className="text-ink-muted size-4 shrink-0" />
+              <span className="flex-1">{t.detail.suggestEdit}</span>
+              <ChevronRightIcon className="text-ink-muted size-4 shrink-0" />
+            </Link>
+            <Link href={`/places/${place.id}/suggest-edit`} className="flex items-center gap-2.5 py-3.5 text-[14px]">
+              <FlagIcon className="text-ink-muted size-4 shrink-0" />
+              <span className="flex-1">{t.detail.reportProblem}</span>
+              <ChevronRightIcon className="text-ink-muted size-4 shrink-0" />
+            </Link>
           </div>
-
-          {place.reviews.length > 0 && (
-            <div>
-              <h2 className="font-display text-bark mb-2.5 text-[19px] font-medium">{t.detail.reviews}</h2>
-              <ReviewsList reviews={place.reviews} />
-            </div>
-          )}
-
-          <Link href={`/places/${place.id}/suggest-edit`} className="text-ink-muted text-sm underline">
-            {t.detail.suggestEdit}
-          </Link>
         </div>
 
-        {/* Save already lives in the header's SaveIconButton — this bar
-            only needs to surface once there's a "mark visited" action to
-            take, so a signed-out or not-yet-saved visitor sees no floating
-            bar at all. bottom-[76px] clears the floating global tab bar
-            (MobileTabBar, ~44px pill + 26px offset) instead of sitting
-            underneath it. */}
-        {status !== null && (
-          <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-5 pt-8">
-            <PlaceActions
-              placeId={place.id}
-              isSignedIn={isSignedIn}
-              status={status}
-              onStatusChange={setStatus}
-              size="mobile"
-              fullWidth
-              showSaveButton={false}
-            />
-          </div>
-        )}
+        {/* bottom-[76px] clears the floating global tab bar (MobileTabBar,
+            ~44px pill + 26px offset) instead of sitting underneath it. */}
+        <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-4 pt-6">
+          <PlaceActions
+            placeId={place.id}
+            isSignedIn={isSignedIn}
+            status={status}
+            onStatusChange={setStatus}
+            size="mobile"
+            fullWidth
+            extra={<DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} variant="cta" />}
+          />
+        </div>
       </div>
 
       {/* Desktop detail screen (>=1024px). */}

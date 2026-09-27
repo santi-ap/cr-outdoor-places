@@ -80,6 +80,12 @@ const es = {
     contact: 'Contacto',
     website: 'Sitio web',
     whatsappButton: 'Escribir por WhatsApp',
+    tabInfo: 'Info',
+    tabMap: 'Mapa',
+    openMap: 'Abrir mapa',
+    route: 'Recorrido',
+    reportProblem: 'Reportar un problema',
+    save: 'Guardar',
   },
   myList: {
     saved: 'Guardados',
@@ -144,6 +150,8 @@ const es = {
     notSet: 'No definido',
     locationHint: 'Toca el mapa para marcar dónde está el lugar.',
     locationPicked: 'Ubicación marcada:',
+    locationEntranceHint:
+      'Trata de marcar la entrada del lugar, no solo un punto dentro — así "Cómo llegar" no lleva al lado equivocado.',
     hoursPresetDaily: 'Todos los días',
     hoursPresetWeekdays: 'Entre semana',
     hoursPresetWeekend: 'Fines de semana',
@@ -243,6 +251,12 @@ const en: typeof es = {
     contact: 'Contact',
     website: 'Website',
     whatsappButton: 'Message on WhatsApp',
+    tabInfo: 'Info',
+    tabMap: 'Map',
+    openMap: 'Open map',
+    route: 'Route',
+    reportProblem: 'Report a problem',
+    save: 'Save',
   },
   myList: {
     saved: 'Saved',
@@ -307,6 +321,8 @@ const en: typeof es = {
     notSet: 'Not set',
     locationHint: 'Tap the map to mark where the place is.',
     locationPicked: 'Location marked:',
+    locationEntranceHint:
+      "Try to mark the entrance, not just a point inside — that way \"Get directions\" doesn't send people to the wrong side.",
     hoursPresetDaily: 'Every day',
     hoursPresetWeekdays: 'Weekdays',
     hoursPresetWeekend: 'Weekend',
