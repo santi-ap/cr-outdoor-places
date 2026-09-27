@@ -1,7 +1,7 @@
 'use client';
 
 import type { ComponentType } from 'react';
-import { MapPinIcon, ChevronRightIcon } from 'lucide-react';
+import { MapPinIcon, ChevronRightIcon, NavigationIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -18,10 +18,17 @@ export function DirectionsButton({
   lat,
   lng,
   locationLabel,
+  variant = 'row',
 }: {
   lat: number;
   lng: number;
   locationLabel: string | null;
+  // 'row': the default full-width bordered row (location label + chevron).
+  // 'pill': compact, for sitting inside another card (the 5b map-section
+  // card's "Abrir mapa" pill — Issue #78). 'cta': large filled button, for
+  // the 5b bottom action bar's primary "Cómo llegar" — same underlying
+  // app-picker sheet/popover either way, just a different trigger.
+  variant?: 'row' | 'pill' | 'cta';
 }) {
   const { t } = useLanguage();
   const links = [
@@ -45,15 +52,30 @@ export function DirectionsButton({
     },
   ];
 
-  const triggerContent = (
-    <>
-      <MapPinIcon className="text-clay size-4 shrink-0" />
-      <span className="text-bark min-w-0 flex-1 truncate text-[13px] font-medium">
-        {locationLabel ?? t.detail.getDirections}
-      </span>
-      <ChevronRightIcon className="text-ink-muted size-4 shrink-0" />
-    </>
-  );
+  const triggerContent =
+    variant === 'cta' ? (
+      <>
+        <NavigationIcon className="size-4 shrink-0" />
+        {t.detail.getDirections}
+      </>
+    ) : variant === 'pill' ? (
+      t.detail.openMap
+    ) : (
+      <>
+        <MapPinIcon className="text-clay size-4 shrink-0" />
+        <span className="text-bark min-w-0 flex-1 truncate text-[13px] font-medium">
+          {locationLabel ?? t.detail.getDirections}
+        </span>
+        <ChevronRightIcon className="text-ink-muted size-4 shrink-0" />
+      </>
+    );
+
+  const triggerClassName =
+    variant === 'cta'
+      ? 'bg-forest text-cream flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-semibold'
+      : variant === 'pill'
+        ? 'bg-cream text-forest rounded-control px-3 py-2 text-[13px] font-semibold whitespace-nowrap'
+        : 'border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left';
 
   return (
     <>
@@ -63,14 +85,7 @@ export function DirectionsButton({
           much vertical space. */}
       <div className="lg:hidden">
         <Sheet>
-          <SheetTrigger
-            render={
-              <button
-                type="button"
-                className="border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left"
-              />
-            }
-          >
+          <SheetTrigger render={<button type="button" className={triggerClassName} />}>
             {triggerContent}
           </SheetTrigger>
           <SheetContent side="bottom" className="rounded-t-sheet border-line bg-cream gap-2.5 pb-5">
