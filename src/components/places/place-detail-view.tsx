@@ -10,8 +10,6 @@ import {
   ClockIcon,
   DollarSignIcon,
   MountainIcon,
-  PawPrintIcon,
-  ChevronDownIcon,
   ChevronRightIcon,
   PencilIcon,
   FlagIcon,
@@ -35,6 +33,7 @@ import {
   getTerrainLabels,
 } from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
+import { getOpenStatus, getWeeklySchedule } from '@/lib/places/hours';
 import type { Place, PlaceReview } from '@/lib/validation/schemas';
 
 const DIFFICULTY_TIER: Record<string, Tier> = {
@@ -73,7 +72,6 @@ export function PlaceDetailView({
   const infoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
   const reviewsSectionRef = useRef<HTMLDivElement>(null);
-  const [hoursExpanded, setHoursExpanded] = useState(false);
 
   function goToSection(tab: typeof activeTab, ref: React.RefObject<HTMLDivElement | null>) {
     setActiveTab(tab);
@@ -161,9 +159,13 @@ export function PlaceDetailView({
       value: place.cost_amount ?? costTypeLabels[place.cost_type],
     });
   }
-  if (place.pet_friendly !== 'unknown') {
-    factCards.push({ icon: PawPrintIcon, label: t.detail.pets, value: petFriendlyLabels[place.pet_friendly] });
-  }
+  // Pet policy is deliberately not repeated here — it's already one of the
+  // pills above (mobilePills), and repeating it in both places was flagged
+  // as clutter (#83). Keep whatever's in the pills there; this grid is for
+  // what isn't already shown elsewhere.
+
+  const openStatus = getOpenStatus(place.hours);
+  const weeklySchedule = getWeeklySchedule(place.hours, language);
 
   const locationLine = [
     place.province,
@@ -180,15 +182,21 @@ export function PlaceDetailView({
 
   return (
     <>
-      {/* Mobile detail screen (<1024px) — "5b" redesign, Issue #78. */}
+      {/* Mobile detail screen (<1024px) — "5b" redesign, Issue #78/#83. */}
       <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
-        {/* Back + share overlay the photo directly now, instead of back
-            living in its own sticky strip above it and share sitting down
-            in the title row — matches 5b. */}
+        {/* Share overlays the photo; back is a separate zero-height sticky
+            wrapper rendered just before it in flow, so it starts at the
+            same top-4 spot over the photo but — unlike share — stays
+            pinned there through the whole scroll instead of scrolling
+            away with the photo (#83: "make sure back is sticky"). */}
+        <div className="sticky top-4 z-30 h-0 px-4">
+          <div className="flex justify-start">
+            <BackButton href="/" ariaLabel={t.detail.backToMap} className="bg-cream" />
+          </div>
+        </div>
         <div className="relative h-[260px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
-          <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-between">
-            <BackButton href="/" ariaLabel={t.detail.backToMap} className="pointer-events-auto" />
+          <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-end">
             <ShareButton title={place.name} iconOnly className="pointer-events-auto" />
           </div>
         </div>
@@ -228,7 +236,9 @@ export function PlaceDetailView({
 
           {/* Sticky anchor tabs — not true scroll-spy (see goToSection),
               just click-to-jump with the clicked tab highlighted. */}
-          <div className="border-line bg-cream sticky top-0 z-10 flex gap-1 border-y px-4 py-2">
+          {/* top-[60px]: sits just below the sticky back button (top-4,
+              44px tall) once both are stuck, instead of overlapping it. */}
+          <div className="border-line bg-cream sticky top-[60px] z-10 flex gap-1 border-y px-4 py-2">
             <button
               type="button"
               onClick={() => goToSection('info', infoSectionRef)}
@@ -264,6 +274,27 @@ export function PlaceDetailView({
           </div>
 
           <div ref={infoSectionRef} className="flex flex-col gap-4 px-4">
+            {weeklySchedule.length > 0 && (
+              <div
+                className={cn(
+                  'flex items-center gap-2.5 rounded-2xl px-3.5 py-3',
+                  openStatus.open ? 'bg-[#dde6d3]' : 'bg-rail',
+                )}
+              >
+                <span
+                  className={cn('size-2 shrink-0 rounded-full', openStatus.open ? 'bg-forest' : 'bg-clay-dark')}
+                />
+                <span className={cn('text-[14px] font-semibold', openStatus.open ? 'text-forest' : 'text-clay-dark')}>
+                  {openStatus.open ? t.detail.openNow : t.detail.closedNow}
+                </span>
+                {openStatus.open && openStatus.changeTime && (
+                  <span className="text-[14px] text-[#3e5a45]">
+                    · {t.detail.closesAt} {openStatus.changeTime}
+                  </span>
+                )}
+              </div>
+            )}
+
             {place.description && (
               <p className="text-ink-body text-[14px] leading-relaxed text-wrap-pretty">{place.description}</p>
             )}
@@ -278,30 +309,37 @@ export function PlaceDetailView({
                     <div key={card.label} className="bg-rail flex flex-col gap-1.5 rounded-2xl p-3">
                       <card.icon className="text-forest size-4 shrink-0" />
                       <span className="text-ink-muted text-[12px]">{card.label}</span>
-                      <span className="text-[14px] leading-snug font-semibold text-wrap-pretty">{card.value}</span>
+                      <span className="line-clamp-2 text-[14px] leading-snug font-semibold text-wrap-pretty">
+                        {card.value}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {place.hours_text && (
+            {/* Always-shown per-day table (5a design), not the collapsed
+                single-line summary 5b originally had — Issue #83. */}
+            {weeklySchedule.length > 0 && (
               <div className="border-line rounded-2xl border">
-                <button
-                  type="button"
-                  aria-expanded={hoursExpanded}
-                  onClick={() => setHoursExpanded((v) => !v)}
-                  className="flex w-full items-center justify-between px-3.5 py-3"
-                >
-                  <span className="flex items-center gap-2 text-[14px] font-semibold">
-                    <ClockIcon className="text-forest size-4 shrink-0" />
-                    {t.detail.hours}
-                  </span>
-                  <ChevronDownIcon
-                    className={cn('text-ink-muted size-4 shrink-0 transition-transform', hoursExpanded && 'rotate-180')}
-                  />
-                </button>
-                {hoursExpanded && (
+                <div className="flex items-center gap-2 px-3.5 py-3 text-[14px] font-semibold">
+                  <ClockIcon className="text-forest size-4 shrink-0" />
+                  {t.detail.hours}
+                </div>
+                {weeklySchedule.map((row) => (
+                  <div
+                    key={row.label}
+                    className="border-line-soft flex items-center justify-between border-t px-3.5 py-2.5 text-[13.5px]"
+                  >
+                    <span className="text-ink-muted">{row.label}</span>
+                    <span
+                      className={cn('font-semibold tabular-nums', row.closed && 'text-clay-dark')}
+                    >
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
+                {place.hours_text && (
                   <p className="text-ink-body border-line-soft border-t px-3.5 py-2.5 text-[13px] leading-relaxed">
                     {place.hours_text}
                   </p>
@@ -321,6 +359,7 @@ export function PlaceDetailView({
                   center={[place.lat, place.lng]}
                   zoom={LOCATION_MAP_ZOOM}
                   interactivePins={false}
+                  interactive={false}
                 />
               </div>
               <div className="bg-rail flex items-center justify-between gap-2 px-3.5 py-2.5">
@@ -383,16 +422,20 @@ export function PlaceDetailView({
           </div>
         </div>
 
-        {/* bottom-[76px] clears the floating global tab bar (MobileTabBar,
-            ~44px pill + 26px offset) instead of sitting underneath it. */}
-        <div className="from-cream border-line fixed inset-x-0 bottom-[76px] border-t bg-gradient-to-t via-70% p-4 pt-6">
+        {/* This replaces the global MobileTabBar entirely on this page
+            (hidden for /places/* routes, see mobile-tab-bar.tsx) rather
+            than sitting above it, so it sits flush at the very bottom —
+            solid background, not the old translucent gradient fade, per
+            #83. */}
+        <div className="bg-cream border-line fixed inset-x-0 bottom-0 border-t p-4 pb-5">
           <PlaceActions
             placeId={place.id}
             isSignedIn={isSignedIn}
             status={status}
             onStatusChange={setStatus}
             size="mobile"
-            fullWidth
+            saveVariant="outline"
+            saveFullWidth={false}
             extra={<DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} variant="cta" />}
           />
         </div>
@@ -444,7 +487,13 @@ export function PlaceDetailView({
               <div className="flex flex-col gap-2.5">
                 <h2 className="font-display text-bark text-lg font-medium">{t.detail.location}</h2>
                 <div className="rounded-2xl border-line h-[220px] overflow-hidden border">
-                  <PlaceMap places={[place]} center={[place.lat, place.lng]} zoom={LOCATION_MAP_ZOOM} interactivePins={false} />
+                  <PlaceMap
+                    places={[place]}
+                    center={[place.lat, place.lng]}
+                    zoom={LOCATION_MAP_ZOOM}
+                    interactivePins={false}
+                    interactive={false}
+                  />
                 </div>
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
               </div>

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { cn } from 'cn';
 import { BookmarkIcon, BookmarkCheckIcon } from 'lucide-react';
-import { ActionButton } from '@/components/ui/action-button';
+import { ActionButton, type ActionButtonVariant } from '@/components/ui/action-button';
 import { SignInRequiredDialog } from '@/components/auth/sign-in-required-dialog';
 import { useLanguage } from '@/lib/i18n/language-context';
 import { savePlace, markVisited } from '@/app/actions/list-items';
@@ -23,6 +23,8 @@ export function PlaceActions({
   fullWidth,
   stacked,
   showSaveButton = true,
+  saveVariant = 'secondary',
+  saveFullWidth,
   extra,
 }: {
   placeId: string;
@@ -36,6 +38,15 @@ export function PlaceActions({
   // showing a second, full-width Save button in the bottom bar duplicated
   // it. Desktop has no icon button elsewhere, so it keeps this one.
   showSaveButton?: boolean;
+  // Desktop keeps the original clay-bordered look; the mobile bottom bar
+  // (5b/Issue #78, revised #83) wants a forest-bordered outline matching
+  // its own design instead.
+  saveVariant?: ActionButtonVariant;
+  // Independent of `fullWidth` -- the mobile bottom bar wants Save (and
+  // Mark visited) sized to their own content, while `extra` (the
+  // directions CTA) fills the rest of the row. Falls back to `fullWidth`
+  // when omitted, so existing callers (desktop) are unaffected.
+  saveFullWidth?: boolean;
   // Rendered as one more item in the same row as Save/Mark visited — the
   // 5b mobile redesign's bottom bar (Issue #78) needs its directions CTA
   // sitting alongside them, not stacked in its own row underneath.
@@ -56,7 +67,7 @@ export function PlaceActions({
             label={status === 'visited' ? t.placeActions.visited : t.placeActions.markVisited}
             variant="primary"
             size={size}
-            fullWidth={fullWidth}
+            fullWidth={saveFullWidth ?? fullWidth}
             disabled={isPending || status === 'visited'}
             onPress={() => {
               if (!isSignedIn) {
@@ -78,9 +89,9 @@ export function PlaceActions({
         {showSaveButton && (
           <ActionButton
             label={status ? t.placeActions.saved : t.placeActions.save}
-            variant="secondary"
+            variant={saveVariant}
             size={size}
-            fullWidth={fullWidth}
+            fullWidth={saveFullWidth ?? fullWidth}
             disabled={isPending || status !== null}
             onPress={() => {
               if (!isSignedIn) {

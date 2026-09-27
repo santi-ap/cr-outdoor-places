@@ -1,10 +1,17 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { TabBarMobile } from '@/components/ui/tab-bar-mobile';
 import { useLanguage } from '@/lib/i18n/language-context';
 
 export function MobileTabBar() {
   const { t } = useLanguage();
+  const pathname = usePathname();
+
+  // The mobile place-detail screen (5b/Issue #78) has its own bottom bar
+  // (Save + Cómo llegar) that replaces this one entirely -- showing both
+  // stacked at once overlapped and wasted space that page doesn't have.
+  if (pathname.startsWith('/places/')) return null;
 
   const items = [
     { label: t.tabBar.explore, href: '/' },

@@ -25,21 +25,25 @@ import {
 } from '@/lib/places/labels';
 import { reverseGeocode } from '@/lib/places/reverse-geocode';
 import { useLanguage } from '@/lib/i18n/language-context';
-import type { Place, PlaceInsert } from '@/lib/validation/schemas';
+import type { HoursRule, Place, PlaceInsert } from '@/lib/validation/schemas';
 
 const LocationPicker = dynamic(
   () => import('./location-picker').then((m) => m.LocationPicker),
   { ssr: false },
 );
+const HoursPicker = dynamic(() => import('./hours-picker').then((m) => m.HoursPicker), {
+  ssr: false,
+});
 
 // rating/reviews are mock/seed-only display data (Issue #36) — not exposed
-// here, since suggestions never touch them. `landscape` is excluded from
-// the generic string-per-field mapping below and handled on its own — a
-// place can be more than one landscape at once, so it's a string array,
-// not a single string like every other field here.
+// here, since suggestions never touch them. `landscape`/`hours` are
+// excluded from the generic string-per-field mapping below and handled on
+// their own — a place can be more than one landscape at once, and open
+// hours are structured day/time rules (#75), not single strings like
+// every other field here.
 type FieldValues = {
-  [K in keyof Omit<PlaceInsert, 'rating' | 'reviews' | 'landscape'>]-?: string;
-} & { landscape: string[] };
+  [K in keyof Omit<PlaceInsert, 'rating' | 'reviews' | 'landscape' | 'hours'>]-?: string;
+} & { landscape: string[]; hours: HoursRule[] };
 
 const EMPTY: FieldValues = {
   name: '',
@@ -60,6 +64,7 @@ const EMPTY: FieldValues = {
   cost_type: 'unknown',
   cost_amount: '',
   pet_friendly: 'unknown',
+  hours: [],
   hours_text: '',
   website: '',
   phone: '',
@@ -86,6 +91,7 @@ function placeToFieldValues(place: Place): FieldValues {
     cost_type: place.cost_type,
     cost_amount: place.cost_amount ?? '',
     pet_friendly: place.pet_friendly,
+    hours: place.hours,
     hours_text: place.hours_text ?? '',
     website: place.website ?? '',
     phone: place.phone ?? '',
@@ -136,7 +142,7 @@ function arraysEqual(a: string[], b: string[]): boolean {
 function buildChanges(values: FieldValues, original: FieldValues | null): Partial<PlaceInsert> {
   const changes: Record<string, unknown> = {};
   for (const key of Object.keys(values) as (keyof FieldValues)[]) {
-    if (key === 'source' || key === 'confidence' || key === 'landscape') continue;
+    if (key === 'source' || key === 'confidence' || key === 'landscape' || key === 'hours') continue;
     const raw = values[key] as string;
     if (original && raw === original[key]) continue; // edit mode: unchanged
     const parsed = parseFieldValue(key as keyof PlaceInsert, raw);
@@ -145,6 +151,9 @@ function buildChanges(values: FieldValues, original: FieldValues | null): Partia
   }
   if (!original || !arraysEqual(values.landscape, original.landscape)) {
     changes.landscape = values.landscape;
+  }
+  if (!original || JSON.stringify(values.hours) !== JSON.stringify(original.hours)) {
+    changes.hours = values.hours;
   }
   return changes as Partial<PlaceInsert>;
 }
@@ -170,6 +179,10 @@ export function SuggestionForm({ place }: { place?: Place }) {
 
   function setLandscape(values: string[]) {
     setValues((prev) => ({ ...prev, landscape: values }));
+  }
+
+  function setHours(hours: HoursRule[]) {
+    setValues((prev) => ({ ...prev, hours }));
   }
 
   // Placing/moving the pin is the source of truth for lat/lng — no more
@@ -338,8 +351,12 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </Field>
 
       <Field label={t.suggest.fields.hours}>
+        <HoursPicker value={values.hours} onChange={setHours} />
+      </Field>
+
+      <Field label={t.suggest.fields.hoursNotes}>
         <Input
-          placeholder={t.suggest.hoursPlaceholder}
+          placeholder={t.suggest.hoursNotesPlaceholder}
           value={values.hours_text}
           onChange={(e) => setField('hours_text', e.target.value)}
         />
