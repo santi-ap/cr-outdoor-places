@@ -163,3 +163,4 @@ export type ListItem = z.infer<typeof listItemSchema>;
 export type ListItemInsert = z.infer<typeof listItemInsertSchema>;
 export type PlaceSuggestion = z.infer<typeof placeSuggestionSchema>;
 export type PlaceSuggestionInsert = z.infer<typeof placeSuggestionInsertSchema>;
+export type PlaceSuggestionStatus = z.infer<typeof placeSuggestionStatusSchema>;
