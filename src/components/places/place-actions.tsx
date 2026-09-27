@@ -57,7 +57,9 @@ export function PlaceActions({
   const [isPending, startTransition] = useTransition();
   const [signInDialogOpen, setSignInDialogOpen] = useState(false);
 
-  const rowClassName = cn('flex gap-2', stacked && 'flex-col');
+  // 10px gap on the mobile bottom bar, matching the design exactly
+  // (Issue #82 follow-up); unchanged (8px) elsewhere.
+  const rowClassName = cn('flex gap-2', size === 'mobile' && 'gap-2.5', stacked && 'flex-col');
 
   return (
     <div className="flex flex-col gap-2">
@@ -92,6 +94,7 @@ export function PlaceActions({
             variant={saveVariant}
             size={size}
             fullWidth={saveFullWidth ?? fullWidth}
+            icon={size === 'mobile' ? (status ? BookmarkCheckIcon : BookmarkIcon) : undefined}
             disabled={isPending || status !== null}
             onPress={() => {
               if (!isSignedIn) {
