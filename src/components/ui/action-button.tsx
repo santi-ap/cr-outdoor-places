@@ -5,6 +5,10 @@ const VARIANT_STYLES = {
   primary: 'border-0 bg-forest text-cream',
   secondary: 'border-[1.5px] border-clay bg-transparent text-bark',
   quiet: 'border-0 bg-transparent text-ink-muted',
+  // Forest-bordered outline, e.g. the mobile detail page's "Guardar"
+  // (Issue #78/#83) -- distinct from `secondary`'s clay border, used
+  // elsewhere for a lighter-weight "not the primary action" treatment.
+  outline: 'border-[1.5px] border-forest bg-transparent text-forest',
 } as const;
 
 const SIZE_STYLES = {
@@ -12,9 +16,11 @@ const SIZE_STYLES = {
   desktop: 'min-h-11 px-[18px] py-[11px] text-[14px]',
 } as const;
 
+export type ActionButtonVariant = keyof typeof VARIANT_STYLES;
+
 type ActionButtonProps = {
   label: string;
-  variant?: keyof typeof VARIANT_STYLES;
+  variant?: ActionButtonVariant;
   size?: keyof typeof SIZE_STYLES;
   fullWidth?: boolean;
   className?: string;

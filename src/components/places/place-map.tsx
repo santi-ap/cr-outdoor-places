@@ -122,6 +122,7 @@ export function PlaceMap({
   zoom = 8,
   hasDrawer = false,
   interactivePins = true,
+  interactive = true,
   onBoundsChange,
 }: {
   places: Place[];
@@ -138,6 +139,12 @@ export function PlaceMap({
   // it's already sitting on. True (the default) is for the main Explore
   // map, where both make sense.
   interactivePins?: boolean;
+  // False for the place-detail page's small reference map (#83) — a
+  // static preview that only needs to show where the place is, not invite
+  // panning/zooming that's easy to trigger by accident while scrolling
+  // past it and fiddly to recover from on a small map. True (the default)
+  // for the main Explore map.
+  interactive?: boolean;
   // Reports this map's own visible area on mount and after every pan/zoom
   // — omitted for the place-detail page's small reference map, which has
   // no list next to it to filter. See Issue #68.
@@ -179,7 +186,13 @@ export function PlaceMap({
         // this stacking context so it can't render above fixed-position UI
         // elsewhere on the page (e.g. the filters Sheet).
         className="isolate h-full w-full"
-        scrollWheelZoom
+        scrollWheelZoom={interactive}
+        dragging={interactive}
+        touchZoom={interactive}
+        doubleClickZoom={interactive}
+        boxZoom={interactive}
+        keyboard={interactive}
+        zoomControl={interactive}
       >
         <ZoomTracker onZoomChange={setCurrentZoom} />
         {onBoundsChange && <BoundsTracker onBoundsChange={onBoundsChange} />}

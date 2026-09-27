@@ -86,6 +86,9 @@ const es = {
     route: 'Recorrido',
     reportProblem: 'Reportar un problema',
     save: 'Guardar',
+    openNow: 'Abierto ahora',
+    closedNow: 'Cerrado ahora',
+    closesAt: 'cierra a las',
   },
   myList: {
     saved: 'Guardados',
@@ -257,6 +260,9 @@ const en: typeof es = {
     route: 'Route',
     reportProblem: 'Report a problem',
     save: 'Save',
+    openNow: 'Open now',
+    closedNow: 'Closed now',
+    closesAt: 'closes at',
   },
   myList: {
     saved: 'Saved',
