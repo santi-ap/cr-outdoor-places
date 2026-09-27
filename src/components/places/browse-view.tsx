@@ -20,6 +20,12 @@ import {
   getServerDrawerStateSnapshot,
   subscribeDrawerState,
 } from '@/lib/places/drawer-state';
+import {
+  getServerUserLocationSnapshot,
+  getUserLocationSnapshot,
+  subscribeUserLocation,
+} from '@/lib/geo/user-location-state';
+import { haversineDistanceMeters } from '@/lib/geo/distance';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
@@ -48,6 +54,12 @@ export function BrowseView() {
   // layout actually on screen.
   const [mobileMapBounds, setMobileMapBounds] = useState<MapBounds | null>(null);
   const [desktopMapBounds, setDesktopMapBounds] = useState<MapBounds | null>(null);
+  const [nearMeRadiusKm, setNearMeRadiusKm] = useState<number | null>(null);
+  const userLocationState = useSyncExternalStore(
+    subscribeUserLocation,
+    getUserLocationSnapshot,
+    getServerUserLocationSnapshot,
+  );
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
@@ -60,9 +72,20 @@ export function BrowseView() {
   );
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
-  const visiblePlaces = trimmedQuery
+  const searchedPlaces = trimmedQuery
     ? places.filter((place) => normalizeForSearch(place.name).includes(trimmedQuery))
     : places;
+  // Straight-line distance from the user (#82) -- only actually narrows
+  // results once a radius is picked AND a location has resolved; picking a
+  // radius before permission resolves (or after it's denied) is a no-op
+  // rather than hiding everything.
+  const userLocation = userLocationState.location;
+  const visiblePlaces =
+    nearMeRadiusKm && userLocation
+      ? searchedPlaces.filter(
+          (place) => haversineDistanceMeters(userLocation, { lat: place.lat, lng: place.lng }) <= nearMeRadiusKm * 1000,
+        )
+      : searchedPlaces;
 
   // The map's own visible area doubles as a filter (#68) — but only while
   // the map itself is actually on screen. On mobile that's the drawer's
@@ -115,7 +138,7 @@ export function BrowseView() {
           Map/List toggle from #24. */}
       <div className="relative h-full overflow-hidden lg:hidden">
         <div className="absolute inset-0">
-          <PlaceMap places={visiblePlaces} hasDrawer onBoundsChange={setMobileMapBounds} />
+          <PlaceMap places={visiblePlaces} hasDrawer onBoundsChange={setMobileMapBounds} showUserLocation />
         </div>
         <ListDrawer
           places={mobilePlaces}
@@ -129,6 +152,8 @@ export function BrowseView() {
           onFilterChange={setFilter}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          nearMeRadiusKm={nearMeRadiusKm}
+          onNearMeRadiusChange={setNearMeRadiusKm}
         />
       </div>
 
@@ -154,7 +179,7 @@ export function BrowseView() {
             </div>
 
             <div className="rounded-card-lg border-line h-[240px] shrink-0 overflow-hidden border">
-              <PlaceMap places={visiblePlaces} onBoundsChange={setDesktopMapBounds} />
+              <PlaceMap places={visiblePlaces} onBoundsChange={setDesktopMapBounds} showUserLocation />
             </div>
 
             {isLoading ? (
@@ -175,7 +200,13 @@ export function BrowseView() {
               </div>
             )}
           </div>
-          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={boundsFilteredPlaces.length} />
+          <FilterPanelDesktop
+            filter={filter}
+            onChange={setFilter}
+            matchCount={boundsFilteredPlaces.length}
+            nearMeRadiusKm={nearMeRadiusKm}
+            onNearMeRadiusChange={setNearMeRadiusKm}
+          />
         </div>
       </div>
 
@@ -185,6 +216,8 @@ export function BrowseView() {
         filter={filter}
         onChange={setFilter}
         matchCount={mobilePlaces.length}
+        nearMeRadiusKm={nearMeRadiusKm}
+        onNearMeRadiusChange={setNearMeRadiusKm}
       />
 
       <SignInRequiredDialog

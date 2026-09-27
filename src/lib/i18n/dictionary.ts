@@ -39,6 +39,11 @@ const es = {
     clearFilters: 'Limpiar filtros',
     allFilters: 'Todos los filtros',
     resultsCount: 'lugares',
+    nearMe: 'Cerca de mí',
+    nearMeRequesting: 'Obteniendo tu ubicación…',
+    nearMeDenied: 'No se pudo acceder a tu ubicación. Revisa los permisos del navegador.',
+    nearMeUnsupported: 'Tu navegador no admite la geolocalización.',
+    useMyLocation: 'Usar mi ubicación',
   },
   placeActions: {
     save: 'Guardar en mi lista',
@@ -89,6 +94,8 @@ const es = {
     openNow: 'Abierto ahora',
     closedNow: 'Cerrado ahora',
     closesAt: 'cierra a las',
+    distanceAway: 'a',
+    distanceAwaySuffix: 'de ti',
   },
   myList: {
     saved: 'Guardados',
@@ -173,6 +180,10 @@ const es = {
       'El nombre, una categoría o paisaje, y la ubicación en el mapa son obligatorios para un lugar nuevo.',
     errorChangeAtLeastOne: 'Cambia al menos un campo antes de enviar.',
   },
+  map: {
+    locateMe: 'Mostrar mi ubicación',
+    youAreHere: 'Tu ubicación',
+  },
 };
 
 const en: typeof es = {
@@ -213,6 +224,11 @@ const en: typeof es = {
     clearFilters: 'Clear filters',
     allFilters: 'All filters',
     resultsCount: 'places',
+    nearMe: 'Near me',
+    nearMeRequesting: 'Getting your location…',
+    nearMeDenied: "Couldn't access your location. Check your browser permissions.",
+    nearMeUnsupported: "Your browser doesn't support geolocation.",
+    useMyLocation: 'Use my location',
   },
   placeActions: {
     save: 'Save to my list',
@@ -263,6 +279,8 @@ const en: typeof es = {
     openNow: 'Open now',
     closedNow: 'Closed now',
     closesAt: 'closes at',
+    distanceAway: '',
+    distanceAwaySuffix: 'away',
   },
   myList: {
     saved: 'Saved',
@@ -346,6 +364,10 @@ const en: typeof es = {
     errorNameCategoryRequired:
       'Name, either a category or landscape, and a location on the map are required for a new place.',
     errorChangeAtLeastOne: 'Change at least one field before submitting.',
+  },
+  map: {
+    locateMe: 'Show my location',
+    youAreHere: 'Your location',
   },
 };
 

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { MultiSelectField, DistanceFilterField } from './filter-field';
+import { MultiSelectField, DistanceFilterField, NearMeFilterField } from './filter-field';
 import {
   getCategoryLabels,
   getLandscapeLabels,
@@ -18,12 +18,16 @@ type MultiValueKey = 'category' | 'landscape' | 'difficulty' | 'pet_friendly' | 
 export function PlaceFilters({
   filter,
   onChange,
+  nearMeRadiusKm,
+  onNearMeRadiusChange,
 }: {
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
+  nearMeRadiusKm: number | null;
+  onNearMeRadiusChange: (km: number | null) => void;
 }) {
   const { t, language } = useLanguage();
-  const hasActiveFilters = Object.keys(filter).length > 0;
+  const hasActiveFilters = Object.keys(filter).length > 0 || nearMeRadiusKm !== null;
 
   function setValues<K extends MultiValueKey>(key: K, values: string[]) {
     const next = { ...filter };
@@ -89,8 +93,20 @@ export function PlaceFilters({
 
       <DistanceFilterField value={filter.max_distance_m} onChange={setDistance} />
 
+      <FieldGroup label={t.filters.nearMe}>
+        <NearMeFilterField value={nearMeRadiusKm} onChange={onNearMeRadiusChange} />
+      </FieldGroup>
+
       {hasActiveFilters && (
-        <Button variant="ghost" size="sm" className="self-start" onClick={() => onChange({})}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="self-start"
+          onClick={() => {
+            onChange({});
+            onNearMeRadiusChange(null);
+          }}
+        >
           {t.filters.clearFilters}
         </Button>
       )}

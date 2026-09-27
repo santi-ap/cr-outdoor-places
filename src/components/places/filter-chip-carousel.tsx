@@ -5,7 +5,7 @@ import { cn } from 'cn';
 import { XIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MultiSelectField, DistanceFilterField } from './filter-field';
+import { MultiSelectField, DistanceFilterField, NearMeFilterField } from './filter-field';
 import {
   getCategoryLabels,
   getLandscapeLabels,
@@ -22,7 +22,8 @@ type FilterKey =
   | 'difficulty'
   | 'pet_friendly'
   | 'cost_type'
-  | 'max_distance_m';
+  | 'max_distance_m'
+  | 'near_me';
 type MultiValueKey = 'category' | 'landscape' | 'difficulty' | 'pet_friendly' | 'cost_type';
 
 // A horizontally-scrollable row of filter buttons ("All filters" plus one
@@ -36,11 +37,15 @@ export function FilterChipCarousel({
   onChange,
   onOpenAllFilters,
   resultsLabel,
+  nearMeRadiusKm,
+  onNearMeRadiusChange,
 }: {
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
   onOpenAllFilters: () => void;
   resultsLabel: string;
+  nearMeRadiusKm: number | null;
+  onNearMeRadiusChange: (km: number | null) => void;
 }) {
   const { t, language } = useLanguage();
   const [openField, setOpenField] = useState<FilterKey | null>(null);
@@ -82,6 +87,7 @@ export function FilterChipCarousel({
     { key: 'pet_friendly', label: t.filters.pets, count: filter.pet_friendly?.length ?? 0 },
     { key: 'cost_type', label: t.filters.cost, count: filter.cost_type?.length ?? 0 },
     { key: 'max_distance_m', label: t.filters.maxDistance, count: filter.max_distance_m ? 1 : 0 },
+    { key: 'near_me', label: t.filters.nearMe, count: nearMeRadiusKm ? 1 : 0 },
   ];
 
   const selectedPills: { key: string; label: string; onRemove: () => void }[] = [
@@ -116,6 +122,15 @@ export function FilterChipCarousel({
             key: 'max_distance_m',
             label: `${t.filters.maxDistance}: ${(filter.max_distance_m / 1000).toFixed(1)} km`,
             onRemove: () => setDistance(undefined),
+          },
+        ]
+      : []),
+    ...(nearMeRadiusKm
+      ? [
+          {
+            key: 'near_me',
+            label: `${t.filters.nearMe}: ${nearMeRadiusKm} km`,
+            onRemove: () => onNearMeRadiusChange(null),
           },
         ]
       : []),
@@ -196,6 +211,7 @@ export function FilterChipCarousel({
                 size="sm"
                 onClick={() => {
                   if (activeField.key === 'max_distance_m') setDistance(undefined);
+                  else if (activeField.key === 'near_me') onNearMeRadiusChange(null);
                   else setValues(activeField.key as MultiValueKey, []);
                 }}
               >
@@ -241,6 +257,9 @@ export function FilterChipCarousel({
             )}
             {openField === 'max_distance_m' && (
               <DistanceFilterField value={filter.max_distance_m} onChange={setDistance} />
+            )}
+            {openField === 'near_me' && (
+              <NearMeFilterField value={nearMeRadiusKm} onChange={onNearMeRadiusChange} />
             )}
           </div>
         </SheetContent>

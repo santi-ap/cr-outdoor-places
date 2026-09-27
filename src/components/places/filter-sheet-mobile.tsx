@@ -11,12 +11,16 @@ export function FilterSheetMobile({
   filter,
   onChange,
   matchCount,
+  nearMeRadiusKm,
+  onNearMeRadiusChange,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
   matchCount: number;
+  nearMeRadiusKm: number | null;
+  onNearMeRadiusChange: (km: number | null) => void;
 }) {
   const { t } = useLanguage();
 
@@ -30,7 +34,12 @@ export function FilterSheetMobile({
           </p>
         </SheetHeader>
         <div className="px-4 pb-5">
-          <PlaceFilters filter={filter} onChange={onChange} />
+          <PlaceFilters
+            filter={filter}
+            onChange={onChange}
+            nearMeRadiusKm={nearMeRadiusKm}
+            onNearMeRadiusChange={onNearMeRadiusChange}
+          />
         </div>
       </SheetContent>
     </Sheet>

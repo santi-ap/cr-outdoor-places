@@ -44,6 +44,8 @@ export function ListDrawer({
   onFilterChange,
   searchQuery,
   onSearchChange,
+  nearMeRadiusKm,
+  onNearMeRadiusChange,
 }: {
   places: Place[];
   isLoading: boolean;
@@ -56,6 +58,8 @@ export function ListDrawer({
   onFilterChange: (filter: PlacesFilter) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  nearMeRadiusKm: number | null;
+  onNearMeRadiusChange: (km: number | null) => void;
 }) {
   const { t } = useLanguage();
   const state = useSyncExternalStore(
@@ -200,6 +204,8 @@ export function ListDrawer({
           onChange={onFilterChange}
           onOpenAllFilters={onOpenFilters}
           resultsLabel={resultsLabel}
+          nearMeRadiusKm={nearMeRadiusKm}
+          onNearMeRadiusChange={onNearMeRadiusChange}
         />
       </div>
 

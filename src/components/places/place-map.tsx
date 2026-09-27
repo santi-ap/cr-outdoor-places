@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { cn } from 'cn';
 import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvent } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
-import { XIcon } from 'lucide-react';
+import { XIcon, LocateFixedIcon } from 'lucide-react';
 import { PlacePills } from './place-pills';
 import {
   getDrawerHeightPx,
@@ -14,6 +15,12 @@ import {
   getServerDrawerStateSnapshot,
   subscribeDrawerState,
 } from '@/lib/places/drawer-state';
+import {
+  getServerUserLocationSnapshot,
+  getUserLocationSnapshot,
+  requestUserLocation,
+  subscribeUserLocation,
+} from '@/lib/geo/user-location-state';
 import type { MapBounds } from '@/lib/places/map-bounds';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
@@ -54,6 +61,20 @@ const selectedMarkerIcon = L.divIcon({
   iconAnchor: [18, 48],
   popupAnchor: [0, -42],
   tooltipAnchor: [0, -42],
+});
+
+// The user's own position (#82) reads as a plain blue location dot with a
+// soft halo, deliberately not shaped like a place pin — it isn't a place,
+// tapping it does nothing, and it shouldn't invite the same "open this"
+// expectation the green pins do.
+const userLocationIcon = L.divIcon({
+  className: '',
+  html: `<svg width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="11" cy="11" r="10" fill="#2f6fed" fill-opacity="0.18"/>
+    <circle cx="11" cy="11" r="6" fill="#2f6fed" stroke="#f7f1e7" stroke-width="2.5"/>
+  </svg>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
 });
 
 // Groups of nearby pins collapse into one numbered bubble at low zoom so
@@ -124,6 +145,7 @@ export function PlaceMap({
   interactivePins = true,
   interactive = true,
   onBoundsChange,
+  showUserLocation = false,
 }: {
   places: Place[];
   center?: [number, number];
@@ -149,6 +171,10 @@ export function PlaceMap({
   // — omitted for the place-detail page's small reference map, which has
   // no list next to it to filter. See Issue #68.
   onBoundsChange?: (bounds: MapBounds) => void;
+  // True on the Explore map only (#82) — adds a "locate me" button and, once
+  // permission is granted, a "you are here" marker. False (the default) on
+  // the place-detail page's small reference map, which has no use for either.
+  showUserLocation?: boolean;
 }) {
   const { t } = useLanguage();
   const [currentZoom, setCurrentZoom] = useState(zoom);
@@ -157,6 +183,11 @@ export function PlaceMap({
   const selectedPlace = interactivePins ? (places.find((place) => place.id === selectedPlaceId) ?? null) : null;
   const mapRef = useRef<L.Map | null>(null);
   const drawerState = useSyncExternalStore(subscribeDrawerState, getDrawerStateSnapshot, getServerDrawerStateSnapshot);
+  const userLocationState = useSyncExternalStore(
+    subscribeUserLocation,
+    getUserLocationSnapshot,
+    getServerUserLocationSnapshot,
+  );
   const drawerHeightPx = hasDrawer ? getDrawerHeightPx(drawerState) : 0;
   const panelBottomPx = Number.isFinite(drawerHeightPx)
     ? drawerHeightPx + (hasDrawer ? PANEL_DRAWER_GAP_PX : PANEL_BOTTOM_INSET_PX)
@@ -221,7 +252,32 @@ export function PlaceMap({
             </Marker>
           ))}
         </MarkerClusterGroup>
+        {showUserLocation && userLocationState.status === 'granted' && userLocationState.location && (
+          <Marker
+            position={[userLocationState.location.lat, userLocationState.location.lng]}
+            icon={userLocationIcon}
+            interactive={false}
+            keyboard={false}
+            zIndexOffset={2000}
+          >
+            <Tooltip direction="top">{t.map.youAreHere}</Tooltip>
+          </Marker>
+        )}
       </MapContainer>
+
+      {showUserLocation && (
+        <button
+          type="button"
+          aria-label={t.map.locateMe}
+          onClick={requestUserLocation}
+          className={cn(
+            'bg-cream text-bark absolute top-3 right-3 z-[400] flex h-9 w-9 items-center justify-center rounded-full shadow-md',
+            userLocationState.status === 'granted' && 'text-[#2f6fed]',
+          )}
+        >
+          <LocateFixedIcon className="size-4.5" />
+        </button>
+      )}
 
       {/* A tap on a pin previews it here — name + the same at-a-glance
           pills the list-view cards use — instead of jumping straight to

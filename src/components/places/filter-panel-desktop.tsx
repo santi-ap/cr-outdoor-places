@@ -8,10 +8,14 @@ export function FilterPanelDesktop({
   filter,
   onChange,
   matchCount,
+  nearMeRadiusKm,
+  onNearMeRadiusChange,
 }: {
   filter: PlacesFilter;
   onChange: (filter: PlacesFilter) => void;
   matchCount: number;
+  nearMeRadiusKm: number | null;
+  onNearMeRadiusChange: (km: number | null) => void;
 }) {
   const { t } = useLanguage();
 
@@ -21,7 +25,12 @@ export function FilterPanelDesktop({
       <p className="text-ink-muted mb-3.5 text-[13px]">
         {matchCount} {t.filters.resultsCount}
       </p>
-      <PlaceFilters filter={filter} onChange={onChange} />
+      <PlaceFilters
+        filter={filter}
+        onChange={onChange}
+        nearMeRadiusKm={nearMeRadiusKm}
+        onNearMeRadiusChange={onNearMeRadiusChange}
+      />
     </div>
   );
 }
