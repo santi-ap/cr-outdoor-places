@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import Link from 'next/link';
 import { cn } from 'cn';
 
@@ -12,7 +13,10 @@ const VARIANT_STYLES = {
 } as const;
 
 const SIZE_STYLES = {
-  mobile: 'min-h-[48px] px-4 py-3 text-[14px]',
+  // 52px/18px horizontal padding, no vertical padding (centered via flex
+  // instead) -- matches the mobile detail page's bottom action bar in the
+  // design (Issue #83 follow-up, #82 round 2), which was previously 48px.
+  mobile: 'min-h-[52px] px-[18px] text-[14px]',
   desktop: 'min-h-11 px-[18px] py-[11px] text-[14px]',
 } as const;
 
@@ -23,6 +27,10 @@ type ActionButtonProps = {
   variant?: ActionButtonVariant;
   size?: keyof typeof SIZE_STYLES;
   fullWidth?: boolean;
+  // Leading icon -- the mobile bottom bar's "Guardar" button pairs a small
+  // bookmark icon with the label in the design, unlike the plain
+  // text-only buttons elsewhere that don't pass this.
+  icon?: ComponentType<{ className?: string }>;
   className?: string;
 };
 
@@ -31,6 +39,7 @@ export function ActionButton({
   variant = 'primary',
   size = 'mobile',
   fullWidth,
+  icon: Icon,
   disabled,
   type = 'button',
   onPress,
@@ -42,24 +51,31 @@ export function ActionButton({
     | { href?: undefined; disabled?: boolean; type?: 'button' | 'submit'; onPress?: () => void }
   )) {
   const sharedClassName = cn(
-    'cursor-pointer rounded-control text-center font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    'flex cursor-pointer items-center justify-center gap-2 rounded-control text-center font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
     VARIANT_STYLES[variant],
     SIZE_STYLES[size],
     fullWidth ? 'w-full' : 'w-auto',
     className,
   );
 
+  const content = (
+    <>
+      {Icon && <Icon className="size-4 shrink-0" />}
+      {label}
+    </>
+  );
+
   if (href) {
     return (
-      <Link href={href} className={cn(sharedClassName, 'inline-block')}>
-        {label}
+      <Link href={href} className={cn(sharedClassName, 'inline-flex')}>
+        {content}
       </Link>
     );
   }
 
   return (
     <button type={type} onClick={onPress} disabled={disabled} className={sharedClassName}>
-      {label}
+      {content}
     </button>
   );
 }

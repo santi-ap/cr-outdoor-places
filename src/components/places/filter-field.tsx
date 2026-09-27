@@ -57,13 +57,16 @@ export function MultiSelectField({
   );
 }
 
-export const NEAR_ME_PRESETS_KM = [1, 5, 10, 25];
+export const NEAR_ME_MAX_KM = 100;
 
-// Distance-FROM-THE-USER filter (Issue #82) -- distinct from
-// DistanceFilterField above, which filters by a place's own recorrido
-// (trail/route) length. Tapping a preset both requests geolocation (if
-// not already granted) and selects that radius; the actual filtering in
-// browse-view.tsx only takes effect once a location is available.
+// Distance-FROM-THE-USER filter (Issue #82, changed to a slider in the #82
+// follow-up round) -- distinct from DistanceFilterField above, which
+// filters by a place's own recorrido (trail/route) length. Reaching the
+// slider's max collapses to "any" (no filter), same pattern as
+// DistanceFilterField's own MAX_DISTANCE_M sentinel. Moving the slider
+// requests geolocation once (if not already granted/requested) — the
+// actual filtering in browse-view.tsx only takes effect once a location
+// is available.
 export function NearMeFilterField({
   value,
   onChange,
@@ -78,29 +81,24 @@ export function NearMeFilterField({
     getServerUserLocationSnapshot,
   );
 
-  function selectRadius(km: number) {
-    if (status !== 'granted') requestUserLocation();
-    onChange(value === km ? null : km);
+  function handleChange(km: number) {
+    if (status === 'idle') requestUserLocation();
+    onChange(km >= NEAR_ME_MAX_KM ? null : km);
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
-        {NEAR_ME_PRESETS_KM.map((km) => (
-          <button
-            key={km}
-            type="button"
-            aria-pressed={value === km}
-            onClick={() => selectRadius(km)}
-            className={cn(
-              'rounded-control border-[1.5px] px-3 py-1.5 text-[13px] font-medium transition-colors',
-              value === km ? 'border-forest bg-forest text-cream' : 'border-line-strong bg-cream text-bark',
-            )}
-          >
-            {km} km
-          </button>
-        ))}
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <Label className="font-medium">{t.filters.nearMe}</Label>
+        <span className="text-muted-foreground shrink-0">{value ? `${value} km` : t.filters.any}</span>
       </div>
+      <Slider
+        min={1}
+        max={NEAR_ME_MAX_KM}
+        step={1}
+        value={value ?? NEAR_ME_MAX_KM}
+        onValueChange={(v) => handleChange(typeof v === 'number' ? v : v[0])}
+      />
       {status === 'requesting' && <p className="text-muted-foreground text-xs">{t.filters.nearMeRequesting}</p>}
       {status === 'denied' && <p className="text-muted-foreground text-xs">{t.filters.nearMeDenied}</p>}
       {status === 'unsupported' && <p className="text-muted-foreground text-xs">{t.filters.nearMeUnsupported}</p>}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { cn } from 'cn';
@@ -38,6 +38,7 @@ import { haversineDistanceMeters } from '@/lib/geo/distance';
 import {
   getServerUserLocationSnapshot,
   getUserLocationSnapshot,
+  requestUserLocation,
   subscribeUserLocation,
 } from '@/lib/geo/user-location-state';
 import type { Place, PlaceReview } from '@/lib/validation/schemas';
@@ -83,6 +84,32 @@ export function PlaceDetailView({
     setActiveTab(tab);
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+  // Mobile-only: the floating back button over the photo and the sticky
+  // Info/Mapa/Reseñas tabs bar used to each be sticky at their own
+  // independent top offset, which meant one could visually collide with
+  // whatever was still scrolling past underneath the other. Instead, the
+  // two states are mutually exclusive — a sentinel placed right before the
+  // tabs bar reports (via IntersectionObserver) whether the tabs bar has
+  // reached the top of the scroll container; once it has, the floating
+  // back button is replaced by one merged into the tabs bar itself
+  // (scooting the tabs right), and reverts the moment it's scrolled back
+  // down (#82 follow-up).
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const tabsSentinelRef = useRef<HTMLDivElement>(null);
+  const [tabsStuck, setTabsStuck] = useState(false);
+
+  useEffect(() => {
+    const root = scrollContainerRef.current;
+    const sentinel = tabsSentinelRef.current;
+    if (!root || !sentinel) return;
+    const observer = new IntersectionObserver(([entry]) => setTabsStuck(!entry.isIntersecting), {
+      root,
+      threshold: 0,
+    });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   const categoryLabels = getCategoryLabels(language);
   const landscapeLabels = getLandscapeLabels(language);
@@ -170,7 +197,7 @@ export function PlaceDetailView({
   // as clutter (#83). Keep whatever's in the pills there; this grid is for
   // what isn't already shown elsewhere.
 
-  const openStatus = getOpenStatus(place.hours);
+  const openStatus = getOpenStatus(place.hours, language);
   const weeklySchedule = getWeeklySchedule(place.hours, language);
 
   const locationLine = [
@@ -211,17 +238,21 @@ export function PlaceDetailView({
   return (
     <>
       {/* Mobile detail screen (<1024px) — "5b" redesign, Issue #78/#83. */}
-      <div className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
+      <div ref={scrollContainerRef} className="no-scrollbar flex h-full flex-col overflow-y-auto lg:hidden">
         {/* Share overlays the photo; back is a separate zero-height sticky
             wrapper rendered just before it in flow, so it starts at the
             same top-4 spot over the photo but — unlike share — stays
             pinned there through the whole scroll instead of scrolling
-            away with the photo (#83: "make sure back is sticky"). */}
-        <div className="sticky top-4 z-30 h-0 px-4">
-          <div className="flex justify-start">
-            <BackButton href="/" ariaLabel={t.detail.backToMap} className="bg-cream" />
+            away with the photo (#83: "make sure back is sticky"). Hidden
+            once the tabs bar below is stuck — it merges into that bar
+            instead (#82 follow-up), rather than floating over it. */}
+        {!tabsStuck && (
+          <div className="sticky top-4 z-30 h-0 px-4">
+            <div className="flex justify-start">
+              <BackButton href="/" ariaLabel={t.detail.backToMap} className="bg-cream" />
+            </div>
           </div>
-        </div>
+        )}
         <div className="relative h-[260px] shrink-0">
           <PhotoCarousel roundedClassName="rounded-b-[30px]" className="h-full" />
           <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-end">
@@ -262,11 +293,24 @@ export function PlaceDetailView({
             </div>
           </div>
 
+          {/* Sentinel for the IntersectionObserver above -- once this
+              scrolls above the container's top edge, the tabs bar below is
+              considered "stuck" (see tabsStuck). */}
+          <div ref={tabsSentinelRef} />
+
           {/* Sticky anchor tabs — not true scroll-spy (see goToSection),
-              just click-to-jump with the clicked tab highlighted. */}
-          {/* top-[60px]: sits just below the sticky back button (top-4,
-              44px tall) once both are stuck, instead of overlapping it. */}
-          <div className="border-line bg-cream sticky top-[60px] z-10 flex gap-1 border-y px-4 py-2">
+              just click-to-jump with the clicked tab highlighted. Once
+              stuck (top-0), the back button merges in on the left and the
+              tabs make room instead of floating separately (#82
+              follow-up). */}
+          <div className="border-line bg-cream sticky top-0 z-10 flex items-center gap-1 border-y px-4 py-2">
+            {tabsStuck && (
+              <BackButton
+                href="/"
+                ariaLabel={t.detail.backToMap}
+                className="mr-1 h-10 w-10 shrink-0 bg-transparent shadow-none"
+              />
+            )}
             <button
               type="button"
               onClick={() => goToSection('info', infoSectionRef)}
@@ -395,8 +439,20 @@ export function PlaceDetailView({
                   <span className="block truncate text-[13px] font-semibold">
                     {directionsLabel ?? place.name}
                   </span>
-                  {distanceAwayText && (
+                  {distanceAwayText ? (
                     <span className="text-ink-muted block text-[12px]">{distanceAwayText}</span>
+                  ) : userLocationState.status === 'requesting' ? (
+                    <span className="text-ink-muted block text-[12px]">{t.filters.nearMeRequesting}</span>
+                  ) : (
+                    userLocationState.status !== 'unsupported' && (
+                      <button
+                        type="button"
+                        onClick={requestUserLocation}
+                        className="text-forest block text-left text-[12px] underline"
+                      >
+                        {t.filters.useMyLocation}
+                      </button>
+                    )
                   )}
                 </div>
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} variant="pill" />
@@ -460,7 +516,7 @@ export function PlaceDetailView({
             than sitting above it, so it sits flush at the very bottom —
             solid background, not the old translucent gradient fade, per
             #83. */}
-        <div className="bg-cream border-line fixed inset-x-0 bottom-0 border-t p-4 pb-5">
+        <div className="bg-cream border-line fixed inset-x-0 bottom-0 border-t px-4 pt-3 pb-5">
           <PlaceActions
             placeId={place.id}
             isSignedIn={isSignedIn}
@@ -528,7 +584,21 @@ export function PlaceDetailView({
                     interactive={false}
                   />
                 </div>
-                {distanceAwayText && <p className="text-ink-muted text-[13px]">{distanceAwayText}</p>}
+                {distanceAwayText ? (
+                  <p className="text-ink-muted text-[13px]">{distanceAwayText}</p>
+                ) : userLocationState.status === 'requesting' ? (
+                  <p className="text-ink-muted text-[13px]">{t.filters.nearMeRequesting}</p>
+                ) : (
+                  userLocationState.status !== 'unsupported' && (
+                    <button
+                      type="button"
+                      onClick={requestUserLocation}
+                      className="text-forest self-start text-[13px] underline"
+                    >
+                      {t.filters.useMyLocation}
+                    </button>
+                  )
+                )}
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
               </div>
 

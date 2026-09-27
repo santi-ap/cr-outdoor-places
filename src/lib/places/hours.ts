@@ -52,12 +52,16 @@ export function getWeekdayLabels(language: Language): Record<Weekday, string> {
   return language === 'es' ? weekdayLabelsEs : weekdayLabelsEn;
 }
 
-// "07:00" -> "7:00", "16:00" -> "16:00" -- the 5a schedule table shows
-// plain 24h time (no a.m./p.m., no leading zero), unlike the 12h style
-// used elsewhere in this app's free-text hours.
-function formatTimeOfDay24(time: string): string {
+// "07:00" -> "7:00 a.m.", "16:00" -> "4:00 p.m." -- 12h with am/pm, matching
+// the style already used in this app's free-text hours notes (Issue #84
+// follow-up: the schedule table originally used plain 24h time here, but
+// that read as "military time" next to everything else in 12h).
+export function formatTimeOfDay12(time: string, language: Language): string {
   const [hourStr, minute] = time.split(':');
-  return `${Number(hourStr)}:${minute}`;
+  const hour = Number(hourStr);
+  const suffix = language === 'es' ? (hour < 12 ? 'a.m.' : 'p.m.') : hour < 12 ? 'AM' : 'PM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute} ${suffix}`;
 }
 
 function sameRule(a: HoursRule | null, b: HoursRule | null): boolean {
@@ -91,7 +95,9 @@ export function getWeeklySchedule(hours: HoursRule[], language: Language): Weekl
       i === j
         ? fullLabels[WEEKDAY_ORDER[i]]
         : `${fullLabels[WEEKDAY_ORDER[i]]} – ${fullLabels[WEEKDAY_ORDER[j]]}`;
-    const value = rule ? `${formatTimeOfDay24(rule.opens)} – ${formatTimeOfDay24(rule.closes)}` : closedLabel;
+    const value = rule
+      ? `${formatTimeOfDay12(rule.opens, language)} – ${formatTimeOfDay12(rule.closes, language)}`
+      : closedLabel;
     rows.push({ label, value, closed: !rule });
     i = j + 1;
   }
@@ -104,7 +110,7 @@ export type OpenStatus = { open: boolean; changeTime: string | null };
 // "now" for open/closed purposes is just the current time converted to
 // that zone -- no timezone database lookup needed beyond what
 // toLocaleString already does.
-export function getOpenStatus(hours: HoursRule[], now: Date = new Date()): OpenStatus {
+export function getOpenStatus(hours: HoursRule[], language: Language, now: Date = new Date()): OpenStatus {
   if (hours.length === 0) return { open: false, changeTime: null };
 
   const crNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Costa_Rica' }));
@@ -117,5 +123,5 @@ export function getOpenStatus(hours: HoursRule[], now: Date = new Date()): OpenS
   const [openH, openM] = todayRule.opens.split(':').map(Number);
   const [closeH, closeM] = todayRule.closes.split(':').map(Number);
   const isOpen = minutes >= openH * 60 + openM && minutes < closeH * 60 + closeM;
-  return { open: isOpen, changeTime: isOpen ? todayRule.closes : null };
+  return { open: isOpen, changeTime: isOpen ? formatTimeOfDay12(todayRule.closes, language) : null };
 }
