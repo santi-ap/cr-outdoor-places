@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import dynamic from 'next/dynamic';
 import { createPlaceSuggestion } from '@/app/actions/place-suggestions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,8 +23,14 @@ import {
   getPetFriendlySuggestionLabels,
   getTerrainLabels,
 } from '@/lib/places/labels';
+import { reverseGeocode } from '@/lib/places/reverse-geocode';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place, PlaceInsert } from '@/lib/validation/schemas';
+
+const LocationPicker = dynamic(
+  () => import('./location-picker').then((m) => m.LocationPicker),
+  { ssr: false },
+);
 
 // rating/reviews are mock/seed-only display data (Issue #36) — not exposed
 // here, since suggestions never touch them. `landscape` is excluded from
@@ -165,12 +172,34 @@ export function SuggestionForm({ place }: { place?: Place }) {
     setValues((prev) => ({ ...prev, landscape: values }));
   }
 
+  // Placing/moving the pin is the source of truth for lat/lng — no more
+  // typing coordinates by hand (#73). Province/canton get a best-effort
+  // auto-fill from it so those don't need typing either, but stay
+  // editable: reverse geocoding a pin isn't always right, and a failed
+  // lookup (network hiccup, no OSM match) shouldn't block placing the pin
+  // itself, so it's silently left for the suggester to fill in by hand.
+  function setLocation(lat: number, lng: number) {
+    setValues((prev) => ({ ...prev, lat: String(lat), lng: String(lng) }));
+    reverseGeocode(lat, lng, language)
+      .then(({ province, canton }) => {
+        setValues((prev) => ({
+          ...prev,
+          province: province ?? prev.province,
+          canton: canton ?? prev.canton,
+        }));
+      })
+      .catch(() => {});
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (
       !place &&
-      (values.name.trim() === '' || (values.category.trim() === '' && values.landscape.length === 0))
+      (values.name.trim() === '' ||
+        (values.category.trim() === '' && values.landscape.length === 0) ||
+        values.lat.trim() === '' ||
+        values.lng.trim() === '')
     ) {
       setError(t.suggest.errorNameCategoryRequired);
       setStatus('error');
@@ -230,31 +259,20 @@ export function SuggestionForm({ place }: { place?: Place }) {
         <MultiSelectField values={values.landscape} options={landscapeLabels} onChange={setLandscape} />
       </Field>
 
+      <Field label={t.suggest.fields.location}>
+        <LocationPicker
+          lat={values.lat === '' ? null : Number(values.lat)}
+          lng={values.lng === '' ? null : Number(values.lng)}
+          onChange={setLocation}
+        />
+      </Field>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label={t.suggest.fields.province}>
           <Input value={values.province} onChange={(e) => setField('province', e.target.value)} />
         </Field>
         <Field label={t.suggest.fields.canton}>
           <Input value={values.canton} onChange={(e) => setField('canton', e.target.value)} />
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label={t.suggest.fields.latitude}>
-          <Input
-            type="number"
-            step="any"
-            value={values.lat}
-            onChange={(e) => setField('lat', e.target.value)}
-          />
-        </Field>
-        <Field label={t.suggest.fields.longitude}>
-          <Input
-            type="number"
-            step="any"
-            value={values.lng}
-            onChange={(e) => setField('lng', e.target.value)}
-          />
         </Field>
       </div>
 
