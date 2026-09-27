@@ -125,11 +125,11 @@ function HoursRuleEditor({
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1">
+        <label className="flex min-w-0 flex-col gap-1">
           <span className="text-ink-muted text-[12px]">{t.suggest.hoursOpens}</span>
           <Input type="time" value={rule.opens} onChange={(e) => onChange({ opens: e.target.value })} />
         </label>
-        <label className="flex flex-col gap-1">
+        <label className="flex min-w-0 flex-col gap-1">
           <span className="text-ink-muted text-[12px]">{t.suggest.hoursCloses}</span>
           <Input type="time" value={rule.closes} onChange={(e) => onChange({ closes: e.target.value })} />
         </label>
