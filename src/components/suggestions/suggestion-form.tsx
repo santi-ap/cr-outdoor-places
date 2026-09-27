@@ -17,9 +17,9 @@ import { MultiSelectField } from '@/components/places/filter-field';
 import {
   getCategoryLabels,
   getLandscapeLabels,
-  getCostTypeLabels,
+  getCostTypeSuggestionLabels,
   getDifficultyLabels,
-  getPetFriendlyLabels,
+  getPetFriendlySuggestionLabels,
   getTerrainLabels,
 } from '@/lib/places/labels';
 import { useLanguage } from '@/lib/i18n/language-context';
@@ -47,9 +47,12 @@ const EMPTY: FieldValues = {
   terrain: '',
   distance_m: '',
   duration_min: '',
-  cost_type: '',
+  // Not '' like the rest — cost/pet policy always have one of their real
+  // values selected (see the label-map comment in lib/places/labels.ts),
+  // and 'unknown' is both a real choice and this column's own DB default.
+  cost_type: 'unknown',
   cost_amount: '',
-  pet_friendly: '',
+  pet_friendly: 'unknown',
   hours_text: '',
   website: '',
   phone: '',
@@ -151,8 +154,8 @@ export function SuggestionForm({ place }: { place?: Place }) {
   const landscapeLabels = getLandscapeLabels(language);
   const difficultyLabels = getDifficultyLabels(language);
   const terrainLabels = getTerrainLabels(language);
-  const costTypeLabels = getCostTypeLabels(language);
-  const petFriendlyLabels = getPetFriendlyLabels(language);
+  const costTypeLabels = getCostTypeSuggestionLabels(language);
+  const petFriendlyLabels = getPetFriendlySuggestionLabels(language);
 
   function setField(key: keyof PlaceInsert, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -293,10 +296,9 @@ export function SuggestionForm({ place }: { place?: Place }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label={t.suggest.fields.costType}>
-          <EnumSelect
+          <RequiredEnumSelect
             value={values.cost_type}
             options={costTypeLabels}
-            placeholder={t.suggest.notSet}
             onChange={(v) => setField('cost_type', v)}
           />
         </Field>
@@ -310,10 +312,9 @@ export function SuggestionForm({ place }: { place?: Place }) {
       </div>
 
       <Field label={t.suggest.fields.petPolicy}>
-        <EnumSelect
+        <RequiredEnumSelect
           value={values.pet_friendly}
           options={petFriendlyLabels}
-          placeholder={t.suggest.notSet}
           onChange={(v) => setField('pet_friendly', v)}
         />
       </Field>
@@ -395,6 +396,34 @@ function EnumSelect({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="unset">{placeholder}</SelectItem>
+        {Object.entries(options).map(([key, text]) => (
+          <SelectItem key={key} value={key}>
+            {text}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+// Like EnumSelect, but for fields with no separate "blank" state to offer
+// on top of their own options — the value is always one of `options`
+// (never ''), so there's no unset pseudo-item or placeholder.
+function RequiredEnumSelect({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: Record<string, string>;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={(v) => v && onChange(v)}>
+      <SelectTrigger>
+        <SelectValue>{(v: unknown) => options[v as string] ?? ''}</SelectValue>
+      </SelectTrigger>
+      <SelectContent>
         {Object.entries(options).map(([key, text]) => (
           <SelectItem key={key} value={key}>
             {text}

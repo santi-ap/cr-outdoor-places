@@ -84,6 +84,36 @@ const terrainLabelsEs: LabelMap = {
   mixed: 'Mixto',
 };
 
+// Suggestion form: pet policy and cost type both already have 'unknown' as
+// a real, meaningful enum value (it's the column's own DB default) — so
+// unlike category/landscape there's no separate "leave it blank" state to
+// offer on top of that. The select always has one of these three chosen,
+// defaulting to 'unknown', with fuller phrasing suited to a full-width
+// form field rather than the compact filter-chip wording above.
+const petFriendlySuggestionLabelsEn: LabelMap = {
+  unknown: 'Unknown',
+  yes: 'Pets allowed',
+  no: 'Pets not allowed',
+};
+
+const petFriendlySuggestionLabelsEs: LabelMap = {
+  unknown: 'Desconocido',
+  yes: 'Se permiten mascotas',
+  no: 'No se permiten mascotas',
+};
+
+const costTypeSuggestionLabelsEn: LabelMap = {
+  unknown: 'Unknown',
+  free: 'Free',
+  paid: 'Paid',
+};
+
+const costTypeSuggestionLabelsEs: LabelMap = {
+  unknown: 'Desconocido',
+  free: 'Gratis',
+  paid: 'Pagado',
+};
+
 function byLanguage(language: Language, es: LabelMap, en: LabelMap): LabelMap {
   return language === 'es' ? es : en;
 }
@@ -121,6 +151,14 @@ export function getPetFriendlyFilterLabels(language: Language) {
 
 export function getCostTypeFilterLabels(language: Language) {
   return withoutUnknown(getCostTypeLabels(language));
+}
+
+export function getPetFriendlySuggestionLabels(language: Language) {
+  return byLanguage(language, petFriendlySuggestionLabelsEs, petFriendlySuggestionLabelsEn);
+}
+
+export function getCostTypeSuggestionLabels(language: Language) {
+  return byLanguage(language, costTypeSuggestionLabelsEs, costTypeSuggestionLabelsEn);
 }
 
 export function getTerrainLabels(language: Language) {
