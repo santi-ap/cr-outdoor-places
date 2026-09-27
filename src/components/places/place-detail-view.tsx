@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { cn } from 'cn';
@@ -34,6 +34,12 @@ import {
 } from '@/lib/places/labels';
 import { formatDistance, formatDuration } from '@/lib/places/format';
 import { getOpenStatus, getWeeklySchedule } from '@/lib/places/hours';
+import { haversineDistanceMeters } from '@/lib/geo/distance';
+import {
+  getServerUserLocationSnapshot,
+  getUserLocationSnapshot,
+  subscribeUserLocation,
+} from '@/lib/geo/user-location-state';
 import type { Place, PlaceReview } from '@/lib/validation/schemas';
 
 const DIFFICULTY_TIER: Record<string, Tier> = {
@@ -179,6 +185,28 @@ export function PlaceDetailView({
   // closest approximation for a "where is this" label on the directions
   // button.
   const directionsLabel = [place.canton, place.province].filter(Boolean).join(', ') || null;
+
+  // Straight-line distance from the user, shown alongside the location/map
+  // section (#82) — only once permission's been granted; drive-time is
+  // deferred (see lib/geo/distance.ts).
+  const userLocationState = useSyncExternalStore(
+    subscribeUserLocation,
+    getUserLocationSnapshot,
+    getServerUserLocationSnapshot,
+  );
+  const distanceAwayText =
+    userLocationState.status === 'granted' && userLocationState.location
+      ? [
+          t.detail.distanceAway,
+          formatDistance(
+            haversineDistanceMeters(userLocationState.location, { lat: place.lat, lng: place.lng }),
+            language,
+          ),
+          t.detail.distanceAwaySuffix,
+        ]
+          .filter(Boolean)
+          .join(' ')
+      : null;
 
   return (
     <>
@@ -363,9 +391,14 @@ export function PlaceDetailView({
                 />
               </div>
               <div className="bg-rail flex items-center justify-between gap-2 px-3.5 py-2.5">
-                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold">
-                  {directionsLabel ?? place.name}
-                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-semibold">
+                    {directionsLabel ?? place.name}
+                  </span>
+                  {distanceAwayText && (
+                    <span className="text-ink-muted block text-[12px]">{distanceAwayText}</span>
+                  )}
+                </div>
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} variant="pill" />
               </div>
             </div>
@@ -495,6 +528,7 @@ export function PlaceDetailView({
                     interactive={false}
                   />
                 </div>
+                {distanceAwayText && <p className="text-ink-muted text-[13px]">{distanceAwayText}</p>}
                 <DirectionsButton lat={place.lat} lng={place.lng} locationLabel={directionsLabel} />
               </div>
 
