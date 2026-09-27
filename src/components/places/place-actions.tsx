@@ -23,6 +23,7 @@ export function PlaceActions({
   fullWidth,
   stacked,
   showSaveButton = true,
+  extra,
 }: {
   placeId: string;
   isSignedIn: boolean;
@@ -35,6 +36,10 @@ export function PlaceActions({
   // showing a second, full-width Save button in the bottom bar duplicated
   // it. Desktop has no icon button elsewhere, so it keeps this one.
   showSaveButton?: boolean;
+  // Rendered as one more item in the same row as Save/Mark visited — the
+  // 5b mobile redesign's bottom bar (Issue #78) needs its directions CTA
+  // sitting alongside them, not stacked in its own row underneath.
+  extra?: React.ReactNode;
 }) {
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +99,7 @@ export function PlaceActions({
             }}
           />
         )}
+        {extra}
       </div>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <SignInRequiredDialog
