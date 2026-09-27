@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePlaces } from '@/lib/places/use-places';
@@ -14,6 +14,12 @@ import { FilterPanelDesktop } from './filter-panel-desktop';
 import { ListDrawer } from './list-drawer';
 import { PlaceSearchInput } from './place-search-input';
 import { normalizeForSearch } from '@/lib/places/search';
+import { isWithinBounds, type MapBounds } from '@/lib/places/map-bounds';
+import {
+  getDrawerStateSnapshot,
+  getServerDrawerStateSnapshot,
+  subscribeDrawerState,
+} from '@/lib/places/drawer-state';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { PlacesFilter } from '@/lib/validation/schemas';
 
@@ -34,16 +40,43 @@ export function BrowseView() {
   const [filter, setFilter] = useState<PlacesFilter>({});
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // Kept separate per layout (not one shared value): mobile and desktop
+  // each mount their own PlaceMap simultaneously, switched with a CSS
+  // breakpoint rather than an unmount, so at any given viewport width one
+  // of the two is only there for the *other* breakpoint — sharing a single
+  // bounds value would let that one's (possibly stale) state leak into the
+  // layout actually on screen.
+  const [mobileMapBounds, setMobileMapBounds] = useState<MapBounds | null>(null);
+  const [desktopMapBounds, setDesktopMapBounds] = useState<MapBounds | null>(null);
   const { data: places = [], isLoading } = usePlaces(filter);
   const { data: savedIds } = useSavedPlaceIds();
   const queryClient = useQueryClient();
   const [signInDialogOpen, setSignInDialogOpen] = useState(false);
   const isSignedIn = useIsSignedIn();
+  const drawerState = useSyncExternalStore(
+    subscribeDrawerState,
+    getDrawerStateSnapshot,
+    getServerDrawerStateSnapshot,
+  );
 
   const trimmedQuery = normalizeForSearch(searchQuery.trim());
   const visiblePlaces = trimmedQuery
     ? places.filter((place) => normalizeForSearch(place.name).includes(trimmedQuery))
     : places;
+
+  // The map's own visible area doubles as a filter (#68) — but only while
+  // the map itself is actually on screen. On mobile that's the drawer's
+  // 'low' state; once it's dragged to 'full' the map is covered by the
+  // list, so the area it was last showing shouldn't keep narrowing results
+  // you can no longer see it against. Desktop always shows the map
+  // alongside the grid, so there it's unconditional.
+  const mobileBoundsFilteredPlaces = mobileMapBounds
+    ? visiblePlaces.filter((place) => isWithinBounds(place, mobileMapBounds))
+    : visiblePlaces;
+  const mobilePlaces = drawerState === 'full' ? visiblePlaces : mobileBoundsFilteredPlaces;
+  const boundsFilteredPlaces = desktopMapBounds
+    ? visiblePlaces.filter((place) => isWithinBounds(place, desktopMapBounds))
+    : visiblePlaces;
 
   const toggleSaved = useMutation({
     mutationFn: (placeId: string) => toggleSavedPlace(placeId),
@@ -82,15 +115,15 @@ export function BrowseView() {
           Map/List toggle from #24. */}
       <div className="relative h-full overflow-hidden lg:hidden">
         <div className="absolute inset-0">
-          <PlaceMap places={visiblePlaces} hasDrawer />
+          <PlaceMap places={visiblePlaces} hasDrawer onBoundsChange={setMobileMapBounds} />
         </div>
         <ListDrawer
-          places={visiblePlaces}
+          places={mobilePlaces}
           isLoading={isLoading}
           savedIds={savedIds}
           savingPlaceId={savingPlaceId}
           onToggleSave={handleToggleSave}
-          resultsLabel={`${visiblePlaces.length} ${t.filters.resultsCount}`}
+          resultsLabel={`${mobilePlaces.length} ${t.filters.resultsCount}`}
           onOpenFilters={() => setSheetOpen(true)}
           filter={filter}
           onFilterChange={setFilter}
@@ -110,7 +143,7 @@ export function BrowseView() {
                   {t.browse.heading}
                 </h1>
                 <p className="text-ink-muted mt-1 text-[13px]">
-                  {visiblePlaces.length} {t.filters.resultsCount}
+                  {boundsFilteredPlaces.length} {t.filters.resultsCount}
                 </p>
               </div>
               <PlaceSearchInput
@@ -121,16 +154,16 @@ export function BrowseView() {
             </div>
 
             <div className="rounded-card-lg border-line h-[240px] shrink-0 overflow-hidden border">
-              <PlaceMap places={visiblePlaces} />
+              <PlaceMap places={visiblePlaces} onBoundsChange={setDesktopMapBounds} />
             </div>
 
             {isLoading ? (
               <p className="text-ink-muted">{t.browse.loadingPlaces}</p>
-            ) : visiblePlaces.length === 0 ? (
+            ) : boundsFilteredPlaces.length === 0 ? (
               <p className="text-ink-muted">{t.placeCard.noMatches}</p>
             ) : (
               <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
-                {visiblePlaces.map((place) => (
+                {boundsFilteredPlaces.map((place) => (
                   <PlaceCardDesktop
                     key={place.id}
                     place={place}
@@ -142,7 +175,7 @@ export function BrowseView() {
               </div>
             )}
           </div>
-          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={visiblePlaces.length} />
+          <FilterPanelDesktop filter={filter} onChange={setFilter} matchCount={boundsFilteredPlaces.length} />
         </div>
       </div>
 
@@ -151,7 +184,7 @@ export function BrowseView() {
         onOpenChange={setSheetOpen}
         filter={filter}
         onChange={setFilter}
-        matchCount={visiblePlaces.length}
+        matchCount={mobilePlaces.length}
       />
 
       <SignInRequiredDialog

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { MapContainer, TileLayer, Marker, Tooltip, useMapEvent } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvent } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import { XIcon } from 'lucide-react';
@@ -14,6 +14,7 @@ import {
   getServerDrawerStateSnapshot,
   subscribeDrawerState,
 } from '@/lib/places/drawer-state';
+import type { MapBounds } from '@/lib/places/map-bounds';
 import { useLanguage } from '@/lib/i18n/language-context';
 import type { Place } from '@/lib/validation/schemas';
 
@@ -84,12 +85,44 @@ function ZoomTracker({ onZoomChange }: { onZoomChange: (zoom: number) => void })
   return null;
 }
 
+function toMapBounds(bounds: L.LatLngBounds): MapBounds {
+  return {
+    north: bounds.getNorth(),
+    south: bounds.getSouth(),
+    east: bounds.getEast(),
+    west: bounds.getWest(),
+  };
+}
+
+// Reports the map's own visible area back up so the list/results count can
+// be filtered to "what's on screen right now" (#68) — captured on mount
+// too, not just on subsequent moves, so that filter is in effect from the
+// first render rather than only kicking in after the first pan/zoom.
+//
+// The mobile and desktop Explore layouts each mount their own PlaceMap,
+// switched between with a CSS breakpoint (`lg:hidden`/`hidden lg:block`)
+// rather than actually unmounting the one that's not current — so the
+// off-breakpoint map is still mounted, just inside a `display:none`
+// ancestor, which makes its container report a 0×0 size. Skip reporting
+// bounds from that: they'd be meaningless, and calling onBoundsChange with
+// them would corrupt whichever state that map's own bounds feed into.
+function BoundsTracker({ onBoundsChange }: { onBoundsChange: (bounds: MapBounds) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    const size = map.getSize();
+    if (size.x > 0 && size.y > 0) onBoundsChange(toMapBounds(map.getBounds()));
+  }, [map, onBoundsChange]);
+  useMapEvent('moveend', (e) => onBoundsChange(toMapBounds(e.target.getBounds())));
+  return null;
+}
+
 export function PlaceMap({
   places,
   center = COSTA_RICA_CENTER,
   zoom = 8,
   hasDrawer = false,
   interactivePins = true,
+  onBoundsChange,
 }: {
   places: Place[];
   center?: [number, number];
@@ -105,6 +138,10 @@ export function PlaceMap({
   // it's already sitting on. True (the default) is for the main Explore
   // map, where both make sense.
   interactivePins?: boolean;
+  // Reports this map's own visible area on mount and after every pan/zoom
+  // — omitted for the place-detail page's small reference map, which has
+  // no list next to it to filter. See Issue #68.
+  onBoundsChange?: (bounds: MapBounds) => void;
 }) {
   const { t } = useLanguage();
   const [currentZoom, setCurrentZoom] = useState(zoom);
@@ -145,6 +182,7 @@ export function PlaceMap({
         scrollWheelZoom
       >
         <ZoomTracker onZoomChange={setCurrentZoom} />
+        {onBoundsChange && <BoundsTracker onBoundsChange={onBoundsChange} />}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
