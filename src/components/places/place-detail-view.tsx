@@ -427,6 +427,7 @@ export function PlaceDetailView({
             <div className="border-line overflow-hidden rounded-2xl border">
               <div className="h-[170px]">
                 <PlaceMap
+                  key={place.id}
                   places={[place]}
                   center={[place.lat, place.lng]}
                   zoom={LOCATION_MAP_ZOOM}
@@ -577,6 +578,7 @@ export function PlaceDetailView({
                 <h2 className="font-display text-bark text-lg font-medium">{t.detail.location}</h2>
                 <div className="rounded-2xl border-line h-[220px] overflow-hidden border">
                   <PlaceMap
+                    key={place.id}
                     places={[place]}
                     center={[place.lat, place.lng]}
                     zoom={LOCATION_MAP_ZOOM}
