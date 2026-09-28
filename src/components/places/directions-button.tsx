@@ -72,7 +72,7 @@ export function DirectionsButton({
 
   const triggerClassName =
     variant === 'cta'
-      ? 'bg-forest text-cream flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-semibold'
+      ? 'bg-forest text-cream flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-control text-[15px] font-semibold'
       : variant === 'pill'
         ? 'bg-cream text-forest rounded-control px-3 py-2 text-[13px] font-semibold whitespace-nowrap'
         : 'border-line bg-cream flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left';
