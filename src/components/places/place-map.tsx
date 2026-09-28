@@ -199,6 +199,16 @@ export function PlaceMap({
   // and refuses to initialize a new map on a node that still has one —
   // "Map container is already initialized." Clearing it on unmount lets
   // a later reappear/remount succeed instead of throwing.
+  //
+  // This is a safety net, not the primary fix: the actual trigger (#85) was
+  // navigating between two different places' detail pages without ever
+  // properly unmounting the small reference map in between — with no
+  // React `key` distinguishing them, React treated the destination page's
+  // PlaceMap as the same "reappearing" instance as the previous place's,
+  // reusing its DOM node (and stale Leaflet instance) instead of mounting
+  // fresh. place-detail-view.tsx now keys both of its PlaceMap instances
+  // by `place.id` so a navigation to a different place is never mistaken
+  // for a reappear of the same one.
   useEffect(() => {
     const map = mapRef.current;
     return () => {
